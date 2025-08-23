@@ -109,7 +109,6 @@ homelab/
 1. **Bootstrap Secret**: Bitwarden credentials stored in k3s `default` namespace (via Ansible)
 2. **Dynamic Secrets**: All other secrets fetched from Bitwarden via External Secrets Operator
 3. **Encryption**: All sensitive files encrypted with SOPS + Age
-4. **Zero Trust**: No secrets in Git repository (except encrypted)
 
 ### **Key Security Features**
 - ✅ SOPS encryption for all sensitive data
@@ -132,16 +131,7 @@ homelab/
 - **CV/Portfolio**: Personal website and portfolio
 - **Jellyfin**: Media server for movies, TV shows, and music
 - **Nextcloud**: Self-hosted cloud storage and productivity suite
-- **Vaultwarden**: Self-hosted Bitwarden server
-- **Prometheus + Grafana**: Monitoring and observability
 - **Restic**: Automated backup solution
-
-#### 🔄 **Future Applications**
-- **Paperless-ngx**: Document management system
-- **Immich**: Self-hosted photo and video management
-- **Tandoor**: Recipe management
-- **Bookstack**: Documentation and wiki
-- **Pi-hole**: Network-wide ad blocking
 
 ## 📋 Todo List
 
