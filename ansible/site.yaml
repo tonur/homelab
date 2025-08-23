@@ -36,8 +36,6 @@
   vars:
     secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
     ansible_become_password: "{{ secrets.ansible_become_password }}"
-    bw_client_id: "{{ secrets.bw_client_id }}"
-    bw_client_secret: "{{ secrets.bw_client_secret }}"
-    bw_password: "{{ secrets.bw_password }}"
+    bw_access_token: "{{ secrets.bw_access_token }}"
   roles:
     - gitops-bootstrap

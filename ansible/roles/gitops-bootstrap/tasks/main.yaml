@@ -36,9 +36,7 @@
         namespace: default
       type: Opaque
       stringData:
-        BW_CLIENTID: "{{ bw_client_id }}"
-        BW_CLIENTSECRET: "{{ bw_client_secret }}"
-        BW_PASSWORD: "{{ bw_password }}"
+        BW_ACCESS_TOKEN: "{{ bw_access_token }}"
     state: present
   delegate_to: localhost
   run_once: true
