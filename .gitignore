@@ -1,0 +1,31 @@
+# Secrets and keys
+age-key.txt
+*.key
+*.pem
+
+# Temporary kubeconfig files
+/tmp/k3s-kubeconfig.yaml
+**/kubeconfig*
+
+# Ansible facts cache
+ansible/.ansible/
+ansible/ansible.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# VS Code
+.vscode/settings.json
+
+# macOS
+.DS_Store
+
+# Decrypted SOPS files (just in case)
+*.dec.yaml
+*.dec.yml

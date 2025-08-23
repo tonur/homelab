@@ -1,0 +1,26 @@
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: bitwarden-css
+spec:
+  provider:
+    bitwarden:
+      # Reference the bootstrap secret created by Ansible in the default namespace
+      #LINK - ansible/roles/k8s-secrets/tasks/main.yaml
+      auth:
+        secretRef:
+          credentials:
+            name: bitwarden-credentials
+            namespace: default
+            key: BW_PASSWORD
+          clientId:
+            name: bitwarden-credentials
+            namespace: default
+            key: BW_CLIENTID
+          clientSecret:
+            name: bitwarden-credentials
+            namespace: default
+            key: BW_CLIENTSECRET
+      # Bitwarden server configuration
+      server: "https://vault.bitwarden.com"

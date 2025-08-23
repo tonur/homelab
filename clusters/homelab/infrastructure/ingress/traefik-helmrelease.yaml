@@ -1,0 +1,36 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: infrastructure
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: traefik
+      version: 27.0.x
+      sourceRef:
+        kind: HelmRepository
+        name: traefik-charts
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    deployment:
+      kind: DaemonSet
+    service:
+      enabled: false # no LoadBalancer; traffic arrives via tailscale/VPS reverse proxy
+    ingressRoute:
+      dashboard:
+        enabled: false
+    logs:
+      general:
+        level: INFO
+    ports:
+      web:
+        exposedPort: 8080
+      websecure:
+        exposedPort: 8443
+    additionalArguments:
+      - "--entrypoints.web.address=:8080"
+      - "--entrypoints.websecure.address=:8443"
