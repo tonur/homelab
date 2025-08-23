@@ -6,9 +6,8 @@ kind: Kustomization
 # This is applied by Flux, not directly by humans
 
 resources:
-  # Infrastructure components (namespaces, ESO, ingress)
-  # Kustomize deploys in order, so infrastructure comes first
-  - infrastructure/
+  # Flux Kustomizations for staged infrastructure deployment
+  - flux-kustomizations/
 
   # Applications (future)
   # These can safely reference infrastructure components
