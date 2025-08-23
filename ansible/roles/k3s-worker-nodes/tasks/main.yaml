@@ -1,0 +1,20 @@
+---
+# k3s-worker-nodes role: Install and configure Kubernetes worker nodes
+# 
+# This role sets up k3s agents (worker nodes) that join the control plane:
+# - Downloads and installs k3s in agent mode
+# - Connects to control plane using server IP and node token
+
+- name: Download k3s installer
+  get_url:
+    url: https://get.k3s.io
+    dest: /tmp/k3s-install.sh
+    mode: '0755'
+
+- name: Install k3s worker node
+  environment:
+    K3S_URL: "https://{{ k3s_server_ip }}:6443"
+    K3S_TOKEN: "{{ hostvars[k3s_server_host].k3s_node_token }}"
+  shell: /tmp/k3s-install.sh
+  args:
+    creates: /usr/local/bin/k3s-agent

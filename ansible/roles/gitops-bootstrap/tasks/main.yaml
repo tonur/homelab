@@ -1,0 +1,58 @@
+---
+# gitops-bootstrap role: Bootstrap GitOps infrastructure
+# 
+# This role sets up the minimal components needed to bootstrap GitOps:
+# - Retrieves kubeconfig from k3s server
+# - Creates Bitwarden credentials secret in 'default' namespace (for ESO)
+# - Applies GitRepository and Kustomization for Flux to manage the cluster
+# 
+# After this role completes, Flux manages all infrastructure and applications from Git.
+
+- name: Fetch kubeconfig from k3s server
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /tmp/k3s-kubeconfig.yaml
+    flat: yes
+
+- name: Fix kubeconfig server URL
+  replace:
+    path: /tmp/k3s-kubeconfig.yaml
+    regexp: 'https://127\.0\.0\.1:6443'
+    replace: 'https://{{ ansible_host }}:6443'
+  delegate_to: localhost
+
+- name: Set localhost kubeconfig environment
+  set_fact:
+    kubeconfig_env:
+      KUBECONFIG: /tmp/k3s-kubeconfig.yaml
+
+- name: Create Bitwarden credentials secret in default namespace for ESO bootstrap
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: bitwarden-credentials
+        namespace: default
+      type: Opaque
+      stringData:
+        BW_CLIENTID: "{{ bw_client_id }}"
+        BW_CLIENTSECRET: "{{ bw_client_secret }}"
+        BW_PASSWORD: "{{ bw_password }}"
+    state: present
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  no_log: true
+
+- name: Bootstrap GitOps - Apply Git repository and cluster kustomization
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ item }}"
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  loop: "{{ lookup('file', playbook_dir + '/../bootstrap.yaml') | from_yaml_all | list }}"
+
+# Note: All namespaces, ESO deployment, and other secrets will be managed by Flux/GitOps.
+# ESO will use a ClusterSecretStore to access this bootstrap secret from the default namespace.

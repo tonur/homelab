@@ -1,0 +1,2 @@
+---
+# SOPS-encrypted secrets are loaded via vars_files in the playbook

@@ -1,0 +1,16 @@
+---
+- name: Ensure basic packages
+  apt:
+    name:
+      - curl
+      - git
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - software-properties-common
+    state: present
+    update_cache: yes
+
+- name: Set timezone to UTC
+  timezone:
+    name: Etc/UTC

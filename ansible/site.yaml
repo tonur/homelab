@@ -1,0 +1,43 @@
+---
+- name: Base setup and Tailscale mesh networking
+  hosts: all
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+    bw_client_id: "{{ secrets.bw_client_id }}"
+    bw_client_secret: "{{ secrets.bw_client_secret }}"
+    bw_password: "{{ secrets.bw_password }}"
+  roles:
+    - base
+    - tailscale
+
+- name: k3s control plane
+  hosts: k3s_server
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  roles:
+    - k3s-control-plane
+
+- name: k3s worker nodes
+  hosts: k3s_agents
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  roles:
+    - k3s-worker-nodes
+
+- name: Bootstrap GitOps infrastructure
+  hosts: k3s_server
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+    bw_client_id: "{{ secrets.bw_client_id }}"
+    bw_client_secret: "{{ secrets.bw_client_secret }}"
+    bw_password: "{{ secrets.bw_password }}"
+  roles:
+    - gitops-bootstrap

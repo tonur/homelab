@@ -1,0 +1,101 @@
+---
+- name: Install dependencies
+  apt:
+    name: [curl, gnupg, apt-transport-https]
+    state: present
+    update_cache: yes
+
+- name: Add Tailscale GPG key
+  shell: |
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/jammy.noarmor.gpg | gpg --dearmor -o /usr/share/keyrings/tailscale-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
+
+- name: Add Tailscale APT repo
+  copy:
+    dest: /etc/apt/sources.list.d/tailscale.list
+    content: |
+      deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu jammy main
+
+- name: Install tailscale
+  apt:
+    name: tailscale
+    state: present
+    update_cache: yes
+
+- name: Enable tailscaled
+  systemd:
+    name: tailscaled
+    state: started
+    enabled: true
+
+- name: Check if Tailscale is already authenticated
+  command: tailscale status --json
+  register: tailscale_status
+  failed_when: false
+  changed_when: false
+
+- name: Parse Tailscale status
+  set_fact:
+    tailscale_authenticated: "{{ (tailscale_status.stdout | from_json).BackendState == 'Running' }}"
+  when: tailscale_status.rc == 0 and tailscale_status.stdout != ""
+  
+- name: Set tailscale_authenticated to false if command failed
+  set_fact:
+    tailscale_authenticated: false
+  when: tailscale_status.rc != 0 or tailscale_status.stdout == ""
+
+- name: Set authentication status to false if status command failed
+  set_fact:
+    tailscale_authenticated: false
+  when: tailscale_status.rc != 0
+
+- name: Start Tailscale authentication (interactive)
+  command: >-
+    tailscale up --hostname={{ inventory_hostname }}
+  register: ts_up
+  failed_when: false
+  when: not tailscale_authenticated
+
+- name: Display authentication instructions
+  debug:
+    msg: |
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      🔗 TAILSCALE AUTHENTICATION REQUIRED FOR {{ inventory_hostname }}
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      {% if ts_up.stderr is defined and 'https://login.tailscale.com' in ts_up.stderr %}
+      🌐 Open this URL in your browser to authenticate:
+      {{ ts_up.stderr | regex_search('https://login\.tailscale\.com[^\s]+') }}
+      {% else %}
+      ⚠️  Authentication may be required. Check the output above for a login URL.
+      {% endif %}
+      
+      📋 After clicking the link and authorizing the device:
+         1. The device will automatically connect to your Tailscale network
+         2. Press ENTER to continue with the next host
+      
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  when: not tailscale_authenticated and ts_up.rc != 0
+
+- name: Wait for user to complete authentication
+  pause:
+    prompt: |
+      
+      Press ENTER after you've clicked the authentication link and authorized {{ inventory_hostname }} in your browser
+  when: not tailscale_authenticated and ts_up.rc != 0
+
+- name: Verify Tailscale connection after authentication
+  command: tailscale status --json
+  register: final_status
+  until: (final_status.stdout | from_json).BackendState == "Running"
+  retries: 10
+  delay: 2
+  when: not tailscale_authenticated
+
+- name: Show final Tailscale status
+  debug:
+    msg: |
+      ✅ {{ inventory_hostname }} successfully connected to Tailscale!
+      🏠 Tailscale IP: {{ (final_status.stdout | from_json).Self.TailscaleIPs[0] }}
+  when: not tailscale_authenticated and final_status is defined

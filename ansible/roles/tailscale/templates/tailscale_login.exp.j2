@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+
+set timeout 60
+
+spawn tailscale up --hostname={{ inventory_hostname }}
+
+expect {
+    "To authenticate, visit:" {
+        expect "https://login.tailscale.com/a/*"
+        expect eof
+        puts "Manual authentication required - visit the URL above"
+        exit 1
+    }
+    "Success." {
+        puts "Already authenticated"
+        exit 0
+    }
+    timeout {
+        puts "Timeout waiting for tailscale up"
+        exit 1
+    }
+}
