@@ -15,13 +15,3 @@ spec:
   wait: true
   dependsOn:
     - name: infrastructure-base
-  # Wait for External Secrets Operator and cert-manager to be ready
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: cert-manager
-      namespace: cert-manager
-    - apiVersion: helm.toolkit.fluxcd.io/v2beta1
-      kind: HelmRelease
-      name: external-secrets
-      namespace: external-secrets
