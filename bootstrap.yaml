@@ -6,9 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  # Update this with your Git URL when ready
-  # url: https://github.com/yourusername/homelab
-  url: file:///home/chkpe/work/homelab
+  url: https://github.com/tonur/homelab
   ref:
     branch: main
 ---

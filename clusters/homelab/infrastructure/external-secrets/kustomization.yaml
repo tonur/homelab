@@ -6,4 +6,3 @@ resources:
   - external-secrets-helmrepo.yaml
   - external-secrets-helmrelease.yaml
   - bitwarden-css.yaml
-  - external-secrets.yaml
