@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure-config
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: "./clusters/homelab/infrastructure/config"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  timeout: 5m
+  wait: true
+  dependsOn:
+    - name: infrastructure-base
