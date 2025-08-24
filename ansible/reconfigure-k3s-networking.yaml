@@ -1,0 +1,76 @@
+---
+# This playbook reconfigures k3s to use Tailscale networking properly
+# It will stop k3s services, clean up, and reinstall with correct config
+
+- name: Stop and clean k3s on all nodes
+  hosts: k3s_server,k3s_agents,edge
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  tasks:
+    - name: Stop k3s-agent service (on agents and edge)
+      systemd:
+        name: k3s-agent
+        state: stopped
+      ignore_errors: true
+      when: inventory_hostname in groups['k3s_agents'] or inventory_hostname in groups['edge']
+
+    - name: Stop k3s service (on server)
+      systemd:
+        name: k3s
+        state: stopped
+      ignore_errors: true
+      when: inventory_hostname in groups['k3s_server']
+
+    - name: Uninstall k3s-agent (on agents and edge)
+      shell: /usr/local/bin/k3s-agent-uninstall.sh
+      ignore_errors: true
+      when: inventory_hostname in groups['k3s_agents'] or inventory_hostname in groups['edge']
+
+    - name: Uninstall k3s (on server)
+      shell: /usr/local/bin/k3s-uninstall.sh
+      ignore_errors: true
+      when: inventory_hostname in groups['k3s_server']
+
+    - name: Wait for cleanup
+      pause:
+        seconds: 10
+
+- name: Reinstall k3s control plane with Tailscale networking
+  hosts: k3s_server
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  roles:
+    - k3s-control-plane
+
+- name: Reinstall k3s worker nodes with Tailscale networking
+  hosts: k3s_agents
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  roles:
+    - k3s-worker-nodes
+
+- name: Reinstall k3s edge nodes with Tailscale networking
+  hosts: edge
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  roles:
+    - k3s-edge-node
+
+- name: Reinstall node scheduling and Bootstrap GitOps infrastructure
+  hosts: k3s_server
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+    bw_access_token: "{{ secrets.bw_access_token }}"
+  roles:
+    - k3s-node-scheduling
+    - gitops-bootstrap

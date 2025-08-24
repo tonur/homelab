@@ -14,17 +14,33 @@
     dest: /tmp/k3s-kubeconfig.yaml
     flat: yes
 
-- name: Fix kubeconfig server URL
+- name: Get Tailscale IP for k3s server
+  shell: tailscale status --json | jq -r '.Peer[] | select(.HostName == "gigabyte") | .TailscaleIPs[0]'
+  register: k3s_server_tailscale_ip
+  delegate_to: localhost
+  run_once: true
+
+- name: Fix kubeconfig server URL to use Tailscale IP
   replace:
     path: /tmp/k3s-kubeconfig.yaml
     regexp: 'https://127\.0\.0\.1:6443'
-    replace: 'https://{{ ansible_host }}:6443'
+    replace: 'https://{{ k3s_server_tailscale_ip.stdout }}:6443'
   delegate_to: localhost
 
 - name: Set localhost kubeconfig environment
   set_fact:
     kubeconfig_env:
       KUBECONFIG: /tmp/k3s-kubeconfig.yaml
+
+- name: Install kubectl if not present on localhost
+  shell: |
+    if ! command -v kubectl &> /dev/null; then
+      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+      rm kubectl
+    fi
+  delegate_to: localhost
+  run_once: true
 
 - name: Install Flux CLI if not present
   shell: |
@@ -43,15 +59,23 @@
   environment: "{{ kubeconfig_env }}"
   changed_when: false
 
-- name: Install Flux controllers manually if not present
+- name: Debug namespace check result
+  debug:
+    var: flux_namespace_check
+
+- name: Install Flux controllers if not present
   shell: |
-    if [[ "{{ flux_namespace_check.stdout }}" == "not-found" ]]; then
-      kubectl apply -f https://github.com/fluxcd/flux2/releases/latest/download/install.yaml
-    fi
+    kubectl apply -f https://github.com/fluxcd/flux2/releases/latest/download/install.yaml
   delegate_to: localhost
   run_once: true
   environment: "{{ kubeconfig_env }}"
   register: flux_install_result
+  when: '"not-found" in flux_namespace_check.stdout'
+
+- name: Debug Flux installation result
+  debug:
+    var: flux_install_result
+  when: flux_install_result is defined
 
 - name: Wait for Flux deployments to be ready
   kubernetes.core.k8s_info:
@@ -66,7 +90,7 @@
   delegate_to: localhost
   run_once: true
   environment: "{{ kubeconfig_env }}"
-  when: flux_install_result.changed
+  when: flux_install_result is defined and flux_install_result.changed
 
 - name: Wait for GitRepository CRD to be available
   kubernetes.core.k8s_info:
@@ -81,7 +105,7 @@
   delegate_to: localhost
   run_once: true
   environment: "{{ kubeconfig_env }}"
-  when: flux_install_result.changed
+  when: flux_install_result is defined and flux_install_result.changed
 
 - name: Create Bitwarden credentials secret in default namespace for ESO bootstrap
   kubernetes.core.k8s:

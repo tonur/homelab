@@ -6,6 +6,16 @@
 # - beelink: Tainted for media-only (requires toleration)
 # - vhs-vps: Tainted for edge-only (requires toleration)
 
+- name: Get control plane Tailscale IP
+  command: tailscale status --json
+  register: server_tailscale_status
+  run_once: true
+  
+- name: Parse server Tailscale status to get server IP
+  set_fact:
+    server_tailscale_ip: "{{ (server_tailscale_status.stdout | from_json).Self.TailscaleIPs[0] }}"
+  run_once: true
+
 - name: Fetch kubeconfig from k3s server
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
@@ -17,7 +27,7 @@
   replace:
     path: /tmp/k3s-kubeconfig.yaml
     regexp: 'https://127\.0\.0\.1:6443'
-    replace: 'https://{{ hostvars[groups["k3s_control_plane"][0]]["ansible_host"] }}:6443'
+    replace: 'https://{{ server_tailscale_ip }}:6443'
   delegate_to: localhost
   run_once: true
 
