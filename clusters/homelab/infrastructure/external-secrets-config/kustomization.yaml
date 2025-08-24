@@ -4,3 +4,4 @@ kind: Kustomization
 
 resources:
   - clustersecretstore.yaml
+  - bitwarden-certificates.yaml
