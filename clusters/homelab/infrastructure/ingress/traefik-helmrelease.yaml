@@ -73,14 +73,9 @@ spec:
         allowExternalNameServices: true
         namespaces: []  # Watch all namespaces
 
-    # ACME/Let's Encrypt configuration
+    # Additional configuration
     additionalArguments:
-      - "--certificatesresolvers.letsencrypt.acme.email=contact@kragh.dev"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--log.level=INFO"
-      - "--providers.kubernetesingress.allowCrossNamespace=true"
 
     # Persistence for ACME certificates
     persistence:
