@@ -7,3 +7,4 @@ resources:
   - infrastructure-external-secrets.yaml
   - infrastructure-secrets-config.yaml
   - infrastructure-ingress.yaml
+  - apps.yaml
