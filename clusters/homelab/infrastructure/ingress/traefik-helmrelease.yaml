@@ -32,7 +32,7 @@ spec:
     nodeSelector:
       node.kubernetes.io/edge: "true"
     tolerations:
-      - key: node.homelab.dev/edge-only
+      - key: edge
         operator: Equal
         value: "true"
         effect: NoSchedule
