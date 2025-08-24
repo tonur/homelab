@@ -1,0 +1,112 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 10m
+  targetNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: 27.0.x
+      sourceRef:
+        kind: HelmRepository
+        name: traefik-charts
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # Deployment configuration
+    deployment:
+      enabled: true
+      kind: Deployment
+      replicas: 1
+
+    # Node scheduling for edge node
+    nodeSelector:
+      node.kubernetes.io/edge: "true"
+    tolerations:
+      - key: node.homelab.dev/edge-only
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+
+    # Service configuration
+    service:
+      enabled: true
+      type: NodePort
+      spec:
+        externalTrafficPolicy: Local
+        externalIPs:
+          - "198.55.102.244" # VPS public IP
+
+    # Ports configuration
+    ports:
+      web:
+        nodePort: 30080
+      websecure:
+        nodePort: 30443
+
+    # Ingress class configuration
+    ingressClass:
+      enabled: true
+      isDefaultClass: true
+      name: traefik
+
+    # Providers configuration
+    providers:
+      kubernetesIngress:
+        enabled: true
+        ingressClass: traefik
+        allowCrossNamespace: true
+        allowExternalNameServices: true
+      kubernetesCRD:
+        enabled: true
+        allowCrossNamespace: true
+        allowExternalNameServices: true
+
+    # ACME/Let's Encrypt configuration
+    additionalArguments:
+      - "--certificatesresolvers.letsencrypt.acme.email=contact@kragh.dev"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--log.level=INFO"
+
+    # Persistence for ACME certificates
+    persistence:
+      enabled: true
+      size: 128Mi
+      storageClass: local-path
+
+    # Security context
+    securityContext:
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsGroup: 65532
+      runAsNonRoot: true
+      runAsUser: 65532
+
+    podSecurityContext:
+      fsGroup: 65532
+      fsGroupChangePolicy: OnRootMismatch
+
+    # Logs configuration
+    logs:
+      general:
+        level: INFO
+      access:
+        enabled: false
+
+    # Global arguments
+    globalArguments:
+      - "--global.checknewversion=false"
+      - "--global.sendanonymoususage=false"
