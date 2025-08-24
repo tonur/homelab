@@ -55,8 +55,6 @@ spec:
       general:
         level: INFO
     additionalArguments:
-      - "--providers.kubernetescrd.endpoints=100.120.207.59:6443"
-      - "--providers.kubernetesingress.endpoints=100.120.207.59:6443"
       - "--certificatesresolvers.letsencrypt.acme.email=contact@kragh.dev"
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
