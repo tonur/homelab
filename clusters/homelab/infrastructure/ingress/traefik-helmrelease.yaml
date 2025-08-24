@@ -44,6 +44,11 @@ spec:
         exposedPort: 443
         nodePort: 30443
     hostNetwork: false
+    providers:
+      kubernetes:
+        enabled: true
+      kubernetesIngress:
+        enabled: true
     ingressRoute:
       dashboard:
         enabled: true
