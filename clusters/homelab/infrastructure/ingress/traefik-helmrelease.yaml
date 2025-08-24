@@ -64,7 +64,6 @@ spec:
       kubernetesIngress:
         enabled: true
         ingressClass: traefik
-        allowCrossNamespace: true
         allowExternalNameServices: true
         namespaces: []  # Watch all namespaces
       kubernetesCRD:
