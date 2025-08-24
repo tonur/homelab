@@ -26,6 +26,50 @@
     kubeconfig_env:
       KUBECONFIG: /tmp/k3s-kubeconfig.yaml
 
+- name: Install Flux CLI if not present
+  shell: |
+    if ! command -v flux &> /dev/null; then
+      curl -s https://fluxcd.io/install.sh | sudo bash
+    fi
+  delegate_to: localhost
+  run_once: true
+
+- name: Check if Flux is already installed in the cluster
+  kubernetes.core.k8s_info:
+    api_version: source.toolkit.fluxcd.io/v1
+    kind: GitRepository
+    namespace: flux-system
+  register: flux_gitrepo_crd
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  failed_when: false
+
+- name: Reinstall Flux with latest version if CRDs are missing
+  shell: |
+    flux uninstall --silent || true
+    sleep 10
+    flux install --components-extra=image-reflector-controller,image-automation-controller --timeout=5m
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  when: flux_gitrepo_crd.api_found is not defined or not flux_gitrepo_crd.api_found
+  register: flux_install_result
+
+- name: Wait for Flux CRDs to be available
+  kubernetes.core.k8s_info:
+    api_version: source.toolkit.fluxcd.io/v1
+    kind: GitRepository
+    namespace: flux-system
+  register: wait_for_crds
+  until: wait_for_crds.api_found is defined and wait_for_crds.api_found
+  retries: 30
+  delay: 10
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  when: flux_gitrepo_crd.api_found is not defined or not flux_gitrepo_crd.api_found
+
 - name: Create Bitwarden credentials secret in default namespace for ESO bootstrap
   kubernetes.core.k8s:
     definition:

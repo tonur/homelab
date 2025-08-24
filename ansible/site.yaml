@@ -48,3 +48,12 @@
     bw_access_token: "{{ secrets.bw_access_token }}"
   roles:
     - gitops-bootstrap
+
+- name: Configure node scheduling and workload placement
+  hosts: k3s_server
+  become: true
+  vars:
+    secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+    ansible_become_password: "{{ secrets.ansible_become_password }}"
+  roles:
+    - k3s-node-scheduling
