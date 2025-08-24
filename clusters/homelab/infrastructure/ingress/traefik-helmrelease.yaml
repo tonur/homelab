@@ -80,6 +80,7 @@ spec:
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--log.level=INFO"
+      - "--providers.kubernetesingress.allowCrossNamespace=true"
 
     # Persistence for ACME certificates
     persistence:
