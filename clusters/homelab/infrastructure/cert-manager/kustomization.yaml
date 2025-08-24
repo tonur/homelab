@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - helmrepo.yaml
   - helmrelease.yaml
+  - letsencrypt-clusterissuer.yaml
