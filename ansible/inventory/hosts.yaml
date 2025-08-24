@@ -1,0 +1,22 @@
+---
+all:
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  children:
+    k3s_server:
+      hosts:
+        gigabyte:
+          ansible_host: 192.168.50.16
+          ansible_user: chkpe
+    k3s_agents:
+      hosts:
+        beelink:
+          ansible_host: 192.168.50.220
+          ansible_user: chkpe
+          k3s_server_host: gigabyte
+          k3s_server_ip: 192.168.50.16
+    edge:
+      hosts:
+        vps-edge:
+          ansible_host: 198.55.102.244
+          ansible_user: root

@@ -1,0 +1,16 @@
+---
+- name: Setup VPS edge node
+  hosts: edge
+  become: true
+  tasks:
+    - name: Include base role
+      include_role:
+        name: base
+        
+    - name: Include tailscale role  
+      include_role:
+        name: tailscale
+        
+    - name: Include k3s edge node role
+      include_role:
+        name: k3s-edge-node
