@@ -14,5 +14,3 @@ spec:
   path: "./clusters/homelab/infrastructure"
   prune: true
   wait: true
-  dependsOn:
-    - name: infrastructure-ingress
