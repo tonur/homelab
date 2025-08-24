@@ -29,3 +29,5 @@ __pycache__/
 # Decrypted SOPS files (just in case)
 *.dec.yaml
 *.dec.yml
+
+old-attempts/
