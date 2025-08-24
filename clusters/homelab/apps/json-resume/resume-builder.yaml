@@ -49,7 +49,9 @@ spec:
           export PATH="/shared/bin:$PATH"
           export NODE_PATH="/shared/lib/node_modules"
           cd /workspace
-          resume export index.html --resume resume.json --theme even
+          ls -la /shared/bin/ || echo "No bin directory"
+          ls -la /shared/lib/node_modules/ || echo "No node_modules directory"
+          /shared/bin/resume export index.html --resume resume.json --theme even
           echo "Resume built successfully"
           ls -la /workspace/
         securityContext:
