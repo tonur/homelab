@@ -4,3 +4,4 @@ kind: Kustomization
 
 resources:
   - letsencrypt-clusterissuer.yaml
+  - bitwarden-certificates.yaml
