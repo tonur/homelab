@@ -24,6 +24,16 @@ spec:
     # Enable Bitwarden SDK Server for Bitwarden Secrets Manager
     bitwarden-sdk-server:
       enabled: true
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
 
     # Resource settings
     resources:
