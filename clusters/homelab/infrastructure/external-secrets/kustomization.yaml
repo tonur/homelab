@@ -5,4 +5,3 @@ kind: Kustomization
 resources:
   - helmrepo.yaml
   - helmrelease.yaml
-  - certificates.yaml

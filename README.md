@@ -63,7 +63,7 @@ cd homelab
 # Configure secrets in Bitwarden and update ansible/secrets/homelab.yaml
 # Run Ansible to provision cluster
 cd ansible
-ansible-playbook -i inventory/hosts.ini site.yaml
+ansible-playbook -i inventory/hosts.yaml site.yaml
 ```
 
 ### 2. Deploy Applications via GitOps
@@ -83,10 +83,11 @@ homelab/
 ├── ansible/                    # Infrastructure provisioning
 │   ├── roles/
 │   │   ├── base/              # Base system setup
-│   │   ├── tailscale-interactive/  # Tailscale mesh networking
-│   │   ├── k3s-server/        # Kubernetes control plane
-│   │   ├── k3s-agent/         # Kubernetes worker nodes
-│   │   └── k8s-secrets/       # Bootstrap secrets
+│   │   ├── tailscale/         # Tailscale mesh networking
+│   │   ├── k3s-control-plane/ # Kubernetes control plane
+│   │   ├── k3s-worker-nodes/  # Kubernetes worker nodes
+│   │   ├── k3s-edge-node/     # VPS edge node setup
+│   │   └── gitops-bootstrap/  # Bootstrap secrets
 │   ├── inventory/             # Server inventory
 │   ├── secrets/               # SOPS-encrypted secrets
 │   └── site.yaml             # Main playbook
@@ -126,7 +127,10 @@ homelab/
 
 ### **Homelab Applications**
 
-#### ✅ **Planned Applications**
+#### ✅ **Deployed Applications**
+- **CV/Portfolio**: Personal website and portfolio at kragh.dev
+
+#### 🚧 **Planned Applications**
 - **Home Assistant**: Smart home automation platform
 - **CV/Portfolio**: Personal website and portfolio
 - **Jellyfin**: Media server for movies, TV shows, and music
@@ -136,20 +140,20 @@ homelab/
 ## 📋 Todo List
 
 ### **Infrastructure List**
-- [ ] Complete Flux bootstrap automation in Ansible
-- [ ] Test GitOps reconciliation from Git repository
+- [x] Complete Flux bootstrap automation in Ansible
+- [x] Test GitOps reconciliation from Git repository
+- [x] Implement cert-manager for automated TLS
 - [ ] Set up automated backups with Restic
 - [ ] Configure monitoring with Prometheus/Grafana
-- [ ] Implement cert-manager for automated TLS
 
 ### **Applications**
 - [ ] **Home Assistant**: Deploy smart home automation
   - [ ] Configure device integrations
   - [ ] Set up automation rules
   - [ ] Implement secure external access
-- [ ] **CV/Portfolio Website**: Deploy personal website
-  - [ ] Set up custom domain (kragh.dev)
-  - [ ] Configure static site hosting
+- [x] **CV/Portfolio Website**: Deploy personal website
+  - [x] Set up custom domain (kragh.dev)
+  - [x] Configure static site hosting
   - [ ] Implement CI/CD for updates
 - [ ] **Jellyfin Media Server**: Deploy media streaming
   - [ ] Configure media storage
@@ -206,9 +210,8 @@ graph TD
 
 ## 📖 Documentation
 
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [Backup Strategy](docs/BACKUP-STRATEGY.md)
-- [Operations Guide](docs/OPERATIONS.md)
+- [Homelab Context](docs/HOMELAB_CONTEXT.md) - Comprehensive setup documentation
+- [AI Assistant Prompt](docs/AI_ASSISTANT_PROMPT.md) - Quick context for AI assistants
 
 ## 🤝 Contributing
 

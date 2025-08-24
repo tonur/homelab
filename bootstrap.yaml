@@ -1,4 +1,18 @@
 ---
+# Flux System Namespace
+# This namespace is created by 'flux bootstrap' or manually during initial setup
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flux-system
+  labels:
+    app.kubernetes.io/instance: flux-system
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v2.0.0
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest
+---
+# GitRepository - Source of truth for GitOps
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -10,6 +24,7 @@ spec:
   ref:
     branch: main
 ---
+# Root Kustomization - Entry point for all cluster configuration
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
