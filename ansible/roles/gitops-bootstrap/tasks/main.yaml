@@ -35,40 +35,53 @@
   run_once: true
 
 - name: Check if Flux is already installed in the cluster
-  kubernetes.core.k8s_info:
-    api_version: source.toolkit.fluxcd.io/v1
-    kind: GitRepository
-    namespace: flux-system
-  register: flux_gitrepo_crd
-  delegate_to: localhost
-  run_once: true
-  environment: "{{ kubeconfig_env }}"
-  failed_when: false
-
-- name: Reinstall Flux with latest version if CRDs are missing
   shell: |
-    flux uninstall --silent || true
-    sleep 10
-    flux install --components-extra=image-reflector-controller,image-automation-controller --timeout=5m
+    kubectl get namespace flux-system 2>/dev/null || echo "not-found"
+  register: flux_namespace_check
   delegate_to: localhost
   run_once: true
   environment: "{{ kubeconfig_env }}"
-  when: flux_gitrepo_crd.api_found is not defined or not flux_gitrepo_crd.api_found
+  changed_when: false
+
+- name: Install Flux controllers manually if not present
+  shell: |
+    if [[ "{{ flux_namespace_check.stdout }}" == "not-found" ]]; then
+      kubectl apply -f https://github.com/fluxcd/flux2/releases/latest/download/install.yaml
+    fi
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
   register: flux_install_result
 
-- name: Wait for Flux CRDs to be available
+- name: Wait for Flux deployments to be ready
   kubernetes.core.k8s_info:
-    api_version: source.toolkit.fluxcd.io/v1
-    kind: GitRepository
+    api_version: apps/v1
+    kind: Deployment
     namespace: flux-system
-  register: wait_for_crds
-  until: wait_for_crds.api_found is defined and wait_for_crds.api_found
-  retries: 30
-  delay: 10
+    wait: true
+    wait_condition:
+      type: Available
+      status: "True"
+    wait_timeout: 300
   delegate_to: localhost
   run_once: true
   environment: "{{ kubeconfig_env }}"
-  when: flux_gitrepo_crd.api_found is not defined or not flux_gitrepo_crd.api_found
+  when: flux_install_result.changed
+
+- name: Wait for GitRepository CRD to be available
+  kubernetes.core.k8s_info:
+    api_version: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    name: gitrepositories.source.toolkit.fluxcd.io
+    wait: true
+    wait_condition:
+      type: Established
+      status: "True"
+    wait_timeout: 60
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  when: flux_install_result.changed
 
 - name: Create Bitwarden credentials secret in default namespace for ESO bootstrap
   kubernetes.core.k8s:

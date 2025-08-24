@@ -4,6 +4,7 @@ kind: Kustomization
 
 resources:
   - infrastructure-cert-manager.yaml
+  - infrastructure-cert-manager-config.yaml
   - infrastructure-config.yaml
   - infrastructure-external-secrets.yaml
   - infrastructure-secrets-config.yaml
