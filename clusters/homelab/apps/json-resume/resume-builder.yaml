@@ -19,77 +19,77 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-      - name: install-resume-cli
-        image: node:20-alpine
-        command:
-        - sh
-        - -c
-        - |
-          cd /tmp
-          npm install resume-cli
-          cp -r node_modules /shared/
-          echo '#!/bin/sh' > /shared/resume
-          echo 'node /shared/node_modules/resume-cli/index.js "$@"' >> /shared/resume
-          chmod +x /shared/resume
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-            - ALL
-        volumeMounts:
-        - name: shared-tools
-          mountPath: /shared
-        - name: tmp
-          mountPath: /tmp
+        - name: install-resume-cli
+          image: node:20-alpine
+          command:
+            - sh
+            - -c
+            - |
+              cd /tmp
+              npm install resume-cli jsonresume-theme-even
+              cp -r node_modules /shared/
+              echo '#!/bin/sh' > /shared/resume
+              echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
+              chmod +x /shared/resume
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: shared-tools
+              mountPath: /shared
+            - name: tmp
+              mountPath: /tmp
       containers:
-      - name: build-resume
-        image: node:20-alpine
-        command:
-        - sh
-        - -c
-        - |
-          cd /workspace
-          ls -la /shared/ || echo "No shared directory"
-          /shared/resume export index.html --resume resume.json --theme even
-          echo "Resume built successfully"
-          ls -la /workspace/
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities:
-            drop:
-            - ALL
-        volumeMounts:
-        - name: resume-data
-          mountPath: /workspace/resume.json
-          subPath: resume.json
-          readOnly: true
-        - name: generated-html
-          mountPath: /workspace
-        - name: shared-tools
-          mountPath: /shared
-          readOnly: true
-        - name: tmp
-          mountPath: /tmp
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+        - name: build-resume
+          image: node:20-alpine
+          command:
+            - sh
+            - -c
+            - |
+              cd /workspace
+              ls -la /shared/ || echo "No shared directory"
+              NODE_PATH=/shared/node_modules /shared/resume export index.html --resume resume.json --theme even
+              echo "Resume built successfully"
+              ls -la /workspace/
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: resume-data
+              mountPath: /workspace/resume.json
+              subPath: resume.json
+              readOnly: true
+            - name: generated-html
+              mountPath: /workspace
+            - name: shared-tools
+              mountPath: /shared
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
       volumes:
-      - name: resume-data
-        configMap:
-          name: resume-data
-      - name: generated-html
-        persistentVolumeClaim:
-          claimName: resume-html-pvc
-      - name: shared-tools
-        emptyDir: {}
-      - name: tmp
-        emptyDir: {}
+        - name: resume-data
+          configMap:
+            name: resume-data
+        - name: generated-html
+          persistentVolumeClaim:
+            claimName: resume-html-pvc
+        - name: shared-tools
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
