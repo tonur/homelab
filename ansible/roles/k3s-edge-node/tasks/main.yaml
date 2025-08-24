@@ -69,6 +69,15 @@
   pause:
     seconds: 30
 
+- name: Apply taint to edge node to prevent regular workloads
+  command: >
+    kubectl taint nodes {{ inventory_hostname }} 
+    edge=true:NoSchedule --overwrite
+  delegate_to: "{{ k3s_server_host }}"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  become: true
+
 - name: Install iptables-persistent for rule persistence
   package:
     name: iptables-persistent
