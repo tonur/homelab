@@ -31,12 +31,12 @@ spec:
           echo '#!/bin/sh' > /shared/resume
           echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
           chmod +x /shared/resume
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            capabilities:
-              drop:
-                - ALL
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
           volumeMounts:
             - name: shared-tools
               mountPath: /shared
