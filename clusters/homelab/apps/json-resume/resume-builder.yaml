@@ -19,24 +19,24 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-      - name: install-resume-cli
-        image: node:20-alpine
-        command:
-        - sh
-        - -c
-        - |
-          cd /tmp
-          npm install resume-cli
-          cp -r node_modules /shared/
-          echo '#!/bin/sh' > /shared/resume
-          echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
-          chmod +x /shared/resume
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-              - ALL
+        - name: install-resume-cli
+          image: node:20-alpine
+          command:
+            - sh
+            - -c
+            - |
+              cd /tmp
+              npm install resume-cli
+              cp -r node_modules /shared/
+              echo '#!/bin/sh' > /shared/resume
+              echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
+              chmod +x /shared/resume
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - name: shared-tools
               mountPath: /shared
