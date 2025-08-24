@@ -22,13 +22,13 @@ spec:
     remediation:
       retries: 3
   values:
-    # Basic deployment configuration
+    # Deployment configuration
     deployment:
       enabled: true
       kind: Deployment
       replicas: 1
-    
-    # Node scheduling for edge-only workloads
+
+    # Node scheduling
     nodeSelector:
       node.kubernetes.io/edge: "true"
     tolerations:
@@ -36,7 +36,7 @@ spec:
         operator: Equal
         value: "true"
         effect: NoSchedule
-    
+
     # Service configuration
     service:
       enabled: true
@@ -44,91 +44,42 @@ spec:
       spec:
         externalTrafficPolicy: Local
         externalIPs:
-          - "198.55.102.244"  # VPS public IP
-    
-    # Port configuration
+          - "198.55.102.244"
+
+    # Ports configuration
     ports:
       web:
-        port: 80
-        exposedPort: 80
         nodePort: 30080
-        protocol: TCP
       websecure:
-        port: 443
-        exposedPort: 443
         nodePort: 30443
-        protocol: TCP
-        tls:
-          enabled: true
-    
-    # Ingress configuration
+
+    # Ingress class
     ingressClass:
       enabled: true
       isDefaultClass: true
       name: traefik
-    
-    # Provider configuration
+
+    # Providers
     providers:
       kubernetesIngress:
         enabled: true
-        allowExternalNameServices: true
-        allowEmptyServices: false
         ingressClass: traefik
-        publishedService:
-          enabled: true
       kubernetesCRD:
         enabled: true
-        allowExternalNameServices: true
-        allowEmptyServices: false
-        allowCrossNamespace: false
-    
-    # Additional arguments
+
+    # ACME configuration
     additionalArguments:
       - "--certificatesresolvers.letsencrypt.acme.email=contact@kragh.dev"
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--log.level=INFO"
-      - "--accesslog=true"
-    
-    # Security context
-    securityContext:
-      capabilities:
-        drop: [ALL]
-        add: [NET_BIND_SERVICE]
-      readOnlyRootFilesystem: true
-      runAsGroup: 65532
-      runAsNonRoot: true
-      runAsUser: 65532
-    
-    # Pod security context
-    podSecurityContext:
-      fsGroup: 65532
-      fsGroupChangePolicy: OnRootMismatch
-    
-    # Resources
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
-    
-    # Persistence for ACME certificates
+
+    # Persistence for ACME
     persistence:
       enabled: true
       size: 128Mi
-      path: /data
-    
-    # Dashboard IngressRoute (disabled for now)
-    ingressRoute:
-      dashboard:
-        enabled: false
-    
+
     # Logs
     logs:
       general:
         level: INFO
-      access:
-        enabled: true
