@@ -42,6 +42,17 @@ spec:
         exposedPort: 443
         nodePort: 30443
     hostNetwork: true
+    securityContext:
+      runAsNonRoot: false
+      runAsUser: 0
+      runAsGroup: 0
+    containerSecurityContext:
+      runAsNonRoot: false
+      runAsUser: 0
+      runAsGroup: 0
+      capabilities:
+        add:
+          - NET_BIND_SERVICE
     ingressRoute:
       dashboard:
         enabled: true
