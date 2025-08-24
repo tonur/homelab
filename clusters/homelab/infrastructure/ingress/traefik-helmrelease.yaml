@@ -49,6 +49,7 @@ spec:
         enabled: true
       kubernetesIngress:
         enabled: true
+        ingressClass: traefik-traefik
     ingressRoute:
       dashboard:
         enabled: true
