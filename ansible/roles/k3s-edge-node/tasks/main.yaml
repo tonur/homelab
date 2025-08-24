@@ -76,7 +76,22 @@
   loop:
     - "80"
     - "443"
-    - "6443"  # k3s API if needed
+    - "30080"  # NodePort for web
+    - "30443"  # NodePort for websecure
+    - "6443"   # k3s API if needed
+
+- name: Configure iptables port forwarding for Traefik ingress
+  iptables:
+    table: nat
+    chain: PREROUTING
+    protocol: tcp
+    destination_port: "{{ item.src }}"
+    jump: REDIRECT
+    to_ports: "{{ item.dst }}"
+    comment: "Forward port {{ item.src }} to {{ item.dst }} for Traefik"
+  loop:
+    - { src: "80", dst: "30080" }
+    - { src: "443", dst: "30443" }
 
 - name: Save iptables rules
   shell: iptables-save > /etc/iptables/rules.v4
