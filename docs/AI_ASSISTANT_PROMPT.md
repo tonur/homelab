@@ -5,7 +5,7 @@
 Use this as system context when working with this homelab repository.
 
 ## Quick Overview
-- **3-node k3s cluster**: Gigabyte (control), Beelink (worker), VPS-edge (public ingress)
+- **3-node k3s cluster**: Gigabyte (control), Beelink (worker), vhs-vps (public ingress)
 - **GitOps**: FluxCD manages everything from Git
 - **Networking**: Tailscale mesh + Traefik ingress
 - **Secrets**: External Secrets Operator + Bitwarden

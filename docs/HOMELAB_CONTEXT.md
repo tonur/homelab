@@ -125,7 +125,7 @@ k3s_agents:
 
 edge:
   hosts:
-    vps-edge:
+    vhs-vps:
       ansible_host: 198.55.102.244
       ansible_user: root
 ```
