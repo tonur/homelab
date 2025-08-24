@@ -8,7 +8,3 @@ kind: Kustomization
 resources:
   # Flux Kustomizations for staged infrastructure deployment
   - flux-kustomizations/
-
-  # Applications (future)
-  # These can safely reference infrastructure components
-  - apps/
