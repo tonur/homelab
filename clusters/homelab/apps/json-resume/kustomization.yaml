@@ -6,7 +6,6 @@ namespace: json-resume
 
 resources:
   - namespace.yaml
-  - nginx-config.yaml
   - resume-builder.yaml
   - deployment.yaml
   - service.yaml

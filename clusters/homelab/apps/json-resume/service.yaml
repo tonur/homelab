@@ -11,6 +11,6 @@ spec:
     app: json-resume
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 80
       protocol: TCP
       name: http
