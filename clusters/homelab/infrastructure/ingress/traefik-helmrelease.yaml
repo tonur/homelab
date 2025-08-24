@@ -21,9 +21,9 @@ spec:
       kind: Deployment
       replicas: 1
     nodeSelector:
-      node-role.kubernetes.io/edge: "true"
+      node.kubernetes.io/edge: "true"
     tolerations:
-      - key: node-role.kubernetes.io/edge
+      - key: node.kubernetes.io/edge
         operator: Equal
         value: "true"
         effect: NoSchedule
