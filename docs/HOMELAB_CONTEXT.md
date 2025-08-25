@@ -1,9 +1,11 @@
 # Homelab Context & Setup Documentation
 
-> **Generated on August 24, 2025** - Comprehensive context for AI assistants and new contributors
+> **Generated on August 25, 2025** - Comprehensive context for AI assistants and new contributors
 
 ## Overview
 This is a fully automated, GitOps-based homelab for the `kragh.dev` domain using k3s, Tailscale, External Secrets Operator, and FluxCD. The infrastructure follows infrastructure-as-code principles with proper secret management and security.
+
+**Current Status**: Production-ready with live applications at [kragh.dev](https://kragh.dev)
 
 ## Architecture
 
@@ -53,6 +55,24 @@ This is a fully automated, GitOps-based homelab for the `kragh.dev` domain using
 - **Encryption**: All sensitive files encrypted with SOPS + Age
 - **Network**: Tailscale mesh VPN for secure inter-node communication
 - **TLS**: Automated certificates via cert-manager + Hetzner DNS
+
+### Networking & Load Balancing
+- **Cross-Node Challenge**: Flannel VXLAN backend over Tailscale mesh doesn't support direct pod-to-pod traffic
+- **Solution**: Traefik IngressRoute with `nativeLB: true` for service-based load balancing
+- **Implementation**: Traffic flows through Kubernetes service VIPs instead of direct pod IPs
+- **Result**: Reliable multi-node deployments without duplicate services or networking workarounds
+
+**Key Configuration**:
+
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+spec:
+  routes:
+    - services:
+        - name: service-name
+          nativeLB: true  # Forces service VIP routing
+```
 
 ## Project Structure
 
@@ -146,18 +166,20 @@ edge:
 
 ## Current Applications
 
-### ✅ Deployed
-- **JSON Resume**: Personal CV/portfolio at `kragh.dev`
-  - Namespace: `json-resume`  
-  - Ingress: Traefik with automatic TLS
-  - Service: Internal ClusterIP
+### ✅ Production Ready
+- **Portfolio Website**: Personal CV/portfolio at [kragh.dev](https://kragh.dev)
+  - **Namespace**: `json-resume`  
+  - **Technology**: Static site with JSON Resume format
+  - **Ingress**: Traefik IngressRoute with `nativeLB: true`
+  - **Security**: Automated TLS certificates via Let's Encrypt + Hetzner DNS
+  - **Service**: Single ClusterIP service (10.43.88.207)
+  - **Status**: Live and operational ✅
 
-### 🚧 Planned (from README)
+### 🚧 Planned Applications
 - **Home Assistant**: Smart home automation platform
-- **Jellyfin**: Media server for movies, TV shows, and music
+- **Jellyfin**: Media server for movies, TV shows, and music  
 - **Nextcloud**: Self-hosted cloud storage and productivity suite
-- **Vaultwarden**: Password manager (migrate from Bitwarden cloud)
-- **Restic**: Automated backup solution
+- **Monitoring Stack**: Prometheus + Grafana for infrastructure monitoring
 
 ## GitOps Workflow
 

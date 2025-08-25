@@ -121,40 +121,50 @@ homelab/
 ## 🏠 Applications
 
 ### **Infrastructure Services**
-- **Traefik**: Reverse proxy and load balancer
-- **External Secrets Operator**: Dynamic secret management
-- **cert-manager**: Automated TLS certificate management
+- **Traefik**: Reverse proxy and load balancer with IngressRoute CRD
+- **External Secrets Operator**: Dynamic secret management with Bitwarden integration
+- **cert-manager**: Automated TLS certificate management via Hetzner DNS
+- **FluxCD**: GitOps continuous deployment from Git repository
 
 ### **Homelab Applications**
 
-#### ✅ **Deployed Applications**
-- **CV/Portfolio**: Personal website and portfolio at kragh.dev
+#### ✅ **Live Applications**
+- **Portfolio Website**: Personal CV and portfolio at [kragh.dev](https://kragh.dev)
+  - **Technology**: Static site with JSON Resume format
+  - **Ingress**: Traefik IngressRoute with native load balancing
+  - **Security**: Automated TLS certificates via Let's Encrypt
+  - **Status**: Production-ready ✅
 
 #### 🚧 **Planned Applications**
 - **Home Assistant**: Smart home automation platform
-- **CV/Portfolio**: Personal website and portfolio
 - **Jellyfin**: Media server for movies, TV shows, and music
 - **Nextcloud**: Self-hosted cloud storage and productivity suite
-- **Restic**: Automated backup solution
+- **Vaultwarden**: Self-hosted Bitwarden-compatible password manager
 
 ## 📋 Todo List
 
-### **Infrastructure List**
+### **Infrastructure ✅ Complete**
 - [x] Complete Flux bootstrap automation in Ansible
 - [x] Test GitOps reconciliation from Git repository
 - [x] Implement cert-manager for automated TLS
+- [x] Resolve cross-node networking with Traefik IngressRoute
+- [x] Configure service-based load balancing for multi-node clusters
+
+### **Infrastructure 🚧 In Progress**
 - [ ] Set up automated backups with Restic
 - [ ] Configure monitoring with Prometheus/Grafana
+- [ ] Implement log aggregation and centralized logging
 
 ### **Applications**
+- [x] **Portfolio Website**: Deploy personal website ✅
+  - [x] Set up custom domain (kragh.dev)
+  - [x] Configure static site hosting
+  - [x] Implement automated TLS certificates
+  - [x] Optimize Traefik routing with IngressRoute
 - [ ] **Home Assistant**: Deploy smart home automation
   - [ ] Configure device integrations
   - [ ] Set up automation rules
   - [ ] Implement secure external access
-- [x] **CV/Portfolio Website**: Deploy personal website
-  - [x] Set up custom domain (kragh.dev)
-  - [x] Configure static site hosting
-  - [ ] Implement CI/CD for updates
 - [ ] **Jellyfin Media Server**: Deploy media streaming
   - [ ] Configure media storage
   - [ ] Set up hardware transcoding
@@ -169,13 +179,18 @@ homelab/
   - [ ] Migrate from Bitwarden cloud
 
 ### **Operations**
-- [ ] Document deployment procedures
+- [x] Document deployment procedures
+- [x] Create comprehensive homelab documentation
 - [ ] Create disaster recovery plan
 - [ ] Set up log aggregation
 - [ ] Implement security scanning
 - [ ] Create maintenance schedules
 
-### **Networking & Security**
+### **Networking & Security ✅ Operational**
+- [x] Configure Tailscale mesh networking
+- [x] Implement secure cross-node communication
+- [x] Set up automated TLS certificate management
+- [x] Configure Traefik service-based load balancing
 - [ ] Configure Tailscale exit nodes
 - [ ] Set up VPN access for external devices
 - [ ] Implement network segmentation
@@ -194,6 +209,29 @@ graph TD
     F --> G[cert-manager issues certificates]
 ```
 
+## 🌐 Networking & Load Balancing
+
+### **Cross-Node Service Discovery**
+The homelab uses a sophisticated networking setup to handle multi-node deployments across Tailscale mesh:
+
+- **Challenge**: Flannel VXLAN backend over Tailscale doesn't support cross-node pod-to-pod traffic
+- **Solution**: Traefik IngressRoute with `nativeLB: true` for service-based load balancing
+- **Result**: Traffic flows through Kubernetes service VIPs instead of direct pod IPs
+
+### **Traefik Configuration Highlights**
+
+```yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+spec:
+  routes:
+    - services:
+        - name: service-name
+          nativeLB: true  # Forces service VIP routing
+```
+
+This ensures reliable cross-node communication without requiring duplicate services or complex networking workarounds.
+
 ## 🚨 Disaster Recovery
 
 ### **Backup Strategy**
@@ -210,7 +248,8 @@ graph TD
 
 ## 📖 Documentation
 
-- [Homelab Context](docs/HOMELAB_CONTEXT.md) - Comprehensive setup documentation
+- [Homelab Context](docs/HOMELAB_CONTEXT.md) - Comprehensive setup and architecture documentation
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Technical solutions and common issues
 - [AI Assistant Prompt](docs/AI_ASSISTANT_PROMPT.md) - Quick context for AI assistants
 
 ## 🤝 Contributing
