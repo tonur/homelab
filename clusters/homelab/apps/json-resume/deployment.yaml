@@ -16,6 +16,13 @@ spec:
       labels:
         app: json-resume
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: vhs-vps
+      tolerations:
+        - key: edge
+          operator: Equal
+          value: "true"
+          effect: NoSchedule
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
