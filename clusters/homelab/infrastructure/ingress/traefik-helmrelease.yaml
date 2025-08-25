@@ -65,6 +65,7 @@ spec:
         enabled: true
         ingressClass: traefik
         allowExternalNameServices: true
+        endpoints: false  # Force using services instead of endpoints
         namespaces: []  # Watch all namespaces
       kubernetesCRD:
         enabled: true
