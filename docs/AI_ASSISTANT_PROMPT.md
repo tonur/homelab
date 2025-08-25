@@ -2,6 +2,8 @@
 
 `Please read AI_ASSISTANT_PROMPT.md for context about this homelab setup`
 
+Note from developer: please use "flux reconcile kustomization flux-system --with-source" to sync changes.
+
 Use this as system context when working with this homelab repository.
 
 ## Quick Overview
