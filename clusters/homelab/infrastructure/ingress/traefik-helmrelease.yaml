@@ -74,8 +74,7 @@ spec:
         namespaces: [] # Watch all namespaces
 
     # Additional configuration
-    additionalArguments:
-      - "--log.level=DEBUG"
+    additionalArguments: []
 
     # Persistence for ACME certificates
     persistence:
