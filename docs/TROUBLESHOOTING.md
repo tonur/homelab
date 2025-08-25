@@ -191,6 +191,25 @@ kubectl get secretstore -A
 kubectl get secret -A | grep -v "kubernetes.io"
 ```
 
+## Traefik Dual API Group Installation
+
+### Understanding the `traefik.io` vs `traefik.containo.us` API Groups
+
+**This is officially documented behavior** starting with Traefik v2.10+. Both API groups are intentionally installed simultaneously.
+
+**Why both API groups exist:**
+- **Official Migration Path**: [PR #9765](https://github.com/traefik/traefik/pull/9765) introduced `traefik.io` API group as part of the v2→v3 migration strategy
+- **Backward Compatibility**: Existing `traefik.containo.us` resources continue working without changes
+- **Forward Compatibility**: New `traefik.io` API group prepares for Traefik v3
+- **Zero-Downtime Migration**: Allows gradual resource migration
+
+**Current Status:**
+- Use `traefik.containo.us/v1alpha1` for existing resources (fully supported)
+- Optional: Migrate to `traefik.io/v1alpha1` when ready for v3 transition
+- Both API groups have identical functionality in v2.10+
+
+**No action required** - this is expected behavior for Traefik v2.10+.
+
 ## Best Practices
 
 1. **Always use service-based routing** for multi-node clusters
