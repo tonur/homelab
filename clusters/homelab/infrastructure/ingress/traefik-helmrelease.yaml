@@ -28,9 +28,14 @@ spec:
       kind: Deployment
       replicas: 1
 
-    # Node scheduling for same node as json-resume (gigabyte)
+    # Node scheduling for edge node
     nodeSelector:
-      kubernetes.io/hostname: gigabyte
+      node.kubernetes.io/edge: "true"
+    tolerations:
+      - key: edge
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
 
     # Service configuration
     service:
