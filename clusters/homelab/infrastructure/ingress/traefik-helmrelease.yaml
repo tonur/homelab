@@ -68,13 +68,12 @@ spec:
         namespaces: []  # Watch all namespaces
       kubernetesCRD:
         enabled: true
-        allowCrossNamespace: true
         allowExternalNameServices: true
         namespaces: []  # Watch all namespaces
 
     # Additional configuration
     additionalArguments:
-      - "--log.level=INFO"
+      - "--log.level=DEBUG"
 
     # Persistence for ACME certificates
     persistence:
