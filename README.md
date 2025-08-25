@@ -217,7 +217,7 @@ The homelab uses a sophisticated networking setup to handle multi-node deploymen
 ### **Traefik Configuration Highlights**
 
 ```yaml
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 spec:
   routes:

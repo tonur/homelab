@@ -65,7 +65,7 @@ This is a fully automated, GitOps-based homelab for the `kragh.dev` domain using
 **Key Configuration**:
 
 ```yaml
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 spec:
   routes:
