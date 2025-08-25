@@ -17,6 +17,7 @@
 
 **Investigation Steps**:
 1. **Pod-to-pod connectivity test**:
+
    ```bash
    # From Traefik pod to backend pod (different nodes)
    kubectl exec -n traefik traefik-pod -- wget -qO- http://10.42.0.20:80
@@ -24,6 +25,7 @@
    ```
 
 2. **Service VIP connectivity test**:
+
    ```bash
    # From Traefik pod to service VIP
    kubectl exec -n traefik traefik-pod -- wget -qO- http://10.43.88.207:80  
@@ -40,6 +42,7 @@
 **Implementation**: Use Traefik's native IngressRoute CRD with `nativeLB: true` instead of standard Kubernetes Ingress.
 
 **Before (Standard Ingress)**:
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -58,8 +61,9 @@ spec:
 ```
 
 **After (IngressRoute with nativeLB)**:
+
 ```yaml
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1
 kind: IngressRoute
 metadata:
   name: my-app
@@ -86,6 +90,7 @@ spec:
 - ✅ Clean, maintainable configuration
 
 **Verification**:
+
 ```bash
 # Check Traefik logs for load-balancer creation
 kubectl logs -n traefik traefik-pod | grep "Creating server"
@@ -146,6 +151,7 @@ kubectl logs -n traefik traefik-pod | grep "Creating server"
 ## Common Troubleshooting Commands
 
 ### Cluster Health Check
+
 ```bash
 # Check all pods across namespaces
 kubectl get pods -A --field-selector=status.phase=Running
@@ -160,6 +166,7 @@ kubectl get certificates -A
 ```
 
 ### Networking Debugging
+
 ```bash
 # Test service connectivity from pod
 kubectl exec -n namespace pod-name -- wget -qO- http://service.namespace.svc.cluster.local
@@ -172,6 +179,7 @@ kubectl run netshoot --rm -it --image=nicolaka/netshoot -- /bin/bash
 ```
 
 ### Traefik Debugging
+
 ```bash
 # Check Traefik logs for routing decisions
 kubectl logs -n traefik -l app.kubernetes.io/name=traefik
@@ -182,6 +190,7 @@ kubectl describe ingressroute -n namespace name
 ```
 
 ### Secret Management
+
 ```bash
 # Check External Secrets status
 kubectl get externalsecret -A
@@ -190,25 +199,6 @@ kubectl get secretstore -A
 # Check if secrets are properly injected
 kubectl get secret -A | grep -v "kubernetes.io"
 ```
-
-## Traefik Dual API Group Installation
-
-### Understanding the `traefik.io` vs `traefik.containo.us` API Groups
-
-**This is officially documented behavior** starting with Traefik v2.10+. Both API groups are intentionally installed simultaneously.
-
-**Why both API groups exist:**
-- **Official Migration Path**: [PR #9765](https://github.com/traefik/traefik/pull/9765) introduced `traefik.io` API group as part of the v2→v3 migration strategy
-- **Backward Compatibility**: Existing `traefik.containo.us` resources continue working without changes
-- **Forward Compatibility**: New `traefik.io` API group prepares for Traefik v3
-- **Zero-Downtime Migration**: Allows gradual resource migration
-
-**Current Status:**
-- Use `traefik.containo.us/v1alpha1` for existing resources (fully supported)
-- Optional: Migrate to `traefik.io/v1alpha1` when ready for v3 transition
-- Both API groups have identical functionality in v2.10+
-
-**No action required** - this is expected behavior for Traefik v2.10+.
 
 ## Best Practices
 

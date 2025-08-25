@@ -173,10 +173,6 @@ homelab/
   - [ ] Configure persistent storage
   - [ ] Set up user accounts
   - [ ] Configure external access
-- [ ] **Vaultwarden**: Deploy password manager
-  - [ ] Configure secure access
-  - [ ] Set up backup strategy
-  - [ ] Migrate from Bitwarden cloud
 
 ### **Operations**
 - [x] Document deployment procedures
