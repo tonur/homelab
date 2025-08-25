@@ -28,21 +28,16 @@ spec:
       kind: Deployment
       replicas: 1
 
-    # Node scheduling for edge node
+    # Node scheduling for same node as json-resume (gigabyte)
     nodeSelector:
-      node.kubernetes.io/edge: "true"
-    tolerations:
-      - key: edge
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
+      kubernetes.io/hostname: gigabyte
 
     # Service configuration
     service:
       enabled: true
       type: NodePort
       spec:
-        externalTrafficPolicy: Local
+        externalTrafficPolicy: Cluster  # Allow routing from any node
         externalIPs:
           - "198.55.102.244" # VPS public IP
 
@@ -65,7 +60,6 @@ spec:
         enabled: true
         ingressClass: traefik
         allowExternalNameServices: true
-        endpoints: false  # Force using services instead of endpoints
         namespaces: []  # Watch all namespaces
       kubernetesCRD:
         enabled: true
