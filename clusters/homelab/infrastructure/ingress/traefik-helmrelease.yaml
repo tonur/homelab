@@ -75,7 +75,6 @@ spec:
     # Additional configuration
     additionalArguments:
       - "--log.level=INFO"
-      - "--providers.kubernetesingress.allowcrossnamespace=true"
 
     # Persistence for ACME certificates
     persistence:
