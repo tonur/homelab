@@ -42,7 +42,7 @@ spec:
       enabled: true
       type: NodePort
       spec:
-        externalTrafficPolicy: Cluster  # Allow routing from any node
+        externalTrafficPolicy: Cluster # Allow routing from any node
         externalIPs:
           - "198.55.102.244" # VPS public IP
 
@@ -65,11 +65,13 @@ spec:
         enabled: true
         ingressClass: traefik
         allowExternalNameServices: true
-        namespaces: []  # Watch all namespaces
+        nativeLBByDefault: true # Use service load balancing instead of endpoints
+        namespaces: [] # Watch all namespaces
       kubernetesCRD:
         enabled: true
         allowExternalNameServices: true
-        namespaces: []  # Watch all namespaces
+        nativeLBByDefault: true # Use service load balancing instead of endpoints
+        namespaces: [] # Watch all namespaces
 
     # Additional configuration
     additionalArguments:
