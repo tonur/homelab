@@ -6,9 +6,6 @@ metadata:
   namespace: json-resume
   labels:
     app: json-resume
-  annotations:
-    traefik.ingress.kubernetes.io/service.nativelb: "true"
-    traefik.ingress.kubernetes.io/service.serversscheme: http
 spec:
   selector:
     app: json-resume
