@@ -25,17 +25,17 @@ metadata:
 spec:
   ingressClassName: traefik
   tls:
-  - hosts:
-    - kragh.dev
-    secretName: json-resume-tls
+    - hosts:
+        - kragh.dev
+      secretName: json-resume-tls
   rules:
-  - host: kragh.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: json-resume-external
-            port:
-              number: 80
+    - host: kragh.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: json-resume-external
+                port:
+                  number: 80
