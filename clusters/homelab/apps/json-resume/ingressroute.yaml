@@ -1,0 +1,19 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: json-resume
+  namespace: json-resume
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`kragh.dev`)
+      kind: Rule
+      services:
+        - name: json-resume
+          port: 80
+          nativeLB: true # Force service-based load balancing (uses service VIP instead of pod IPs)
+          strategy: RoundRobin
+  tls:
+    secretName: json-resume-tls

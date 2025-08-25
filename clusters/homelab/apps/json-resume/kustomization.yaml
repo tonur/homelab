@@ -9,7 +9,7 @@ resources:
   - resume-builder.yaml
   - deployment.yaml
   - service.yaml
-  - ingress.yaml
+  - ingressroute.yaml
 
 configMapGenerator:
   - name: resume-data
