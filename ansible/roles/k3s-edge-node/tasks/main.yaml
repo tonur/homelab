@@ -98,7 +98,22 @@
     - "30443"  # NodePort for websecure
     - "6443"   # k3s API if needed
 
-- name: Configure iptables port forwarding for Traefik ingress
+- name: Allow traffic from Tailscale interface to k3s services
+  iptables:
+    table: filter
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ item }}"
+    jump: ACCEPT
+    comment: "Allow Tailscale access to k3s services"
+    in_interface: "tailscale0"
+  loop:
+    - "80"
+    - "443"
+    - "30080"
+    - "30443"
+
+- name: Configure iptables port forwarding for Traefik ingress (public interface)
   iptables:
     table: nat
     chain: PREROUTING
@@ -107,6 +122,21 @@
     jump: REDIRECT
     to_ports: "{{ item.dst }}"
     comment: "Forward port {{ item.src }} to {{ item.dst }} for Traefik"
+    in_interface: "!tailscale0"  # Only for non-Tailscale traffic
+  loop:
+    - { src: "80", dst: "30080" }
+    - { src: "443", dst: "30443" }
+
+- name: Configure iptables port forwarding for Traefik ingress (Tailscale interface)
+  iptables:
+    table: nat
+    chain: PREROUTING
+    protocol: tcp
+    destination_port: "{{ item.src }}"
+    jump: REDIRECT
+    to_ports: "{{ item.dst }}"
+    comment: "Forward port {{ item.src }} to {{ item.dst }} for Traefik (Tailscale)"
+    in_interface: "tailscale0"
   loop:
     - { src: "80", dst: "30080" }
     - { src: "443", dst: "30443" }
