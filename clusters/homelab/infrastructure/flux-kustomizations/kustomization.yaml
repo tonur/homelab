@@ -7,4 +7,5 @@ resources:
   - infrastructure-cert-manager-config.yaml
   - infrastructure-external-secrets.yaml
   - infrastructure-external-secrets-config.yaml
+  - infrastructure-dns.yaml
   - infrastructure-ingress.yaml

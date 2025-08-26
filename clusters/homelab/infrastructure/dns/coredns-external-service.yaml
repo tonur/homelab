@@ -1,0 +1,47 @@
+---
+# Expose CoreDNS external DNS service via NodePort for Tailscale clients
+apiVersion: v1
+kind: Service
+metadata:
+  name: coredns-external
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: coredns-external
+    app.kubernetes.io/component: dns
+spec:
+  type: NodePort
+  selector:
+    k8s-app: kube-dns
+  ports:
+    - name: dns-udp
+      port: 53
+      targetPort: 53
+      protocol: UDP
+      nodePort: 30053
+    - name: dns-tcp
+      port: 53
+      targetPort: 53
+      protocol: TCP
+      nodePort: 30053
+---
+# Custom CoreDNS configuration to add kragh.dev records
+# See: https://learn.microsoft.com/en-us/azure/aks/coredns-custom#use-custom-domains
+# Data keys must end with .server (new server block) or .override (modify default block)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  kragh.dev.server: |
+    kragh.dev:53 {
+        errors
+        ready
+        # Rewrite ALL kragh.dev queries (including subdomains) to edge nodes hostname (vhs-vps), resolved via Tailscale
+        rewrite name regex (.*)\.kragh\.dev vhs-vps
+        rewrite name kragh.dev vhs-vps
+        # Forward to upstream DNS for resolution
+        forward . 100.100.100.100
+        cache 30
+        reload
+    }
