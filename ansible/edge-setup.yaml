@@ -4,17 +4,19 @@
   become: true
   vars:
     secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
-    ansible_become_password: "{{ secrets.ansible_become_password }}"
+    ansible_become_password: "{{ secrets.gigabyte_password }}"
+  vars_files:
+    - secrets/homelab.yaml
   tasks:
     - name: Get k3s server hostname from inventory
       set_fact:
-        k3s_server_host: "{{ groups['k3s_server'][0] }}"
+        k3s_server_hostname: "gigabyte" # Hardcoded since ansible_become_password is hard coded TODO - figure out a way to get k3s token from gigabyte host without needing password when running on vhs-vps
 
     - name: Get k3s node token from server
       slurp:
         src: /var/lib/rancher/k3s/server/node-token
       register: k3s_token_file
-      delegate_to: "{{ k3s_server_host }}"
+      delegate_to: "{{ k3s_server_hostname }}"
       become: true
 
     - name: Set k3s token fact
@@ -33,5 +35,5 @@
       include_role:
         name: k3s-edge-node
       vars:
-        k3s_server_hostname: "{{ k3s_server_host }}"
+        k3s_server_hostname: "{{ k3s_server_hostname }}"
         k3s_token: "{{ k3s_node_token }}"

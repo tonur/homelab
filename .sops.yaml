@@ -1,8 +1,4 @@
 # SOPS configuration: define which files get encrypted and recipients
 creation_rules:
-  - path_regex: infrastructure/secrets/.*\.ya?ml
-    encrypted_regex: "^(data|stringData)$"
-    age: age19cjycc6l8pnjxgmclp7jzfd6kx79v2w3vrn3y9xzhd2hkfmyvvls6jk3v7
   - path_regex: ansible/secrets/.*\.ya?ml
-    encrypted_regex: "^bw_|^ansible_become_password$"
     age: age19cjycc6l8pnjxgmclp7jzfd6kx79v2w3vrn3y9xzhd2hkfmyvvls6jk3v7
