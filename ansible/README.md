@@ -16,7 +16,7 @@ Generate a peer keypair and instructions:
 ./scripts/generate-wireguard-peer.sh --endpoint mygw.example.com:51820 --ip 10.172.90.2
 ```
 
-Store the private key encrypted (SOPS) as `wg_private_key` and set the peer public key / endpoint vars.
+Store the private key encrypted (SOPS) as `edge_gateway_wg_private_key` and set the peer public key / endpoint vars.
 
 ## Run
 

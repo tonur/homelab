@@ -21,19 +21,19 @@
 
 - name: Generate WireGuard private key (first run)
   command: wg genkey
-  register: wg_private_key_gen
-  when: edge_gateway_generate_wg_key and (wg_private_key is not defined)
+  register: edge_gateway_wg_private_key_gen
+  when: edge_gateway_generate_wg_key and (edge_gateway_wg_private_key is not defined)
   changed_when: true
 
 - name: Set generated private key fact
   set_fact:
-    wg_private_key: "{{ wg_private_key_gen.stdout }}"
-  when: edge_gateway_generate_wg_key and (wg_private_key is not defined)
+    edge_gateway_wg_private_key: "{{ edge_gateway_wg_private_key_gen.stdout }}"
+  when: edge_gateway_generate_wg_key and (edge_gateway_wg_private_key is not defined)
 
 - name: Fail if no private key available
   fail:
-    msg: "WireGuard private key must be provided (wg_private_key) or generation enabled"
-  when: wg_private_key is not defined
+    msg: "WireGuard private key must be provided (edge_gateway_wg_private_key) or generation enabled"
+  when: edge_gateway_wg_private_key is not defined
 
 - name: Ensure config directory exists
   file:
@@ -152,14 +152,14 @@
 - name: Show generated WireGuard private key (first run only)
   debug:
     msg: "Generated WireGuard private key (store securely & encrypt with SOPS)."
-  when: edge_gateway_generate_wg_key and wg_private_key_gen is defined
+  when: edge_gateway_generate_wg_key and edge_gateway_wg_private_key_gen is defined
   no_log: true
 
 - name: Derive edge WireGuard public key
-  command: bash -c 'echo "{{ wg_private_key }}" | wg pubkey'
+  command: bash -c 'echo "{{ edge_gateway_wg_private_key }}" | wg pubkey'
   register: edge_pubkey_calc
   changed_when: false
-  when: wg_private_key is defined
+  when: edge_gateway_wg_private_key is defined
   no_log: true
 
 - name: Set edge public key fact
