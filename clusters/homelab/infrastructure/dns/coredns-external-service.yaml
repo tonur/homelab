@@ -37,9 +37,9 @@ data:
     kragh.dev:53 {
         errors
         ready
-        # Rewrite ALL kragh.dev queries (including subdomains) to edge nodes hostname (vhs-vps), resolved via Tailscale
-        rewrite name regex (.*)\.kragh\.dev vhs-vps
-        rewrite name kragh.dev vhs-vps
+        # Rewrite ALL kragh.dev queries (including subdomains) to edge nodes hostname (vps1), resolved via Tailscale
+        rewrite name regex (.*)\.kragh\.dev vps1
+        rewrite name kragh.dev vps1
         # Forward to upstream DNS for resolution
         forward . 100.100.100.100
         cache 30

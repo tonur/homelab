@@ -27,3 +27,10 @@
   tags: [gitops, flux]
   roles:
     - { role: gitops-bootstrap, tags: [gitops, flux] }
+
+- name: Configure edge gateway
+  hosts: edge
+  become: true
+  tags: [edge, gateway]
+  roles:
+    - { role: edge_gateway, tags: [edge, gateway] }

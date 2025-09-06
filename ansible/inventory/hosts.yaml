@@ -17,7 +17,7 @@ all:
           ansible_become_password: "{{ beelink_password }}"
     edge:
       hosts:
-        vhs-vps:
+        vps1:
           ansible_host: 198.55.102.244
           ansible_user: root
           ansible_become: false

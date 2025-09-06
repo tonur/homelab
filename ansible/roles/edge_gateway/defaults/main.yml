@@ -1,0 +1,20 @@
+---
+# Default variables for edge_gateway role
+edge_gateway_wireguard_port: 51820
+edge_gateway_wg_local: 10.172.90.2
+edge_gateway_wg_peer: 10.172.90.1
+edge_gateway_wg_peer_public_key: "s8uvfVm8iM6yigJR2OuoVN3A4mCs5iWhkQIKlhLf1Ck="
+edge_gateway_wg_peer_endpoint: "wg.kragh.dev:51820"
+edge_gateway_cluster_cidr: 192.168.50.0/24
+edge_gateway_traefik_vip: 192.168.50.240
+edge_gateway_ingress_ports:
+  - 80
+  - 443
+edge_gateway_enable_healthcheck: true
+# Deprecated: cron style string was invalid for systemd OnCalendar
+edge_gateway_healthcheck_interval: "*/2 * * * *"  # deprecated, unused
+# New: minutes between health checks (monotonic timer)
+edge_gateway_healthcheck_interval_minutes: 2
+# Set to false after first deploy if you manage keys manually
+edge_gateway_generate_wg_key: true
+# Provide via vaulted variable if generate is false: edge_gateway_wg_private_key

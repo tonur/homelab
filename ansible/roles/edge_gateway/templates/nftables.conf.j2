@@ -1,0 +1,45 @@
+#!/usr/sbin/nft -f
+flush ruleset
+
+table inet filter {
+  chain input {
+    type filter hook input priority 0;
+    policy drop;
+    ct state {established, related} accept
+    iif lo accept
+    # Allow SSH via tailscale (100.64.0.0/10) or WireGuard peer
+    ip saddr 100.64.0.0/10 tcp dport 22 accept
+    ip saddr {{ edge_gateway_wg_peer }} tcp dport 22 accept
+    # Allow SSH from anywhere (broad). Consider tightening later with CIDR list.
+    tcp dport 22 accept
+    # Allow WireGuard UDP
+    udp dport {{ edge_gateway_wireguard_port }} accept
+    # HTTP/HTTPS ingress
+    tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } accept
+  }
+  chain forward {
+    type filter hook forward priority 0;
+    policy drop;
+    ct state {established, related} accept
+    # Allow forwarding between eth0 and wg0 only for HTTP/HTTPS to Traefik VIP
+    iif "eth0" oif "wg0" tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } ip daddr {{ edge_gateway_traefik_vip }} accept
+    iif "wg0" oif "eth0" ct state {established, related} accept
+  }
+  chain output {
+    type filter hook output priority 0;
+    policy accept;
+  }
+}
+
+table ip nat {
+  chain prerouting {
+    type nat hook prerouting priority -100;
+    # DNAT inbound HTTP/HTTPS to Traefik VIP
+    tcp dport 80  dnat to {{ edge_gateway_traefik_vip }}:80
+    tcp dport 443 dnat to {{ edge_gateway_traefik_vip }}:443
+  }
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    # No MASQUERADE to preserve client IP
+  }
+}
