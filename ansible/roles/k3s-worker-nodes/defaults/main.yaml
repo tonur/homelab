@@ -1,0 +1,12 @@
+---
+# Default variables for k3s-worker-nodes role
+# k3s_server_host: Inventory hostname of the control-plane (must be reachable via Ansible)
+# k3s_server_token: Token for joining the k3s cluster (must be obtained from the control-plane)
+# taints: List of taint strings to apply to this worker node. Example format:
+#   - "media=true:NoSchedule"
+# Set empty list to skip applying taints.
+k3s_server_host: ""
+k3s_server_token: ""
+# By default disallow scheduling unless pods tolerate the media taint.
+taints:
+  - "media=true:NoSchedule"

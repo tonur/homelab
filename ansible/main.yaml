@@ -1,0 +1,29 @@
+---
+- name: Base setup and Tailscale mesh networking
+  hosts: all
+  become: true
+  tags: [initial, base, tailscale]
+  roles:
+    - { role: base, tags: [initial, base] }
+    - { role: tailscale, tags: [initial, tailscale] }
+
+- name: k3s control plane
+  hosts: k3s_server
+  become: true
+  tags: [k3s, control-plane]
+  roles:
+    - { role: k3s-control-plane, tags: [k3s, control-plane] }
+
+- name: k3s worker nodes
+  hosts: k3s_agents
+  become: true
+  tags: [k3s, workers]
+  roles:
+    - { role: k3s-worker-nodes, tags: [k3s, workers] }
+
+- name: Bootstrap GitOps infrastructure
+  hosts: k3s_server
+  become: true
+  tags: [gitops, flux]
+  roles:
+    - { role: gitops-bootstrap, tags: [gitops, flux] }

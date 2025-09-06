@@ -45,11 +45,6 @@
     tailscale_authenticated: false
   when: tailscale_status.rc != 0 or tailscale_status.stdout == ""
 
-- name: Set authentication status to false if status command failed
-  set_fact:
-    tailscale_authenticated: false
-  when: tailscale_status.rc != 0
-
 - name: Start Tailscale authentication (interactive)
   command: >-
     tailscale up --hostname={{ inventory_hostname }}
@@ -72,8 +67,8 @@
       {% endif %}
       
       📋 After clicking the link and authorizing the device:
-         1. The device will automatically connect to your Tailscale network
-         2. Press ENTER to continue with the next host
+      1. The device will automatically connect to your Tailscale network
+      2. Press ENTER to continue with the next host
       
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   when: not tailscale_authenticated and ts_up.rc != 0

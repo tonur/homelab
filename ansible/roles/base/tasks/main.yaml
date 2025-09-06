@@ -11,6 +11,6 @@
     state: present
     update_cache: yes
 
-- name: Set timezone to UTC
+- name: Set timezone to Europe/Copenhagen
   timezone:
-    name: Etc/UTC
+    name: Europe/Copenhagen

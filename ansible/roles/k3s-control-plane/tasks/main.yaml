@@ -41,6 +41,6 @@
     src: /var/lib/rancher/k3s/server/node-token
   register: node_token
 
-- name: Set fact for node token
+- name: Set fact for server token
   set_fact:
-    k3s_node_token: "{{ node_token.content | b64decode | trim }}"
+    k3s_server_token: "{{ node_token.content | b64decode | trim }}"

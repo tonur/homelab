@@ -14,41 +14,33 @@
     dest: /tmp/k3s-kubeconfig.yaml
     flat: yes
 
-- name: Get Tailscale IP for k3s server
-  shell: tailscale status --json | jq -r '.Peer[] | select(.HostName == "gigabyte") | .TailscaleIPs[0]'
-  register: k3s_server_tailscale_ip
-  delegate_to: localhost
-  run_once: true
+- name: Derive k3s server hostname
+  set_fact:
+    derived_k3s_server_host: "{{ groups['k3s_server'] | first }}"
+  when: derived_k3s_server_host is not defined
+
+- name: Derive k3s server Tailscale IP from hostvars
+  set_fact:
+    k3s_server_tailscale_ip: "{{ hostvars[derived_k3s_server_host].current_tailscale_ip }}"
+  when: k3s_server_tailscale_ip is not defined
+
+- name: Fail if Tailscale IP fact missing (ensure control-plane play captured current_tailscale_ip)
+  fail:
+    msg: "current_tailscale_ip not found in hostvars for control-plane host {{ derived_k3s_server_host }}. Ensure k3s-control-plane role ran first."
+  when: k3s_server_tailscale_ip is not defined or (k3s_server_tailscale_ip | length) == 0
 
 - name: Fix kubeconfig server URL to use Tailscale IP
   replace:
     path: /tmp/k3s-kubeconfig.yaml
     regexp: 'https://127\.0\.0\.1:6443'
-    replace: 'https://{{ k3s_server_tailscale_ip.stdout }}:6443'
+    replace: 'https://{{ k3s_server_tailscale_ip }}:6443'
   delegate_to: localhost
+  become: false
 
 - name: Set localhost kubeconfig environment
   set_fact:
     kubeconfig_env:
       KUBECONFIG: /tmp/k3s-kubeconfig.yaml
-
-- name: Install kubectl if not present on localhost
-  shell: |
-    if ! command -v kubectl &> /dev/null; then
-      curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-      sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-      rm kubectl
-    fi
-  delegate_to: localhost
-  run_once: true
-
-- name: Install Flux CLI if not present
-  shell: |
-    if ! command -v flux &> /dev/null; then
-      curl -s https://fluxcd.io/install.sh | sudo bash
-    fi
-  delegate_to: localhost
-  run_once: true
 
 - name: Check if Flux is already installed in the cluster
   shell: |
@@ -58,6 +50,7 @@
   run_once: true
   environment: "{{ kubeconfig_env }}"
   changed_when: false
+  become: false
 
 - name: Debug namespace check result
   debug:
@@ -71,6 +64,7 @@
   environment: "{{ kubeconfig_env }}"
   register: flux_install_result
   when: '"not-found" in flux_namespace_check.stdout'
+  become: false
 
 - name: Debug Flux installation result
   debug:
@@ -91,6 +85,7 @@
   run_once: true
   environment: "{{ kubeconfig_env }}"
   when: flux_install_result is defined and flux_install_result.changed
+  become: false
 
 - name: Wait for GitRepository CRD to be available
   kubernetes.core.k8s_info:
@@ -106,6 +101,7 @@
   run_once: true
   environment: "{{ kubeconfig_env }}"
   when: flux_install_result is defined and flux_install_result.changed
+  become: false
 
 - name: Create Bitwarden credentials secret in default namespace for ESO bootstrap
   kubernetes.core.k8s:
@@ -123,6 +119,7 @@
   run_once: true
   environment: "{{ kubeconfig_env }}"
   no_log: true
+  become: false
 
 - name: Bootstrap GitOps - Apply Git repository and cluster kustomization
   kubernetes.core.k8s:
@@ -132,6 +129,4 @@
   run_once: true
   environment: "{{ kubeconfig_env }}"
   loop: "{{ lookup('file', playbook_dir + '/../bootstrap.yaml') | from_yaml_all | list }}"
-
-# Note: All namespaces, ESO deployment, and other secrets will be managed by Flux/GitOps.
-# ESO will use a ClusterSecretStore to access this bootstrap secret from the default namespace.
+  become: false

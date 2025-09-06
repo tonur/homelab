@@ -1,2 +1,7 @@
 ---
-# SOPS-encrypted secrets are loaded via vars_files in the playbook
+# group_vars/all.yaml
+secrets: "{{ lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml }}"
+gigabyte_password: "{{ secrets.gigabyte_password }}"
+beelink_password: "{{ secrets.beelink_password }}"
+vhs_vps_password: "{{ secrets.vhs_vps_password }}"
+bw_access_token: "{{ secrets.bw_access_token }}"

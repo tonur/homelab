@@ -5,37 +5,44 @@
 # - Downloads and installs k3s in agent mode
 # - Connects to control plane using server IP and node token
 
-- name: Get k3s server host from inventory
+- name: Determine k3s server host (auto-detect first host in k3s_server group if unset)
   set_fact:
-    k3s_server_host: "{{ groups['k3s_server'][0] }}"
+    k3s_server_host: "{{ (groups['k3s_server'] | first) }}"
+  when: (k3s_server_host | default('')) | length == 0
 
-- name: Get k3s server Tailscale IP
-  command: tailscale status --json
-  register: tailscale_status
-  delegate_to: "{{ k3s_server_host }}"
-  
-- name: Parse Tailscale status to get server IP
+- name: Retrieve k3s server token from control plane hostvars if unset
   set_fact:
-    k3s_server_tailscale_ip: "{{ (tailscale_status.stdout | from_json).Self.TailscaleIPs[0] }}"
+    k3s_server_token: "{{ hostvars[k3s_server_host].k3s_server_token | default('') }}"
+  when: (k3s_server_token | default('')) | length == 0
+
+- name: Fail fast if k3s server host not detected
+  fail:
+    msg: "Unable to determine k3s_server_host (group k3s_server empty?)."
+  when: (k3s_server_host | default('')) | length == 0
+
+- name: Fail fast if k3s server token not available (ensure control-plane play ran)
+  fail:
+    msg: "k3s_server_token is empty. Run control-plane play first to generate node token."
+  when: (k3s_server_token | default('')) | length == 0
+
+- name: Debug resolved k3s server join parameters (only when ansible_verbosity>=2)
+  debug:
+    msg: "Joining server {{ k3s_server_host }} with token length {{ k3s_server_token | length }}"
+  when: ansible_verbosity | int >= 2
 
 - name: Get current worker node Tailscale IP
   command: tailscale status --json
   register: worker_tailscale_status
+  # Provide clearer failure if tailscale not ready yet
+  retries: 3
+  delay: 2
+  until: worker_tailscale_status.rc == 0
+  changed_when: false
+  failed_when: worker_tailscale_status.rc != 0
   
 - name: Parse worker Tailscale status to get current host IP
   set_fact:
     current_tailscale_ip: "{{ (worker_tailscale_status.stdout | from_json).Self.TailscaleIPs[0] }}"
-
-- name: Get k3s node token from server
-  slurp:
-    src: /var/lib/rancher/k3s/server/node-token
-  register: k3s_token_file
-  delegate_to: "{{ k3s_server_host }}"
-  become: true
-
-- name: Set k3s token fact
-  set_fact:
-    k3s_token: "{{ k3s_token_file.content | b64decode | trim }}"
 
 - name: Download k3s installer
   get_url:
@@ -45,8 +52,8 @@
 
 - name: Install k3s worker node
   environment:
-    K3S_URL: "https://{{ k3s_server_tailscale_ip }}:6443"
-    K3S_TOKEN: "{{ k3s_token }}"
+    K3S_URL: "https://{{ k3s_server_host }}:6443"
+    K3S_TOKEN: "{{ k3s_server_token }}"
     INSTALL_K3S_EXEC: >
       agent
       --flannel-iface tailscale0
@@ -67,10 +74,13 @@
   pause:
     seconds: 30
 
-- name: Apply taint to media node to reserve for media workloads
-  command: >
-    kubectl taint nodes {{ inventory_hostname }} 
-    media=true:NoSchedule --overwrite
+# Apply any taints provided via the 'taints' variable. Default makes node unschedulable
+# unless pods tolerate the media=true:NoSchedule taint defined in defaults.
+- name: Apply taints to node
+  command: >-
+    kubectl taint nodes {{ inventory_hostname }} {{ item }} --overwrite
+  loop: "{{ taints }}"
+  when: taints | length > 0
   delegate_to: "{{ k3s_server_host }}"
   environment:
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
