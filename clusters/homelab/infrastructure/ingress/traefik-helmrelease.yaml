@@ -21,29 +21,3 @@ spec:
   upgrade:
     remediation:
       retries: 3
-  values:
-    deployment:
-      enabled: true
-      kind: Deployment
-      replicas: 1
-
-    service:
-      enabled: true
-      type: LoadBalancer
-      spec:
-        loadBalancerIP: 198.55.102.244
-        externalTrafficPolicy: Cluster
-
-    ingressClass:
-      enabled: true
-      isDefaultClass: true
-      name: traefik
-
-    # Minimal providers: rely on chart defaults (CRD + Ingress); no extra args
-    providers: {}
-
-    # Keep persistence for ACME certificates (still minimal & practical)
-    persistence:
-      enabled: true
-      size: 128Mi
-      storageClass: local-path
