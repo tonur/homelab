@@ -22,12 +22,21 @@ spec:
     remediation:
       retries: 3
   values:
+    service:
+      type: NodePort
+      spec:
+        externalTrafficPolicy: Local
+      ports:
+        web:
+          nodePort: 30080
+        websecure:
+          nodePort: 30443
     ports:
       web:
         # Preserve real client IP via HAProxy PROXY protocol
         proxyProtocol:
           trustedIPs:
-            - 10.172.90.2   # edge gateway WireGuard IP
+            - 10.172.90.2 # edge gateway WireGuard IP
         forwardedHeaders:
           trustedIPs:
             - 10.172.90.2

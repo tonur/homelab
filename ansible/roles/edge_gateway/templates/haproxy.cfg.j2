@@ -1,5 +1,6 @@
 # Managed by Ansible - HAProxy TCP PROXY protocol passthrough
 # Mode: {{ edge_gateway_mode }}
+# Backend target IP: {{ edge_gateway_traefik_vip }} (Traefik node / WireGuard peer)
 
 global
   maxconn {{ edge_gateway_haproxy_maxconn }}
@@ -14,20 +15,20 @@ defaults
   timeout client  {{ edge_gateway_haproxy_timeout_client }}
   timeout server  {{ edge_gateway_haproxy_timeout_server }}
 
-# HTTP (plaintext) passthrough with PROXY protocol to Traefik
+# HTTP passthrough with PROXY protocol to Traefik NodePort
 frontend fe_http
-  bind *:{{ edge_gateway_proxy_backend_http_port }}
+  bind *:80
   default_backend be_http
 
 backend be_http
   server traefik_http {{ edge_gateway_traefik_vip }}:{{ edge_gateway_proxy_backend_http_port }} send-proxy-v2
 
-# HTTPS (TLS) passthrough with PROXY protocol to Traefik (Traefik terminates TLS in cluster)
+# HTTPS passthrough with PROXY protocol to Traefik NodePort
 frontend fe_https
-  bind *:{{ edge_gateway_proxy_backend_https_port }}
+  bind *:443
   default_backend be_https
 
 backend be_https
   server traefik_https {{ edge_gateway_traefik_vip }}:{{ edge_gateway_proxy_backend_https_port }} send-proxy-v2
 
-# NOTE: Ensure Traefik entryPoints web & websecure enable proxyProtocol and trust {{ edge_gateway_wg_local }} (and optionally public IP).
+# NOTE: Ensure Traefik entryPoints web & websecure enable proxyProtocol and trust {{ edge_gateway_wg_local }}.

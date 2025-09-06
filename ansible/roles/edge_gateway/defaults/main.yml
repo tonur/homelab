@@ -6,7 +6,8 @@ edge_gateway_wg_peer: 10.172.90.1
 edge_gateway_wg_peer_public_key: "s8uvfVm8iM6yigJR2OuoVN3A4mCs5iWhkQIKlhLf1Ck="
 edge_gateway_wg_peer_endpoint: "wg.kragh.dev:51820"
 edge_gateway_cluster_cidr: 192.168.50.0/24
-edge_gateway_traefik_vip: 192.168.50.240
+# Traefik backend target (now using WireGuard peer node IP instead of previous VIP 192.168.50.240)
+edge_gateway_traefik_vip: "{{ edge_gateway_wg_peer }}"
 edge_gateway_ingress_ports:
   - 80
   - 443
@@ -32,8 +33,9 @@ edge_gateway_haproxy_maxconn: 2000
 edge_gateway_haproxy_timeout_client: 60s
 edge_gateway_haproxy_timeout_server: 60s
 edge_gateway_haproxy_timeout_connect: 5s
-edge_gateway_proxy_backend_http_port: 80
-edge_gateway_proxy_backend_https_port: 443
+# Backend now points to Traefik NodePorts (set in HelmRelease). Frontend still listens 80/443.
+edge_gateway_proxy_backend_http_port: 30080
+edge_gateway_proxy_backend_https_port: 30443
 # Trusted source IPs for Traefik proxyProtocol (documented for cluster side)
 edge_gateway_proxy_trusted_source_ips:
   - "{{ edge_gateway_wg_local }}"
