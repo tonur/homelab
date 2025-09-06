@@ -21,3 +21,20 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  values:
+    ports:
+      web:
+        # Preserve real client IP via HAProxy PROXY protocol
+        proxyProtocol:
+          trustedIPs:
+            - 10.172.90.2   # edge gateway WireGuard IP
+        forwardedHeaders:
+          trustedIPs:
+            - 10.172.90.2
+      websecure:
+        proxyProtocol:
+          trustedIPs:
+            - 10.172.90.2
+        forwardedHeaders:
+          trustedIPs:
+            - 10.172.90.2

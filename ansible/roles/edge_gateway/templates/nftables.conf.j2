@@ -1,6 +1,8 @@
 #!/usr/sbin/nft -f
 flush ruleset
 
+# edge_gateway_mode: {{ edge_gateway_mode }} (template rendered)
+
 table inet filter {
   chain input {
     type filter hook input priority 0;
@@ -14,16 +16,19 @@ table inet filter {
     tcp dport 22 accept
     # Allow WireGuard UDP
     udp dport {{ edge_gateway_wireguard_port }} accept
-    # HTTP/HTTPS ingress
+    # HTTP/HTTPS ingress (either to local proxy or for DNAT prerouting)
     tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } accept
   }
   chain forward {
     type filter hook forward priority 0;
     policy drop;
     ct state {established, related} accept
-    # Allow forwarding between eth0 and wg0 only for HTTP/HTTPS to Traefik VIP
+    # In proxy mode we do not forward 80/443; only WireGuard control or other future flows.
+    {% if edge_gateway_mode == 'dnat' %}
+    # DNAT forwarding path eth0 -> wg0 limited to backend VIP ports
     iif "eth0" oif "wg0" tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } ip daddr {{ edge_gateway_traefik_vip }} accept
     iif "wg0" oif "eth0" ct state {established, related} accept
+    {% endif %}
   }
   chain output {
     type filter hook output priority 0;
@@ -31,6 +36,8 @@ table inet filter {
   }
 }
 
+{% if edge_gateway_mode == 'dnat' %}
+# DNAT mode NAT table
 table ip nat {
   chain prerouting {
     type nat hook prerouting priority -100;
@@ -40,6 +47,9 @@ table ip nat {
   }
   chain postrouting {
     type nat hook postrouting priority 100;
-    # No MASQUERADE to preserve client IP
+    # No MASQUERADE to preserve client IP (requires symmetric routing)
   }
 }
+{% else %}
+# Proxy mode: no DNAT or SNAT; HAProxy terminates TCP and re-initiates to backend over wg0.
+{% endif %}

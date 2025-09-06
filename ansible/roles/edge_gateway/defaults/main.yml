@@ -18,3 +18,24 @@ edge_gateway_healthcheck_interval_minutes: 2
 # Set to false after first deploy if you manage keys manually
 edge_gateway_generate_wg_key: true
 # Provide via vaulted variable if generate is false: edge_gateway_wg_private_key
+
+# New: operating mode for handling inbound HTTP(S)
+#   proxy  - (Option B) L4 proxy with PROXY protocol via HAProxy (preserves client IP)
+#   dnat   - (Original) DNAT forward (requires symmetric routing or SNAT) [NOT USED NOW]
+edge_gateway_mode: proxy
+
+# HAProxy specific settings (effective when edge_gateway_mode == 'proxy')
+edge_gateway_enable_haproxy: true
+edge_gateway_haproxy_user: haproxy
+edge_gateway_haproxy_group: haproxy
+edge_gateway_haproxy_maxconn: 2000
+edge_gateway_haproxy_timeout_client: 60s
+edge_gateway_haproxy_timeout_server: 60s
+edge_gateway_haproxy_timeout_connect: 5s
+edge_gateway_proxy_backend_http_port: 80
+edge_gateway_proxy_backend_https_port: 443
+# Trusted source IPs for Traefik proxyProtocol (documented for cluster side)
+edge_gateway_proxy_trusted_source_ips:
+  - "{{ edge_gateway_wg_local }}"
+# Optional: add public IP if Traefik will also trust it (example placeholder)
+#  - "<edge-public-ip>"

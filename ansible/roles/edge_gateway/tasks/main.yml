@@ -6,6 +6,7 @@
       - wireguard-tools
       - nftables
       - iproute2
+      - "{{ 'haproxy' if edge_gateway_enable_haproxy and edge_gateway_mode == 'proxy' else omit }}"
     state: present
     update_cache: yes
   when: ansible_os_family == 'Debian'
@@ -79,6 +80,24 @@
     name: nftables
     enabled: true
     state: started
+
+# New: HAProxy configuration (proxy mode)
+- name: Deploy HAProxy config
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: '0644'
+  when: edge_gateway_mode == 'proxy' and edge_gateway_enable_haproxy
+  notify: restart haproxy
+
+- name: Ensure HAProxy service enabled
+  systemd:
+    name: haproxy
+    enabled: true
+    state: started
+  when: edge_gateway_mode == 'proxy' and edge_gateway_enable_haproxy
 
 - name: Install health-check script
   copy:

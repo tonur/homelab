@@ -8,3 +8,13 @@
   systemd:
     name: nftables
     state: restarted
+
+- name: restart haproxy
+  systemd:
+    name: haproxy
+    state: restarted
+
+- name: reload haproxy
+  systemd:
+    name: haproxy
+    state: reloaded
