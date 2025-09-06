@@ -22,88 +22,28 @@ spec:
     remediation:
       retries: 3
   values:
-    # Deployment configuration
     deployment:
       enabled: true
       kind: Deployment
       replicas: 1
 
-    # Node scheduling for edge node
-    nodeSelector:
-      node.kubernetes.io/edge: "true"
-    tolerations:
-      - key: edge
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
-
-    # Service configuration
     service:
       enabled: true
-      type: NodePort
+      type: LoadBalancer
       spec:
-        externalTrafficPolicy: Cluster # Allow routing from any node
-        externalIPs:
-          - "198.55.102.244" # VPS public IP
+        loadBalancerIP: 198.55.102.244
+        externalTrafficPolicy: Cluster
 
-    # Ports configuration
-    ports:
-      web:
-        nodePort: 30080
-      websecure:
-        nodePort: 30443
-
-    # Ingress class configuration
     ingressClass:
       enabled: true
       isDefaultClass: true
       name: traefik
 
-    # Providers configuration
-    providers:
-      kubernetesIngress:
-        enabled: true
-        ingressClass: traefik
-        allowExternalNameServices: true
-        nativeLBByDefault: true # Use service load balancing instead of endpoints
-        namespaces: [] # Watch all namespaces
-      kubernetesCRD:
-        enabled: true
-        allowExternalNameServices: true
-        nativeLBByDefault: true # Use service load balancing instead of endpoints
-        namespaces: [] # Watch all namespaces
+    # Minimal providers: rely on chart defaults (CRD + Ingress); no extra args
+    providers: {}
 
-    # Additional configuration
-    additionalArguments: []
-
-    # Persistence for ACME certificates
+    # Keep persistence for ACME certificates (still minimal & practical)
     persistence:
       enabled: true
       size: 128Mi
       storageClass: local-path
-
-    # Security context
-    securityContext:
-      capabilities:
-        drop:
-          - ALL
-      readOnlyRootFilesystem: true
-      runAsGroup: 65532
-      runAsNonRoot: true
-      runAsUser: 65532
-
-    podSecurityContext:
-      fsGroup: 65532
-      fsGroupChangePolicy: OnRootMismatch
-
-    # Logs configuration
-    logs:
-      general:
-        level: INFO
-      access:
-        enabled: false
-
-    # Global arguments
-    globalArguments:
-      - "--global.checknewversion=false"
-      - "--global.sendanonymoususage=false"

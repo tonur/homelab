@@ -10,30 +10,30 @@ This is a fully automated, GitOps-based homelab for the `kragh.dev` domain using
 ## Architecture
 
 ### Physical Infrastructure
-- **3 machines** connected via Tailscale mesh network:
+- **2 machines** connected via Tailscale mesh network:
   - **Gigabyte** (192.168.50.16) - k3s control plane/server (local)
   - **Beelink** (192.168.50.220) - k3s worker node (local)  
-  - **VPS Edge** (198.55.102.244) - k3s agent for public ingress (cloud)
+
+(Future: reinstate external exposure via BGP / pfSense + LoadBalancer IP; former standalone VPS edge node has been decommissioned.)
 
 ### Network Topology
 
 ```text
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   VPS Edge      │    │    Gigabyte     │    │    Beelink      │
-│   (k3s agent)   │    │  (k3s server)   │    │  (k3s agent)    │
-│                 │    │                 │    │                 │
-│ - Public access │    │ - Control plane │    │ - Worker node   │
-│ - Load balancer │    │ - GitOps        │    │ - Applications  │
-│ - Traefik edge  │    │ - Flux CD       │    │ - Local storage │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Tailscale     │
-                    │  Mesh Network   │
-                    │ (100.x.x.x IPs) │
-                    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐
+│    Gigabyte     │    │    Beelink      │
+│  (k3s server)   │    │  (k3s agent)    │
+│                 │    │                 │
+│ - Control plane │    │ - Applications  │
+│ - GitOps        │    │ - Local storage │
+└─────────────────┘    └─────────────────┘
+          │                 │
+          └─────────────────┘
+                 │
+        ┌─────────────────┐
+        │   Tailscale     │
+        │  Mesh Network   │
+        │ (100.x.x.x IPs) │
+        └─────────────────┘
 ```
 
 ## Technology Stack
@@ -57,10 +57,9 @@ This is a fully automated, GitOps-based homelab for the `kragh.dev` domain using
 - **TLS**: Automated certificates via cert-manager + Hetzner DNS
 
 ### Networking & Load Balancing
-- **Cross-Node Challenge**: Flannel VXLAN backend over Tailscale mesh doesn't support direct pod-to-pod traffic
-- **Solution**: Traefik IngressRoute with `nativeLB: true` for service-based load balancing
-- **Implementation**: Traffic flows through Kubernetes service VIPs instead of direct pod IPs
-- **Result**: Reliable multi-node deployments without duplicate services or networking workarounds
+- **Current**: Internal cluster access via NodePorts / future LoadBalancer IP (BGP/pfSense planned)
+- **Traefik Strategy**: Standard deployment, schedules on any node
+- **Planned Evolution**: Introduce BGP (MetalLB or FRR) with pfSense to advertise a stable public/service IP
 
 **Key Configuration**:
 
@@ -71,7 +70,7 @@ spec:
   routes:
     - services:
         - name: service-name
-          nativeLB: true  # Forces service VIP routing
+          nativeLB: true
 ```
 
 ## Project Structure
@@ -82,7 +81,7 @@ spec:
 ansible/
 ├── site.yaml                    # Main playbook orchestrating all roles
 ├── inventory/
-│   ├── hosts.yaml              # Server inventory (3 machines)
+│   ├── hosts.yaml              # Server inventory (2 machines + legacy entries retained)
 │   └── group_vars/all.yml      # Global variables
 ├── secrets/
 │   └── homelab.yaml           # SOPS-encrypted secrets
@@ -91,7 +90,6 @@ ansible/
     ├── tailscale/             # Tailscale mesh networking
     ├── k3s-control-plane/     # Kubernetes control plane (gigabyte)
     ├── k3s-worker-nodes/      # Worker node setup (beelink)
-    ├── k3s-edge-node/         # Edge node setup (vps)
     └── gitops-bootstrap/      # Flux CD bootstrap
 ```
 
@@ -130,6 +128,8 @@ FluxCD manages staged deployment with proper dependencies:
 
 ### Ansible Inventory (`ansible/inventory/hosts.yaml`)
 
+(Edge node entries retained in repository at user request; active cluster currently uses only Gigabyte + Beelink.)
+
 ```yaml
 k3s_server:
   hosts:
@@ -142,26 +142,19 @@ k3s_agents:
     beelink:
       ansible_host: 192.168.50.220
       ansible_user: chkpe
-
-edge:
-  hosts:
-    vhs-vps:
-      ansible_host: 198.55.102.244
-      ansible_user: root
 ```
 
 ### Traefik Configuration
-- **Edge deployment**: Runs on VPS with `node.kubernetes.io/edge: "true"`
-- **Public IP**: 198.55.102.244 exposed via NodePort
-- **Ports**: 80 (→30080), 443 (→30443)
-- **Dashboard**: `traefik.kragh.dev`
-- **ACME**: Let's Encrypt with HTTP challenge
+- **Current Mode**: Standard deployment (no edge-only scheduling)
+- **Future**: BGP-advertised LoadBalancer IP via pfSense/MetalLB
+- **Ingress Class**: `traefik`
+- **TLS**: Managed by cert-manager
 
 ### Domain & DNS
 - **Primary domain**: `kragh.dev`
 - **Applications**:
   - `kragh.dev` → json-resume (personal CV)
-  - `traefik.kragh.dev` → Traefik dashboard
+  - (Dashboard exposure strategy TBD post BGP integration)
 - **DNS provider**: Hetzner DNS with API automation
 
 ## Current Applications
@@ -172,7 +165,7 @@ edge:
   - **Technology**: Static site with JSON Resume format
   - **Ingress**: Traefik IngressRoute with `nativeLB: true`
   - **Security**: Automated TLS certificates via Let's Encrypt + Hetzner DNS
-  - **Service**: Single ClusterIP service (10.43.88.207)
+  - **Service**: Single ClusterIP service
   - **Status**: Live and operational ✅
 
 ### 🚧 Planned Applications
@@ -314,7 +307,7 @@ The homelab uses a **two-phase bootstrap approach**:
 
 ### Phase 1: Infrastructure Bootstrap (Ansible)
 1. **Provision machines**: Base system setup + Tailscale mesh networking
-2. **Deploy k3s**: Control plane, worker nodes, and edge node
+2. **Deploy k3s**: Control plane and worker nodes
 3. **GitOps bootstrap**: Apply `bootstrap.yaml` to create:
    - `flux-system` namespace
    - GitRepository pointing to this repo

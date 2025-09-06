@@ -7,7 +7,7 @@ Note from developer: please use "flux reconcile kustomization flux-system --with
 Use this as system context when working with this homelab repository.
 
 ## Quick Overview
-- **3-node k3s cluster**: Gigabyte (control), Beelink (worker), vhs-vps (public ingress)
+- **k3s cluster**: Gigabyte (control) + Beelink (worker) (former edge VPS removed; future BGP/pfSense LB planned)
 - **GitOps**: FluxCD manages everything from Git
 - **Networking**: Tailscale mesh + Traefik ingress
 - **Secrets**: External Secrets Operator + Bitwarden
@@ -25,7 +25,7 @@ Use this as system context when working with this homelab repository.
 ```text
 ├── ansible/                 # Infrastructure provisioning
 │   ├── site.yaml           # Main playbook
-│   ├── inventory/hosts.yaml # 3 machines
+│   ├── inventory/hosts.yaml # Machines
 │   └── secrets/homelab.yaml # SOPS encrypted
 ├── clusters/homelab/        # GitOps manifests
 │   ├── infrastructure/     # cert-manager → config → external-secrets → secrets-config → ingress
