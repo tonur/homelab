@@ -66,16 +66,3 @@ spec:
     # Cert controller for webhook certificates
     certController:
       create: true
-
-    # Tolerations to allow scheduling on any node despite taints
-    tolerations:
-      - key: edge
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
-      - key: media
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
-
-
