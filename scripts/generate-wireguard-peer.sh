@@ -4,7 +4,7 @@ set -euo pipefail
 # generate-wireguard-peer.sh
 # Helper to generate a WireGuard keypair + config snippet for edge gateway peer variables.
 # It outputs:
-#  - Private key (to store securely, e.g. in SOPS encrypted vars as edge_gateway_wg_private_key)
+#  - Private key (to store securely, e.g. in SOPS encrypted vars as wg_private_key)
 #  - Public key
 #  - Example Ansible vars to add to host/group vars for the opposite peer
 #  - Example wg0.conf snippet for manual setups
@@ -50,7 +50,7 @@ Public Key:
 $pub_key
 
 Add to encrypted Ansible vars (e.g. group_vars/edge.yml or host_vars/<host>.yml via SOPS):
-  edge_gateway_wg_private_key: "$priv_key"
+  wg_private_key: "$priv_key"
 
 If this node is the home peer (existing in defaults as edge_gateway_wg_peer): set on the edge gateway:
   edge_gateway_wg_peer_public_key: "$pub_key"

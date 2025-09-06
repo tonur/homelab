@@ -22,18 +22,18 @@
 - name: Generate WireGuard private key (first run)
   command: wg genkey
   register: wg_private_key_gen
-  when: edge_gateway_generate_wg_key and (edge_gateway_wg_private_key is not defined)
+  when: edge_gateway_generate_wg_key and (wg_private_key is not defined)
   changed_when: true
 
 - name: Set generated private key fact
   set_fact:
-    edge_gateway_wg_private_key: "{{ wg_private_key_gen.stdout }}"
-  when: edge_gateway_generate_wg_key and (edge_gateway_wg_private_key is not defined)
+    wg_private_key: "{{ wg_private_key_gen.stdout }}"
+  when: edge_gateway_generate_wg_key and (wg_private_key is not defined)
 
 - name: Fail if no private key available
   fail:
-    msg: "WireGuard private key must be provided (edge_gateway_wg_private_key) or generation enabled"
-  when: edge_gateway_wg_private_key is not defined
+    msg: "WireGuard private key must be provided (wg_private_key) or generation enabled"
+  when: wg_private_key is not defined
 
 - name: Ensure config directory exists
   file:
@@ -151,6 +151,30 @@
 
 - name: Show generated WireGuard private key (first run only)
   debug:
-    msg: "Generated WireGuard private key (store securely & encrypt with SOPS): {{ edge_gateway_wg_private_key }}"
+    msg: "Generated WireGuard private key (store securely & encrypt with SOPS)."
   when: edge_gateway_generate_wg_key and wg_private_key_gen is defined
   no_log: true
+
+- name: Derive edge WireGuard public key
+  command: bash -c 'echo "{{ wg_private_key }}" | wg pubkey'
+  register: edge_pubkey_calc
+  changed_when: false
+  when: wg_private_key is defined
+  no_log: true
+
+- name: Set edge public key fact
+  set_fact:
+    edge_gateway_wg_public_key: "{{ edge_pubkey_calc.stdout }}"
+  when: edge_pubkey_calc is defined
+  no_log: true
+
+- name: Collect peer public key from k3s_server host (wireguard_peer role)
+  set_fact:
+    edge_gateway_wg_peer_public_key: "{{ hostvars[groups['k3s_server'][0]].wireguard_peer_public_key | default('') }}"
+  when: groups['k3s_server'] | length > 0 and (edge_gateway_wg_peer_public_key is not defined or not edge_gateway_wg_peer_public_key)
+  no_log: true
+
+- name: Fail if peer public key still missing
+  fail:
+    msg: "WireGuard peer public key not available. Ensure wireguard_peer role ran and its private key is configured (wireguard_peer_private_key)."
+  when: edge_gateway_wg_peer_public_key is not defined or edge_gateway_wg_peer_public_key | length == 0

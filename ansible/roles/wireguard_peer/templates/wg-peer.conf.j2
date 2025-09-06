@@ -1,0 +1,12 @@
+[Interface]
+Address = {{ wireguard_peer_address }}
+ListenPort = {{ wireguard_peer_listen_port }}
+PrivateKey = {{ wireguard_peer_private_key }}
+PostUp = sysctl -w net.ipv4.ip_forward=1
+PostDown = sysctl -w net.ipv4.ip_forward=0
+
+[Peer]
+PublicKey = {{ wireguard_edge_public_key | default('MISSING_EDGE_PUBLIC_KEY') }}
+Endpoint = {{ wireguard_edge_endpoint }}
+AllowedIPs = {{ wireguard_edge_allowed_ip }}
+PersistentKeepalive = {{ wireguard_peer_persistent_keepalive }}

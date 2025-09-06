@@ -3,7 +3,6 @@
 edge_gateway_wireguard_port: 51820
 edge_gateway_wg_local: 10.172.90.2
 edge_gateway_wg_peer: 10.172.90.1
-edge_gateway_wg_peer_public_key: "s8uvfVm8iM6yigJR2OuoVN3A4mCs5iWhkQIKlhLf1Ck="
 edge_gateway_wg_peer_endpoint: "wg.kragh.dev:51820"
 edge_gateway_cluster_cidr: 192.168.50.0/24
 # Traefik backend target (now using WireGuard peer node IP instead of previous VIP 192.168.50.240)
@@ -18,7 +17,7 @@ edge_gateway_healthcheck_interval: "*/2 * * * *"  # deprecated, unused
 edge_gateway_healthcheck_interval_minutes: 2
 # Set to false after first deploy if you manage keys manually
 edge_gateway_generate_wg_key: true
-# Provide via vaulted variable if generate is false: edge_gateway_wg_private_key
+# Provide via vaulted variable if generate is false: wg_private_key
 
 # New: operating mode for handling inbound HTTP(S)
 #   proxy  - (Option B) L4 proxy with PROXY protocol via HAProxy (preserves client IP)

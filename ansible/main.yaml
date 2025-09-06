@@ -13,6 +13,7 @@
   tags: [k3s, control-plane]
   roles:
     - { role: k3s-control-plane, tags: [k3s, control-plane] }
+    - { role: wireguard_peer, tags: [wireguard, wgpeer] }
 
 - name: k3s worker nodes
   hosts: k3s_agents
