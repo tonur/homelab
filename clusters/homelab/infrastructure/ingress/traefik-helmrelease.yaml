@@ -23,16 +23,13 @@ spec:
       retries: 3
   values:
     service:
-      enabled: true
       type: NodePort
       spec:
         externalTrafficPolicy: Local
       ports:
         web:
-          port: 80
           nodePort: 31080
         websecure:
-          port: 443
           nodePort: 31443
     ports:
       web:
