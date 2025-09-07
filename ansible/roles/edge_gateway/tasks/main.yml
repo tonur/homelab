@@ -1,4 +1,8 @@
 ---
+- name: Gather facts if missing
+  setup:
+  when: ansible_facts is not defined or (ansible_facts.os_family is not defined)
+
 - name: Ensure required packages
   apt:
     name:
@@ -9,31 +13,66 @@
       - "{{ 'haproxy' if edge_gateway_enable_haproxy and edge_gateway_mode == 'proxy' else omit }}"
     state: present
     update_cache: yes
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] | default('') == 'Debian'
 
-- name: Validate required peer configuration
-  assert:
-    that:
-      - edge_gateway_wg_peer_public_key | length > 0
-      - edge_gateway_wg_peer_endpoint | length > 0
-    fail_msg: "edge_gateway_wg_peer_public_key and edge_gateway_wg_peer_endpoint must be defined (set in host/group vars or vaulted)."
-    success_msg: "Peer configuration present."
+# Collect peer public key early (may be empty initially)
+- name: Collect peer public key from k3s_server host (wireguard_peer role)
+  set_fact:
+    edge_gateway_wg_peer_public_key: "{{ hostvars[groups['k3s_server'][0]].wireguard_peer_public_key | default(hostvars[groups['k3s_server'][0]].ansible_local.wireguard.public_key | default('')) }}"
+  when: groups['k3s_server'] | length > 0
+  no_log: true
 
-- name: Generate WireGuard private key (first run)
+- name: Warn if peer public key missing (continuing without peer)
+  debug:
+    msg: "Peer public key missing; deploying interface without peer. Will reconcile later in play if it appears."
+  when: edge_gateway_wg_peer_public_key | default('') | length == 0
+
+- name: Generate WireGuard private key (only if not provided via SOPS)
   command: wg genkey
   register: edge_gateway_wg_private_key_gen
-  when: edge_gateway_generate_wg_key and (edge_gateway_wg_private_key is not defined)
+  when: edge_gateway_wg_private_key is not defined or edge_gateway_wg_private_key is none or edge_gateway_wg_private_key == ''
   changed_when: true
 
 - name: Set generated private key fact
   set_fact:
     edge_gateway_wg_private_key: "{{ edge_gateway_wg_private_key_gen.stdout }}"
-  when: edge_gateway_generate_wg_key and (edge_gateway_wg_private_key is not defined)
+  when: edge_gateway_wg_private_key_gen is defined and edge_gateway_wg_private_key_gen.stdout is defined
 
 - name: Fail if no private key available
   fail:
     msg: "WireGuard private key must be provided (edge_gateway_wg_private_key) or generation enabled"
   when: edge_gateway_wg_private_key is not defined
+
+- name: Derive edge WireGuard public key
+  command: bash -c 'echo "{{ edge_gateway_wg_private_key }}" | wg pubkey'
+  register: edge_pubkey_calc
+  changed_when: false
+  when: edge_gateway_wg_private_key is defined
+  no_log: true
+
+- name: Set edge public key fact
+  set_fact:
+    edge_gateway_wg_public_key: "{{ edge_pubkey_calc.stdout }}"
+  when: edge_pubkey_calc is defined
+  no_log: true
+
+- name: Ensure custom facts directory exists
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Persist edge WireGuard public key as custom fact
+  copy:
+    dest: /etc/ansible/facts.d/wireguard.fact
+    content: |-
+      {"public_key": "{{ edge_gateway_wg_public_key }}"}
+    owner: root
+    group: root
+    mode: '0644'
+  when: edge_gateway_wg_public_key is defined and edge_gateway_wg_public_key | length > 0
 
 - name: Ensure config directory exists
   file:
@@ -81,7 +120,6 @@
     enabled: true
     state: started
 
-# New: HAProxy configuration (proxy mode)
 - name: Deploy HAProxy config
   template:
     src: haproxy.cfg.j2
@@ -111,7 +149,7 @@
 - name: Create systemd timer unit
   copy:
     dest: /etc/systemd/system/edge-gateway-health.timer
-    content: |
+    content: |-
       [Unit]
       Description=Edge gateway WireGuard health timer
 
@@ -128,7 +166,7 @@
 - name: Create systemd service unit
   copy:
     dest: /etc/systemd/system/edge-gateway-health.service
-    content: |
+    content: |-
       [Unit]
       Description=Edge gateway WireGuard health check
 
@@ -149,32 +187,51 @@
     state: started
   when: edge_gateway_enable_healthcheck
 
+# Reconciliation phase: after peer role ran we might now know its key (same play run ordering). Re-evaluate and patch config if needed.
+- name: Try to read peer custom fact file directly
+  slurp:
+    src: /etc/ansible/facts.d/wireguard.fact
+  register: peer_custom_fact_raw
+  delegate_to: "{{ groups['k3s_server'][0] }}"
+  failed_when: false
+  when: groups['k3s_server'] | length > 0
+
+- name: Parse peer custom fact
+  set_fact:
+    peer_custom_fact: "{{ peer_custom_fact_raw.content | b64decode | from_json }}"
+  when: peer_custom_fact_raw is defined and peer_custom_fact_raw.content is defined
+  no_log: true
+
+- name: Re-collect peer public key post-run
+  set_fact:
+    edge_gateway_wg_peer_public_key: "{{ hostvars[groups['k3s_server'][0]].wireguard_peer_public_key | default(peer_custom_fact.public_key | default(edge_gateway_wg_peer_public_key | default(''))) }}"
+  when: groups['k3s_server'] | length > 0
+  no_log: true
+
+- name: Patch WireGuard config to add peer if it was missing earlier
+  block:
+    - name: Read existing config
+      slurp:
+        src: /etc/wireguard/wg0.conf
+      register: existing_edge_wg_conf
+
+    - name: Determine if peer section present
+      set_fact:
+        edge_has_peer_section: "{{ (existing_edge_wg_conf.content | b64decode).find('[Peer]') != -1 }}"
+
+    - name: Re-template wg0.conf now that peer key is known
+      template:
+        src: wg0.conf.j2
+        dest: /etc/wireguard/wg0.conf
+        owner: root
+        group: root
+        mode: '0600'
+      when: not edge_has_peer_section and (edge_gateway_wg_peer_public_key | default('') | length == 44)
+      notify: restart wireguard
+  when: edge_gateway_wg_peer_public_key | default('') | length == 44
+
 - name: Show generated WireGuard private key (first run only)
   debug:
     msg: "Generated WireGuard private key (store securely & encrypt with SOPS)."
   when: edge_gateway_generate_wg_key and edge_gateway_wg_private_key_gen is defined
   no_log: true
-
-- name: Derive edge WireGuard public key
-  command: bash -c 'echo "{{ edge_gateway_wg_private_key }}" | wg pubkey'
-  register: edge_pubkey_calc
-  changed_when: false
-  when: edge_gateway_wg_private_key is defined
-  no_log: true
-
-- name: Set edge public key fact
-  set_fact:
-    edge_gateway_wg_public_key: "{{ edge_pubkey_calc.stdout }}"
-  when: edge_pubkey_calc is defined
-  no_log: true
-
-- name: Collect peer public key from k3s_server host (wireguard_peer role)
-  set_fact:
-    edge_gateway_wg_peer_public_key: "{{ hostvars[groups['k3s_server'][0]].wireguard_peer_public_key | default('') }}"
-  when: groups['k3s_server'] | length > 0 and (edge_gateway_wg_peer_public_key is not defined or not edge_gateway_wg_peer_public_key)
-  no_log: true
-
-- name: Fail if peer public key still missing
-  fail:
-    msg: "WireGuard peer public key not available. Ensure wireguard_peer role ran and its private key is configured (wireguard_peer_private_key)."
-  when: edge_gateway_wg_peer_public_key is not defined or edge_gateway_wg_peer_public_key | length == 0

@@ -5,8 +5,12 @@ PrivateKey = {{ wireguard_peer_private_key }}
 PostUp = sysctl -w net.ipv4.ip_forward=1
 PostDown = sysctl -w net.ipv4.ip_forward=0
 
+{% if wireguard_edge_public_key is defined and wireguard_edge_public_key | length == 44 and wireguard_edge_public_key is match('^[A-Za-z0-9+/]{43}=$') %}
 [Peer]
-PublicKey = {{ wireguard_edge_public_key | default('MISSING_EDGE_PUBLIC_KEY') }}
+PublicKey = {{ wireguard_edge_public_key }}
 Endpoint = {{ wireguard_edge_endpoint }}
 AllowedIPs = {{ wireguard_edge_allowed_ip }}
 PersistentKeepalive = {{ wireguard_peer_persistent_keepalive }}
+{% else %}
+# Peer section omitted (edge public key not yet available or invalid). Re-run play after edge key derivation.
+{% endif %}

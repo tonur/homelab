@@ -1,4 +1,8 @@
 ---
+- name: Gather facts if missing
+  setup:
+  when: ansible_facts is not defined
+
 - name: Ensure required packages
   apt:
     name:
@@ -7,18 +11,24 @@
       - iproute2
     state: present
     update_cache: yes
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] | default('') == 'Debian'
 
-- name: Generate WireGuard private key (first run)
+- name: Use vaulted control plane private key if provided
+  set_fact:
+    wireguard_peer_private_key: "{{ control_plane_wg_private_key }}"
+  when: control_plane_wg_private_key is defined and control_plane_wg_private_key | length > 0
+  no_log: true
+
+- name: Generate WireGuard private key (only if not provided via SOPS)
   command: wg genkey
   register: wireguard_peer_key_gen
-  when: wireguard_peer_generate_key and (wireguard_peer_private_key is not defined or not wireguard_peer_private_key)
+  when: wireguard_peer_private_key is not defined or wireguard_peer_private_key is none or wireguard_peer_private_key == ''
   changed_when: true
 
 - name: Set generated private key fact
   set_fact:
     wireguard_peer_private_key: "{{ wireguard_peer_key_gen.stdout }}"
-  when: wireguard_peer_generate_key and (wireguard_peer_private_key is not defined or not wireguard_peer_private_key)
+  when: wireguard_peer_key_gen is defined and wireguard_peer_key_gen.stdout is defined
   no_log: true
 
 - name: Fail if no private key available
@@ -36,6 +46,48 @@
   set_fact:
     wireguard_peer_public_key: "{{ wireguard_peer_pub.stdout }}"
   no_log: true
+
+- name: Ensure custom facts directory exists
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Persist peer WireGuard public key as custom fact
+  copy:
+    dest: /etc/ansible/facts.d/wireguard.fact
+    content: |-
+      {"public_key": "{{ wireguard_peer_public_key }}"}
+    owner: root
+    group: root
+    mode: '0644'
+  when: wireguard_peer_public_key is defined and wireguard_peer_public_key | length > 0
+
+- name: Collect edge public key (derived from its private key or custom fact)
+  set_fact:
+    wireguard_edge_public_key: "{{ hostvars[groups['edge'][0]].edge_gateway_wg_public_key | default(hostvars[groups['edge'][0]].ansible_local.wireguard.public_key | default('')) }}"
+  when: groups['edge'] is defined and groups['edge'] | length > 0
+  no_log: true
+
+- name: Derive edge public key from secret (fallback)
+  command: bash -c 'echo "{{ edge_gateway_wg_private_key }}" | wg pubkey'
+  register: edge_pub_from_secret
+  when: (wireguard_edge_public_key is not defined or wireguard_edge_public_key | length == 0) and (edge_gateway_wg_private_key is defined and edge_gateway_wg_private_key | length > 0)
+  changed_when: false
+  no_log: true
+
+- name: Set edge public key fact from secret derivation
+  set_fact:
+    wireguard_edge_public_key: "{{ edge_pub_from_secret.stdout }}"
+  when: edge_pub_from_secret is defined and edge_pub_from_secret.stdout is defined and edge_pub_from_secret.stdout | length > 0
+  no_log: true
+
+- name: Warn if edge public key still missing
+  debug:
+    msg: "Edge public key unavailable; deploying interface without peer. Will patch later in this play if it appears."
+  when: wireguard_edge_public_key is not defined or wireguard_edge_public_key | length == 0
 
 - name: Ensure config directory exists
   file:
@@ -59,6 +111,35 @@
     name: wg-quick@{{ wireguard_peer_interface }}
     enabled: true
     state: started
+
+# Reconciliation: if edge key becomes known (because edge play ran earlier in same run) and peer section missing, patch config now.
+- name: Re-collect edge public key after possible fact publication
+  set_fact:
+    wireguard_edge_public_key: "{{ hostvars[groups['edge'][0]].edge_gateway_wg_public_key | default(hostvars[groups['edge'][0]].ansible_local.wireguard.public_key | default(wireguard_edge_public_key | default(''))) }}"
+  when: groups['edge'] is defined and groups['edge'] | length > 0
+  no_log: true
+
+- name: Patch peer config to add edge if missing
+  block:
+    - name: Read existing peer config
+      slurp:
+        src: /etc/wireguard/{{ wireguard_peer_interface }}.conf
+      register: existing_peer_wg_conf
+
+    - name: Determine if peer section present
+      set_fact:
+        peer_has_edge_section: "{{ (existing_peer_wg_conf.content | b64decode).find('[Peer]') != -1 }}"
+
+    - name: Re-template peer config now that edge key is known
+      template:
+        src: wg-peer.conf.j2
+        dest: /etc/wireguard/{{ wireguard_peer_interface }}.conf
+        owner: root
+        group: root
+        mode: '0600'
+      when: not peer_has_edge_section and (wireguard_edge_public_key | default('') | length == 44)
+      notify: restart wireguard peer
+  when: wireguard_edge_public_key | default('') | length == 44
 
 - name: Show generated WireGuard peer private key (first run only)
   debug:

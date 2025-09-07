@@ -15,9 +15,9 @@ edge_gateway_enable_healthcheck: true
 edge_gateway_healthcheck_interval: "*/2 * * * *"  # deprecated, unused
 # New: minutes between health checks (monotonic timer)
 edge_gateway_healthcheck_interval_minutes: 2
-# Set to false after first deploy if you manage keys manually
-edge_gateway_generate_wg_key: true
-# Provide via vaulted variable if generate is false: edge_gateway_wg_private_key
+# Generate keys only if not provided via SOPS secrets
+edge_gateway_generate_wg_key: false
+# Provide via vaulted variable: edge_gateway_wg_private_key
 
 # New: operating mode for handling inbound HTTP(S)
 #   proxy  - (Option B) L4 proxy with PROXY protocol via HAProxy (preserves client IP)

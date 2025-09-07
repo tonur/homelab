@@ -3,9 +3,8 @@
 wireguard_peer_interface: wg0
 wireguard_peer_address: 10.172.90.1/32
 wireguard_peer_listen_port: 51821  # cluster side optional listen (different from edge 51820)
-wireguard_edge_public_key: "CHANGE_ME_EDGE_PUBLIC_KEY"
 wireguard_edge_endpoint: "wg.kragh.dev:51820"
 wireguard_edge_allowed_ip: 10.172.90.2/32
-wireguard_peer_private_key: null  # Provide via vaulted var or generation
-wireguard_peer_generate_key: true
+wireguard_peer_private_key: null  # Provide via vaulted var (control_plane_wg_private_key)
+wireguard_peer_generate_key: false  # Generate only if not provided via SOPS
 wireguard_peer_persistent_keepalive: 25

@@ -6,9 +6,13 @@ PrivateKey = {{ edge_gateway_wg_private_key }}
 PostUp = sysctl -w net.ipv4.ip_forward=1
 PostDown = sysctl -w net.ipv4.ip_forward=0
 
+{% if edge_gateway_wg_peer_public_key is defined and edge_gateway_wg_peer_public_key | length == 44 and edge_gateway_wg_peer_public_key is match('^[A-Za-z0-9+/]{43}=$') %}
 [Peer]
 # Home peer
 PublicKey = {{ edge_gateway_wg_peer_public_key }}
 AllowedIPs = {{ edge_gateway_cluster_cidr }}, {{ edge_gateway_wg_peer }}/32
 PersistentKeepalive = 25
 Endpoint = {{ edge_gateway_wg_peer_endpoint }}
+{% else %}
+# Peer section omitted; re-run after peer public key known.
+{% endif %}

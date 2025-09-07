@@ -23,7 +23,9 @@ table inet filter {
     type filter hook forward priority 0;
     policy drop;
     ct state {established, related} accept
-    # In proxy mode we do not forward 80/443; only WireGuard control or other future flows.
+    # Allow WireGuard interface traffic forwarding (needed for peer communication)
+    iif "wg0" accept
+    oif "wg0" accept
     {% if edge_gateway_mode == 'dnat' %}
     # DNAT forwarding path eth0 -> wg0 limited to backend VIP ports
     iif "eth0" oif "wg0" tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } ip daddr {{ edge_gateway_traefik_vip }} accept

@@ -7,10 +7,21 @@
     - { role: base, tags: [initial, base] }
     - { role: tailscale, tags: [initial, tailscale] }
 
+- name: Configure edge gateway
+  hosts: edge
+  become: true
+  tags: [edge, gateway, wireguard]
+  vars:
+    edge_gateway_wg_private_key: "{{ (lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml)['edge_gateway_wg_private_key'] }}"
+  roles:
+    - { role: edge_gateway, tags: [wireguard, edge, gateway] }
+
 - name: k3s control plane
   hosts: k3s_server
   become: true
-  tags: [k3s, control-plane]
+  tags: [k3s, control-plane, wireguard]
+  vars:
+    control_plane_wg_private_key: "{{ (lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml)['control_plane_wg_private_key'] }}"
   roles:
     - { role: k3s-control-plane, tags: [k3s, control-plane] }
     - { role: wireguard_peer, tags: [wireguard, wgpeer] }
@@ -28,10 +39,3 @@
   tags: [gitops, flux]
   roles:
     - { role: gitops-bootstrap, tags: [gitops, flux] }
-
-- name: Configure edge gateway
-  hosts: edge
-  become: true
-  tags: [edge, gateway]
-  roles:
-    - { role: edge_gateway, tags: [edge, gateway] }

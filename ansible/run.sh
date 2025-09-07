@@ -11,5 +11,5 @@ cd "$script_dir"
 if [[ -f collections/requirements.yml ]]; then
   ansible-galaxy collection install -r collections/requirements.yml >/dev/null
 fi
-
+export SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt
 ansible-playbook -i inventory/hosts.yaml main.yaml "$@"
