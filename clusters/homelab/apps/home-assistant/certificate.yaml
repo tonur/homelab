@@ -7,7 +7,7 @@ metadata:
 spec:
   secretName: home-assistant-tls
   issuerRef:
-    name: letsencrypt-production
+    name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
     - "home.kragh.dev"
