@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: json-resume-tls
+  namespace: json-resume
+spec:
+  secretName: json-resume-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - kragh.dev
+  duration: 2160h # 90 days
+  renewBefore: 720h # 30 days

@@ -10,6 +10,7 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingressroute.yaml
+  - certificate.yaml
 
 configMapGenerator:
   - name: resume-data
