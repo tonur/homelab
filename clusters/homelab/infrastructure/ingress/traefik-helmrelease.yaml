@@ -28,9 +28,9 @@ spec:
         externalTrafficPolicy: Local
       ports:
         web:
-          nodePort: 30080
+          nodePort: 31080
         websecure:
-          nodePort: 30443
+          nodePort: 31443
     ports:
       web:
         # Preserve real client IP via HAProxy PROXY protocol
