@@ -10,7 +10,7 @@
 - name: Configure edge gateway
   hosts: edge
   become: true
-  tags: [edge, gateway, wireguard]
+  tags: [wireguard, edge, gateway]
   vars:
     edge_gateway_wg_private_key: "{{ (lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml)['edge_gateway_wg_private_key'] }}"
   roles:
