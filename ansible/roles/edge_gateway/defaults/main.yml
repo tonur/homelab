@@ -33,8 +33,8 @@ edge_gateway_haproxy_timeout_client: 60s
 edge_gateway_haproxy_timeout_server: 60s
 edge_gateway_haproxy_timeout_connect: 5s
 # Backend now points to Traefik NodePorts (set in HelmRelease). Frontend still listens 80/443.
-edge_gateway_proxy_backend_http_port: 31028
-edge_gateway_proxy_backend_https_port: 31752
+edge_gateway_proxy_backend_http_port: 30080
+edge_gateway_proxy_backend_https_port: 30443
 # Trusted source IPs for Traefik proxyProtocol (documented for cluster side)
 edge_gateway_proxy_trusted_source_ips:
   - "{{ edge_gateway_wg_local }}"
