@@ -4,7 +4,7 @@ kind: Kustomization
 
 resources:
   - json-resume
+  - home-assistant
 # Future apps will be added here:
-#   - home-assistant
 #   - nextcloud
 #   - etc

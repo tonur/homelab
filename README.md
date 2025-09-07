@@ -151,7 +151,6 @@ homelab/
 - [x] Configure service-based load balancing for multi-node clusters
 
 ### **Infrastructure 🚧 In Progress**
-- [ ] Rework Ansible roles since current setup doesn't work
 - [ ] Set up automated backups with Restic
 - [ ] Configure monitoring with Prometheus/Grafana
 - [ ] Implement log aggregation and centralized logging

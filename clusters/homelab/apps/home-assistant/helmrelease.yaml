@@ -1,0 +1,130 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+  namespace: flux-system
+spec:
+  interval: 15m
+  targetNamespace: home-assistant
+  chart:
+    spec:
+      chart: app-template
+      version: "4.2.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    # Configure options applied to all pods
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: "OnRootMismatch"
+
+    controllers:
+      # Configure the main controller
+      main:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          # Configure the main application container
+          main:
+            image:
+              # Official Home Assistant image
+              repository: ghcr.io/home-assistant/home-assistant
+              # Latest stable version
+              tag: "2025.9.1"
+
+            resources:
+              limits:
+                cpu: 2000m
+                memory: 2Gi
+              requests:
+                cpu: 100m
+                memory: 512Mi
+
+            env:
+              TZ: "UTC"
+              # Disable privileged mode for security
+              HASS_SERVER_HOST: "0.0.0.0"
+
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /api/
+                    port: 8123
+                  initialDelaySeconds: 60
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+
+              readiness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /api/
+                    port: 8123
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+
+    service:
+      # Configure a service for the main application
+      main:
+        controller: main
+        type: ClusterIP
+        ports:
+          http:
+            port: 8123
+
+    ingress:
+      # Configure an Ingress for the main application
+      main:
+        annotations:
+          cert-manager.io/cluster-issuer: "letsencrypt-production"
+        hosts:
+          - host: &host "home.kragh.dev"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - *host
+            secretName: home-assistant-tls
+
+    persistence:
+      # Configure the main configuration storage location
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: "local-path"
+        globalMounts:
+          - path: /config
+
+      # Configure temporary storage for logs
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
