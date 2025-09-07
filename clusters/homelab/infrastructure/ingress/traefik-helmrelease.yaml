@@ -26,25 +26,17 @@ spec:
       type: NodePort
       spec:
         externalTrafficPolicy: Local
-      ports:
-        web:
-          nodePort: 31080
-        websecure:
-          nodePort: 31443
     ports:
       web:
-        port: 8000
-        expose: true
-        exposedPort: 80
         nodePort: 31080
-        # Preserve real client IP via HAProxy PROXY protocol
         proxyProtocol:
           trustedIPs:
-            - 10.172.90.2 # edge gateway WireGuard IP
+            - 10.172.90.2
         forwardedHeaders:
           trustedIPs:
             - 10.172.90.2
       websecure:
+        nodePort: 31443
         proxyProtocol:
           trustedIPs:
             - 10.172.90.2
