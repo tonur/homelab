@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: home-assistant
@@ -97,8 +97,6 @@ spec:
     ingress:
       # Configure an Ingress for the main application
       main:
-        annotations:
-          cert-manager.io/cluster-issuer: "letsencrypt-production"
         hosts:
           - host: &host "home.kragh.dev"
             paths:
@@ -122,9 +120,33 @@ spec:
         globalMounts:
           - path: /config
 
+      # Configure HTTP settings for reverse proxy support
+      http-config:
+        type: configMap
+        name: home-assistant-http-config
+        globalMounts:
+          - path: /config/http.yaml
+            subPath: http.yaml
+
       # Configure temporary storage for logs
       tmp:
         type: emptyDir
         globalMounts:
           - path: /tmp
             subPath: tmp
+
+    configMaps:
+      home-assistant-http-config:
+        enabled: true
+        data:
+          http.yaml: |
+            # HTTP Configuration for Home Assistant
+            # This file configures trusted proxies for reverse proxy support
+            http:
+              use_x_forwarded_for: true
+              trusted_proxies:
+                - 10.42.0.0/16    # k3s pod network
+                - 10.43.0.0/16    # k3s service network  
+                - 172.16.0.0/12   # Docker default bridge networks
+                - 192.168.0.0/16  # Private networks
+                - 127.0.0.1       # Localhost
