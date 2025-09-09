@@ -18,12 +18,12 @@ spec:
       port: 53
       targetPort: 53
       protocol: UDP
-      nodePort: 53
+      nodePort: 31053
     - name: dns-tcp
       port: 53
       targetPort: 53
       protocol: TCP
-      nodePort: 53
+      nodePort: 31053
   # Ensure external traffic can reach this
   externalTrafficPolicy: Local
 ---
