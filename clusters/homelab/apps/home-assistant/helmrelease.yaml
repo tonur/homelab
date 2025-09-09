@@ -97,6 +97,13 @@ spec:
     ingress:
       # Configure an Ingress for the main application
       main:
+        annotations:
+          # Enable external-dns to create DNS records automatically
+          external-dns.alpha.kubernetes.io/hostname: "home.kragh.dev"
+          # Optional: specify TTL for the DNS record
+          external-dns.alpha.kubernetes.io/ttl: "300"
+          # Enable cert-manager to create certificates automatically
+          cert-manager.io/cluster-issuer: "letsencrypt-prod"
         hosts:
           - host: &host "home.kragh.dev"
             paths:

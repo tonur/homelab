@@ -8,7 +8,6 @@ resources:
   - namespace.yaml
   - helmrepo.yaml
   - helmrelease.yaml
-  - certificate.yaml
 
 commonLabels:
   app.kubernetes.io/name: home-assistant
