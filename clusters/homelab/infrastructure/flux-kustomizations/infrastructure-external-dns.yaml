@@ -10,7 +10,8 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: homelab
+  timeout: 5m
   wait: true
   dependsOn:
     - name: infrastructure-external-secrets-config
