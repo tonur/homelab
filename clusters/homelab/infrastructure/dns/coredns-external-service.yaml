@@ -1,5 +1,6 @@
 ---
-# Expose CoreDNS external DNS service via NodePort for Tailscale clients
+# Expose CoreDNS as authoritative DNS server on the internet
+# This makes ns1.kragh.dev reachable on port 53
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,15 +18,16 @@ spec:
       port: 53
       targetPort: 53
       protocol: UDP
-      nodePort: 30053
+      nodePort: 53
     - name: dns-tcp
       port: 53
       targetPort: 53
       protocol: TCP
-      nodePort: 30053
+      nodePort: 53
+  # Ensure external traffic can reach this
+  externalTrafficPolicy: Local
 ---
-# Custom CoreDNS configuration to add kragh.dev records
-# See: https://learn.microsoft.com/en-us/azure/aks/coredns-custom#use-custom-domains
+# Custom CoreDNS configuration - Authoritative server for kragh.dev with AXFR support
 # Data keys must end with .server (new server block) or .override (modify default block)
 apiVersion: v1
 kind: ConfigMap
@@ -37,11 +39,106 @@ data:
     kragh.dev:53 {
         errors
         ready
-        # Rewrite ALL kragh.dev queries (including subdomains) to edge nodes hostname (vhs-vps), resolved via Tailscale
-        rewrite name regex (.*)\.kragh\.dev vhs-vps
-        rewrite name kragh.dev vhs-vps
-        # Forward to upstream DNS for resolution
-        forward . 100.100.100.100
-        cache 30
-        reload
+        log
+        
+        # Authoritative DNS for kragh.dev with existing records preserved
+        
+        # SOA record - Start of Authority (updated serial for primary DNS)
+        template IN SOA kragh.dev {
+            answer "kragh.dev 3600 IN SOA ns1.kragh.dev. admin.kragh.dev. 2025090902 86400 10800 3600000 3600"
+        }
+        
+        # NS records - Mixed primary (your server) + secondary (Hetzner)
+        template IN NS kragh.dev {
+            answer "kragh.dev 3600 IN NS ns1.kragh.dev."
+            answer "kragh.dev 3600 IN NS helium.ns.hetzner.de."
+            answer "kragh.dev 3600 IN NS hydrogen.ns.hetzner.com."
+            answer "kragh.dev 3600 IN NS oxygen.ns.hetzner.com."
+            additional "ns1.kragh.dev 300 IN A 198.55.102.244"
+        }
+        
+        # A records - Main domain and wildcard
+        template IN A kragh.dev {
+            match "^kragh\.dev\.$"
+            answer "kragh.dev 300 IN A 198.55.102.244"
+        }
+        
+        # Wildcard A record for all other subdomains
+        template IN A kragh.dev {
+            match ".*\.kragh\.dev\.$"
+            answer "{{ .Name }} 300 IN A 198.55.102.244"
+        }
+        
+        # MX records - ProtonMail
+        template IN MX kragh.dev {
+            match "^kragh\.dev\.$"
+            answer "kragh.dev 3600 IN MX 10 mail.protonmail.ch."
+            answer "kragh.dev 3600 IN MX 20 mailsec.protonmail.ch."
+        }
+        
+        # Specific A records for mail services
+        template IN A kragh.dev {
+            match "^imap\.kragh\.dev\.$"
+            answer "imap.kragh.dev 3600 IN A 104.21.16.201"
+        }
+        
+        template IN A kragh.dev {
+            match "^mail\.kragh\.dev\.$"
+            answer "mail.kragh.dev 3600 IN A 104.21.16.201"
+        }
+        
+        template IN A kragh.dev {
+            match "^pop3\.kragh\.dev\.$"
+            answer "pop3.kragh.dev 3600 IN A 172.67.215.230"
+        }
+        
+        template IN A kragh.dev {
+            match "^smtp\.kragh\.dev\.$"
+            answer "smtp.kragh.dev 3600 IN A 104.21.16.201"
+        }
+        
+        template IN A kragh.dev {
+            match "^webmail\.kragh\.dev\.$"
+            answer "webmail.kragh.dev 3600 IN A 104.21.16.201"
+        }
+        
+        # CNAME records - ProtonMail DKIM
+        template IN CNAME kragh.dev {
+            match "^protonmail\._domainkey\.kragh\.dev\.$"
+            answer "protonmail._domainkey.kragh.dev 3600 IN CNAME protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
+        }
+        
+        template IN CNAME kragh.dev {
+            match "^protonmail2\._domainkey\.kragh\.dev\.$"
+            answer "protonmail2._domainkey.kragh.dev 3600 IN CNAME protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
+        }
+        
+        template IN CNAME kragh.dev {
+            match "^protonmail3\._domainkey\.kragh\.dev\.$"
+            answer "protonmail3._domainkey.kragh.dev 3600 IN CNAME protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
+        }
+        
+        # TXT records - SPF, DMARC, DKIM verification
+        template IN TXT kragh.dev {
+            match "^kragh\.dev\.$"
+            answer "kragh.dev 3600 IN TXT \"v=spf1 include:_spf.protonmail.ch mx ~all\""
+            answer "kragh.dev 3600 IN TXT \"protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4\""
+            answer "kragh.dev 300 IN TXT \"google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A\""
+        }
+        
+        template IN TXT kragh.dev {
+            match "^_dmarc\.kragh\.dev\.$"
+            answer "_dmarc.kragh.dev 3600 IN TXT \"v=DMARC1; p=quarantine\""
+        }
+        
+        # Allow zone transfers to Hetzner DNS servers for secondary DNS
+        transfer {
+            to 213.239.242.238  # ns1.first-ns.de (Hetzner)
+            to 213.133.105.6    # ns2.first-ns.de (Hetzner)  
+            to 88.198.229.192   # ns3.first-ns.de (Hetzner)
+        }
+        
+        # Fallback for any other queries
+        forward . 1.1.1.1 8.8.8.8
     }
+
