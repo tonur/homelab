@@ -6,10 +6,10 @@ resources:
   # First create the namespace
   - namespace.yaml
   # Then the infrastructure components
-  - cert-manager.yaml
-  - external-secrets.yaml
-  - traefik.yaml
-  - infrastructure-config.yaml
-  - infrastructure-external-secrets-config.yaml
+  - traefik-hr.yaml
+  - cert-manager-hr.yaml
+  - infrastructure-external-secrets-config-hr.yaml
+  - external-secrets-hr.yaml
+  - infrastructure-config-hr.yaml
   # Skip external-dns for now if it's commented out
   # - external-dns.yaml
