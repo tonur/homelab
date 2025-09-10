@@ -15,6 +15,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 15m
+  releaseName: cert-manager
   targetNamespace: cert-manager
   chart:
     spec:
