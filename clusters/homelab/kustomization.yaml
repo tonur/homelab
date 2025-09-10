@@ -2,9 +2,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Homelab cluster configuration managed by Flux GitOps
-# This is applied by Flux, not directly by humans
-
 resources:
-  # HelmReleases for infrastructure deployment and apps
-  - helm-releases/
+  - apps.yaml
+  - infrastructure.yaml
