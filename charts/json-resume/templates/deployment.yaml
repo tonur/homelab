@@ -126,8 +126,7 @@ spec:
           periodSeconds: 5
       volumes:
       - name: generated-html
-        persistentVolumeClaim:
-          claimName: {{ .Values.app.name }}-html-pvc
+        emptyDir: {}
       - name: resume-data
         configMap:
           name: {{ .Values.app.name }}-data
