@@ -11,7 +11,7 @@ spec:
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: cert-manager
+  name: crtmgmr
   namespace: flux-system
 spec:
   interval: 15m
@@ -36,9 +36,6 @@ spec:
   values:
     # Install CRDs as part of the release
     installCRDs: true
-
-    # Override the full name to get clean pod names
-    fullnameOverride: "cert-manager"
     
     # Global settings
     global:
