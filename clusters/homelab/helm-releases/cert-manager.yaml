@@ -1,5 +1,14 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: jetstack
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://charts.jetstack.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: cert-manager
@@ -18,17 +27,21 @@ spec:
   install:
     createNamespace: true
     crds: CreateReplace
+    remediation:
+      retries: 3
   upgrade:
     crds: CreateReplace
+    remediation:
+      retries: 3
   values:
     # Install CRDs as part of the release
     installCRDs: true
-    
+
     # Global settings
     global:
       leaderElection:
         namespace: cert-manager
-    
+
     # Controller settings
     resources:
       limits:
@@ -37,7 +50,7 @@ spec:
       requests:
         cpu: 10m
         memory: 64Mi
-    
+
     # Webhook settings
     webhook:
       resources:
@@ -47,7 +60,7 @@ spec:
         requests:
           cpu: 10m
           memory: 64Mi
-    
+
     # CA Injector settings
     cainjector:
       resources:

@@ -1,0 +1,18 @@
+# Default values for infrastructure-config chart
+# This is a YAML-formatted file.
+
+# Certificate configuration
+letsencrypt:
+  email: "contact@kragh.dev"
+  server: "https://acme-v02.api.letsencrypt.org/directory"
+
+# DNS configuration
+dns:
+  domain: "kragh.dev"
+  externalIP: "198.55.102.244"
+  nodePort: 31053
+
+# Bitwarden configuration
+bitwarden:
+  organizationID: "d5bb2167-2ffc-4342-9aa7-ac9c00c489d9"
+  projectID: "591fdbc5-804a-4e3e-848c-b34201552bea"
