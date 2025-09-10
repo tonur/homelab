@@ -2,13 +2,19 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: resume-builder
-  namespace: json-resume
+  name: {{ .Values.app.name }}-builder
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.app.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: builder
 spec:
   template:
     metadata:
       labels:
-        app: resume-builder
+        app.kubernetes.io/name: {{ .Values.app.name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: builder
     spec:
       restartPolicy: OnFailure
       securityContext:
@@ -20,7 +26,8 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: install-resume-cli
-          image: node:20-alpine
+          image: "{{ .Values.resumeBuilder.image.repository }}:{{ .Values.resumeBuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.resumeBuilder.image.pullPolicy }}
           command:
             - sh
             - -c
@@ -44,7 +51,8 @@ spec:
               mountPath: /tmp
       containers:
         - name: build-resume
-          image: node:20-alpine
+          image: "{{ .Values.resumeBuilder.image.repository }}:{{ .Values.resumeBuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.resumeBuilder.image.pullPolicy }}
           command:
             - sh
             - -c
@@ -73,19 +81,14 @@ spec:
             - name: tmp
               mountPath: /tmp
           resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
+            {{- toYaml .Values.resumeBuilder.resources | nindent 12 }}
       volumes:
         - name: resume-data
           configMap:
-            name: resume-data
+            name: {{ .Values.app.name }}-data
         - name: generated-html
           persistentVolumeClaim:
-            claimName: resume-html-pvc
+            claimName: {{ .Values.app.name }}-html-pvc
         - name: shared-tools
           emptyDir: {}
         - name: tmp
@@ -94,11 +97,14 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: resume-html-pvc
-  namespace: json-resume
+  name: {{ .Values.app.name }}-html-pvc
+  namespace: {{ .Values.app.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.app.name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.storage.accessMode }}
   resources:
     requests:
-      storage: 1Gi
+      storage: {{ .Values.storage.size }}

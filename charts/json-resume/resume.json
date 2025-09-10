@@ -10,7 +10,7 @@
       "address": "",
       "postalCode": "7100",
       "city": "Vejle",
-      "countryCode": "",
+      "countryCode": "DK",
       "region": "Region Syddanmark"
     },
     "profiles": [
@@ -280,19 +280,6 @@
       "description": "",
       "highlights": [],
       "url": ""
-    },
-    {
-      "name": "GitOps Homelab Infrastructure",
-      "startDate": "2024-01-01",
-      "endDate": "",
-      "description": "Fully automated, GitOps-based homelab using k3s, Tailscale, External Secrets Operator, and Flux",
-      "highlights": [
-        "Infrastructure as Code with Terraform and Ansible",
-        "Automated secret management with Bitwarden integration",
-        "Zero-downtime deployments with Flux CD",
-        "Secure mesh networking with Tailscale"
-      ],
-      "url": "https://kragh.dev"
     }
   ]
 }
