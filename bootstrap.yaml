@@ -1,23 +1,10 @@
 ---
-# Flux System Namespace
-# This namespace is created by 'flux bootstrap' or manually during initial setup
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: flux-system
-  labels:
-    app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/part-of: flux
-    app.kubernetes.io/version: v2.0.0
-    pod-security.kubernetes.io/warn: restricted
-    pod-security.kubernetes.io/warn-version: latest
----
 # GitRepository - Source of truth for GitOps
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: homelab
-  namespace: flux-system
+  namespace: default
 spec:
   interval: 1m
   url: https://github.com/tonur/homelab
@@ -29,7 +16,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: homelab-cluster
-  namespace: flux-system
+  namespace: default
 spec:
   interval: 1m
   path: "./clusters/homelab"
