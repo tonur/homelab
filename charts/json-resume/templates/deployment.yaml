@@ -20,6 +20,8 @@ spec:
         app.kubernetes.io/name: {{ .Values.app.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: frontend
+      annotations:
+        checksum/json-resume: {{ .Files.Get "json-resume.json" | sha256sum }}
     spec:
       securityContext:
         runAsNonRoot: true

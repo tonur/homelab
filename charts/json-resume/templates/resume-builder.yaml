@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.app.name }}-builder
+  name: {{ .Values.app.name }}-builder-{{ .Files.Get "json-resume.json" | sha256sum | trunc 8 }}
   namespace: {{ .Values.app.namespace }}
   labels:
     app.kubernetes.io/name: {{ .Values.app.name }}
@@ -15,6 +15,8 @@ spec:
         app.kubernetes.io/name: {{ .Values.app.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: builder
+      annotations:
+        checksum/json-resume: {{ .Files.Get "json-resume.json" | sha256sum }}
     spec:
       restartPolicy: OnFailure
       securityContext:
