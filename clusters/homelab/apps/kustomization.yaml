@@ -4,7 +4,7 @@ kind: Kustomization
 
 resources:
   - json-resume-hr.yaml
-  - home-assistant-hr.yaml
+  # - home-assistant-hr.yaml # Temp disabled for now until external-dns is working
 # Future apps will be added here:
 #   - nextcloud
 #   - etc
