@@ -1,0 +1,58 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: traefik-charts
+  namespace: flux-system
+spec:
+  interval: 1h
+  url: https://traefik.github.io/charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 10m
+  targetNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: 37.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: traefik-charts
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # Override the full name to get clean pod names  
+    fullnameOverride: "traefik"
+    
+    service:
+      type: NodePort
+      spec:
+        externalTrafficPolicy: Local
+    ports:
+      web:
+        nodePort: 31080
+        proxyProtocol:
+          trustedIPs:
+            - 10.172.90.2
+        forwardedHeaders:
+          trustedIPs:
+            - 10.172.90.2
+      websecure:
+        nodePort: 31443
+        proxyProtocol:
+          trustedIPs:
+            - 10.172.90.2
+        forwardedHeaders:
+          trustedIPs:
+            - 10.172.90.2
