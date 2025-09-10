@@ -30,6 +30,63 @@ spec:
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: install-resume-cli
+          image: "{{ .Values.resumeBuilder.image.repository }}:{{ .Values.resumeBuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.resumeBuilder.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - |
+              cd /tmp
+              npm install resume-cli
+              cp -r node_modules /shared/
+              echo '#!/bin/sh' > /shared/resume
+              echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
+              chmod +x /shared/resume
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: shared-tools
+              mountPath: /shared
+            - name: tmp
+              mountPath: /tmp
+        - name: build-resume
+          image: "{{ .Values.resumeBuilder.image.repository }}:{{ .Values.resumeBuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.resumeBuilder.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - |
+              cd /workspace
+              ls -la /shared/ || echo "No shared directory"
+              NODE_PATH=/shared/node_modules /shared/resume export index.html --resume resume.json
+              echo "Resume built successfully"
+              ls -la /workspace/
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: resume-data
+              mountPath: /workspace/resume.json
+              subPath: json-resume.json
+              readOnly: true
+            - name: generated-html
+              mountPath: /workspace
+            - name: shared-tools
+              mountPath: /shared
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            {{- toYaml .Values.resumeBuilder.resources | nindent 12 }}
       containers:
       - name: nginx
         image: "{{ .Values.webServer.image.repository }}:{{ .Values.webServer.image.tag }}"
@@ -71,6 +128,11 @@ spec:
       - name: generated-html
         persistentVolumeClaim:
           claimName: {{ .Values.app.name }}-html-pvc
+      - name: resume-data
+        configMap:
+          name: {{ .Values.app.name }}-data
+      - name: shared-tools
+        emptyDir: {}
       - name: tmp
         emptyDir: {}
       - name: cache
