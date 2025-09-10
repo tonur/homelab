@@ -15,6 +15,7 @@ spec:
         name: homelab
         namespace: default
       interval: 1m
+      reconcileStrategy: Revision # Local chart
   install:
     remediation:
       retries: 3
