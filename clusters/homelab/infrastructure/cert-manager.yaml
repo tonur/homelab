@@ -37,6 +37,9 @@ spec:
     # Install CRDs as part of the release
     installCRDs: true
 
+    # Override the full name to get clean pod names
+    fullnameOverride: "cert-manager"
+    
     # Global settings
     global:
       leaderElection:
