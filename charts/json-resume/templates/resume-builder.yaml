@@ -8,6 +8,10 @@ metadata:
     app.kubernetes.io/name: {{ .Values.app.name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: builder
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   template:
     metadata:
@@ -15,8 +19,6 @@ spec:
         app.kubernetes.io/name: {{ .Values.app.name }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: builder
-      annotations:
-        checksum/json-resume: {{ .Files.Get "json-resume.json" | sha256sum }}
     spec:
       restartPolicy: OnFailure
       securityContext:
