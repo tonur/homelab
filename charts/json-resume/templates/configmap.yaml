@@ -9,5 +9,5 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: data
 data:
-  resume.json: |
-{{ .Files.Get "resume.json" | indent 4 }}
+  json-resume.json: |
+{{ .Files.Get "json-resume.json" | indent 4 }}
