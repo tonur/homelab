@@ -25,7 +25,6 @@ spec:
     # Override values if needed
     ingress:
       host: kragh.dev
-    
-    # Increase replicas for better availability
+
     webServer:
-      replicas: 2
+      replicas: 1
