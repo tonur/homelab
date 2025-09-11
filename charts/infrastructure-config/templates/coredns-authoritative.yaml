@@ -64,11 +64,6 @@ spec:
             items:
               - key: Corefile
                 path: Corefile
-      nodeSelector:
-        kubernetes.io/hostname: "beelink" # Choose which node to run on
-      tolerations:
-        - key: CriticalAddonsOnly
-          operator: Exists
 ---
 # NodePort Service to expose CoreDNS on port 31053
 apiVersion: v1
