@@ -31,22 +31,5 @@ frontend fe_https
 backend be_https
   server traefik_https {{ edge_gateway_traefik_vip }}:{{ edge_gateway_proxy_backend_https_port }} send-proxy-v2
 
-# DNS UDP passthrough to CoreDNS NodePort  
-frontend fe_dns_udp
-  bind *:53 udp
-  mode udp
-  default_backend be_dns_udp
-
-backend be_dns_udp
-  mode udp
-  server coredns_udp {{ edge_gateway_traefik_vip }}:{{ edge_gateway_coredns_nodeport }}
-
-# DNS TCP passthrough to CoreDNS NodePort
-frontend fe_dns_tcp
-  bind *:53
-  default_backend be_dns_tcp
-
-backend be_dns_tcp
-  server coredns_tcp {{ edge_gateway_traefik_vip }}:{{ edge_gateway_coredns_nodeport }}
-
 # NOTE: Ensure Traefik entryPoints web & websecure enable proxyProtocol and trust {{ edge_gateway_wg_local }}.
+# NOTE: DNS on port 53 is handled by nftables DNAT rules directly to NodePort 31053

@@ -16,10 +16,10 @@ table inet filter {
     tcp dport 22 accept
     # Allow WireGuard UDP
     udp dport {{ edge_gateway_wireguard_port }} accept
-    # Allow DNS on standard port 53 (HAProxy will proxy to {{ edge_gateway_coredns_nodeport }})
+    # Allow DNS on standard port 53 (will be DNATed to {{ edge_gateway_coredns_nodeport }})
     udp dport 53 accept
     tcp dport 53 accept
-    # Allow DNS on NodePort from WireGuard peer (for direct access if needed)
+    # Allow DNS on NodePort from WireGuard peer (for direct access)
     ip saddr {{ edge_gateway_wg_peer }} udp dport {{ edge_gateway_coredns_nodeport }} accept
     ip saddr {{ edge_gateway_wg_peer }} tcp dport {{ edge_gateway_coredns_nodeport }} accept
     # HTTP/HTTPS ingress (either to local proxy or for DNAT prerouting)
@@ -40,11 +40,12 @@ table inet filter {
     # Proxy mode: HAProxy forwards traffic over wg0 to backend services
     # Allow HAProxy to reach Traefik NodePorts
     iif "lo" oif "wg0" tcp dport { {{ edge_gateway_proxy_backend_http_port }}, {{ edge_gateway_proxy_backend_https_port }} } ip daddr {{ edge_gateway_traefik_vip }} accept
-    # Allow HAProxy to reach CoreDNS NodePort  
-    iif "lo" oif "wg0" udp dport {{ edge_gateway_coredns_nodeport }} ip daddr {{ edge_gateway_traefik_vip }} accept
-    iif "lo" oif "wg0" tcp dport {{ edge_gateway_coredns_nodeport }} ip daddr {{ edge_gateway_traefik_vip }} accept
     iif "wg0" oif "lo" ct state {established, related} accept
     {% endif %}
+    # DNS forwarding (DNAT) - works in both proxy and dnat modes
+    iif "eth0" oif "wg0" udp dport {{ edge_gateway_coredns_nodeport }} ip daddr {{ edge_gateway_traefik_vip }} accept
+    iif "eth0" oif "wg0" tcp dport {{ edge_gateway_coredns_nodeport }} ip daddr {{ edge_gateway_traefik_vip }} accept
+    iif "wg0" oif "eth0" ct state {established, related} accept
   }
   chain output {
     type filter hook output priority 0;
@@ -60,7 +61,9 @@ table ip nat {
     # DNAT inbound HTTP/HTTPS to Traefik VIP
     tcp dport 80  dnat to {{ edge_gateway_traefik_vip }}:80
     tcp dport 443 dnat to {{ edge_gateway_traefik_vip }}:443
-    # DNS is handled by HAProxy, not DNAT
+    # DNAT inbound DNS to CoreDNS NodePort
+    udp dport 53 dnat to {{ edge_gateway_traefik_vip }}:{{ edge_gateway_coredns_nodeport }}
+    tcp dport 53 dnat to {{ edge_gateway_traefik_vip }}:{{ edge_gateway_coredns_nodeport }}
   }
   chain postrouting {
     type nat hook postrouting priority 100;
@@ -68,5 +71,18 @@ table ip nat {
   }
 }
 {% else %}
-# Proxy mode: no DNAT or SNAT; HAProxy terminates TCP and re-initiates to backend over wg0.
+# Proxy mode: DNS uses DNAT (HAProxy doesn't support UDP), HTTP/HTTPS use HAProxy
+table ip nat {
+  chain prerouting {
+    type nat hook prerouting priority -100;
+    # DNAT inbound DNS to CoreDNS NodePort (HAProxy can't handle UDP)
+    udp dport 53 dnat to {{ edge_gateway_traefik_vip }}:{{ edge_gateway_coredns_nodeport }}
+    tcp dport 53 dnat to {{ edge_gateway_traefik_vip }}:{{ edge_gateway_coredns_nodeport }}
+    # HTTP/HTTPS handled by HAProxy, not DNAT
+  }
+  chain postrouting {
+    type nat hook postrouting priority 100;
+    # No MASQUERADE to preserve client IP
+  }
+}
 {% endif %}
