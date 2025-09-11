@@ -94,32 +94,6 @@ spec:
       targetPort: 53
       protocol: TCP
       nodePort: 31053
----
-# External Service for CoreDNS Authoritative DNS server  
-# This exposes the authoritative CoreDNS via NodePort 31053 with external traffic policy
-apiVersion: v1
-kind: Service
-metadata:
-  name: coredns-external
-  namespace: kube-system
-  labels:
-    app.kubernetes.io/name: coredns-external
-    app.kubernetes.io/component: dns
-spec:
-  type: NodePort
-  selector:
-    app.kubernetes.io/name: coredns-authoritative
-  ports:
-    - name: dns-udp
-      port: 53
-      targetPort: 53
-      protocol: UDP
-      nodePort: 31053
-    - name: dns-tcp
-      port: 53
-      targetPort: 53
-      protocol: TCP
-      nodePort: 31053
   # Ensure external traffic can reach this
   externalTrafficPolicy: Local
 ---
