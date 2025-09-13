@@ -10,6 +10,7 @@ metadata:
   labels:
     app.kubernetes.io/name: coredns-custom
     app.kubernetes.io/component: dns
+    k8s-app: kube-dns  # Ensure it's selected by CoreDNS deployment
 data:
   # This file will be imported by the main CoreDNS via *.server import
   kragh.dev.server: |
@@ -101,31 +102,3 @@ data:
         
         # No fallback needed - main CoreDNS handles that
     }
----
-# NodePort Service to expose the built-in CoreDNS on port 31053
-# This reuses the existing CoreDNS deployment with custom configuration
-apiVersion: v1
-kind: Service
-metadata:
-  name: coredns-external
-  namespace: kube-system
-  labels:
-    app.kubernetes.io/name: coredns-external
-    app.kubernetes.io/component: dns
-spec:
-  type: NodePort
-  selector:
-    k8s-app: kube-dns  # Select the built-in CoreDNS deployment
-  ports:
-    - name: dns-udp
-      port: 53
-      targetPort: 53
-      protocol: UDP
-      nodePort: 31053
-    - name: dns-tcp
-      port: 53
-      targetPort: 53
-      protocol: TCP
-      nodePort: 31053
-  # Ensure external traffic can reach this
-  externalTrafficPolicy: Local

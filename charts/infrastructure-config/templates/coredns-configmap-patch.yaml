@@ -1,0 +1,43 @@
+---
+# CoreDNS ConfigMap Patch - Modifies K3s built-in CoreDNS to import custom zones
+# This patches the existing coredns ConfigMap to include import directive
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: coredns
+    app.kubernetes.io/component: dns
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health {
+           lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+           pods insecure
+           fallthrough in-addr.arpa ip6.arpa
+           ttl 30
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+           max_concurrent 1000
+        }
+        cache 30
+        loop
+        reload
+        loadbalance
+        # Import custom domain configurations
+        import /etc/coredns/custom/*.server
+    }
+  NodeHosts: |
+    127.0.0.1 localhost
+    ::1 localhost ip6-localhost ip6-loopback
+    fe00::0 ip6-localnet
+    fe00::0 ip6-mcastprefix
+    fe00::1 ip6-allnodes
+    fe00::2 ip6-allrouters
+    198.55.102.244 kragh.dev
