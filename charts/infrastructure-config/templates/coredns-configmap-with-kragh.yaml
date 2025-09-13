@@ -1,16 +1,37 @@
 ---
-# CoreDNS Custom Server Block
-# This will be added to the existing CoreDNS configuration
+# Simple CoreDNS replacement with kragh.dev zone
+# Replaces the main CoreDNS ConfigMap with a version that includes kragh.dev
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: coredns-custom
+  name: coredns
   namespace: kube-system
   labels:
-    app.kubernetes.io/name: coredns-custom
+    app.kubernetes.io/name: coredns
     app.kubernetes.io/component: dns
 data:
-  kragh.dev.server: |
+  Corefile: |
+    .:53 {
+        errors
+        health {
+           lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+           pods insecure
+           fallthrough in-addr.arpa ip6.arpa
+           ttl 30
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+           max_concurrent 1000
+        }
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+    
     kragh.dev {
         errors
         ready
@@ -21,7 +42,7 @@ data:
             answer "kragh.dev 3600 IN SOA ns1.kragh.dev. admin.kragh.dev. 2025090902 86400 10800 3600000 3600"
         }
         
-        # NS records
+        # NS records  
         template IN NS kragh.dev {
             answer "kragh.dev 3600 IN NS ns1.kragh.dev."
             answer "kragh.dev 3600 IN NS helium.ns.hetzner.de."
@@ -90,7 +111,7 @@ data:
             answer "protonmail3._domainkey.kragh.dev 3600 IN CNAME protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
         }
         
-        # Transfer block - allow AXFR to Hetzner
+        # Transfer block - allow AXFR to Hetzner  
         transfer {
             to 213.239.242.238  # ns1.first-ns.de
             to 213.133.105.6    # ns2.first-ns.de  
