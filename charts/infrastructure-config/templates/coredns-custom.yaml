@@ -1,37 +1,17 @@
 ---
-# CoreDNS ConfigMap replacement for K3s with custom kragh.dev zone
+# CoreDNS Custom Server Block
+# This will be added to the existing CoreDNS configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: coredns
+  name: coredns-custom
   namespace: kube-system
   labels:
-    app.kubernetes.io/name: coredns
+    app.kubernetes.io/name: coredns-custom
     app.kubernetes.io/component: dns
 data:
-  Corefile: |
-    .:53 {
-        errors
-        health {
-           lameduck 5s
-        }
-        ready
-        kubernetes cluster.local in-addr.arpa ip6.arpa {
-           pods insecure
-           fallthrough in-addr.arpa ip6.arpa
-           ttl 30
-        }
-        prometheus :9153
-        forward . /etc/resolv.conf {
-           max_concurrent 1000
-        }
-        cache 30
-        loop
-        reload
-        loadbalance
-    }
-    
-    kragh.dev:53 {
+  kragh.dev.server: |
+    kragh.dev {
         errors
         ready
         log
@@ -117,12 +97,3 @@ data:
             to 88.198.229.192   # ns3.first-ns.de
         }
     }
-  NodeHosts: |
-    ::1 localhost ip6-localhost ip6-loopback
-    100.85.12.115 beelink
-    100.117.97.65 gigabyte
-    127.0.0.1 localhost
-    198.55.102.244 kragh.dev
-    fe00::0 ip6-mcastprefix
-    fe00::1 ip6-allnodes
-    fe00::2 ip6-allrouters
