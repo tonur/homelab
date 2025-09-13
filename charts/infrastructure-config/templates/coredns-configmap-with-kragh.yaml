@@ -112,9 +112,9 @@ data:
         }
         
         # Transfer block - allow AXFR to Hetzner  
-        transfer {
-            to 213.239.242.238  # ns1.first-ns.de
-            to 213.133.105.6    # ns2.first-ns.de  
-            to 88.198.229.192   # ns3.first-ns.de
-        }
+        # transfer {
+        #     to 213.239.242.238  # ns1.first-ns.de
+        #     to 213.133.105.6    # ns2.first-ns.de  
+        #     to 88.198.229.192   # ns3.first-ns.de
+        # }
     }
