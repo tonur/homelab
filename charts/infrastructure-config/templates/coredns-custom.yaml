@@ -1,19 +1,36 @@
 ---
-# CoreDNS Custom Configuration - Integrates with K3s built-in CoreDNS
-# This extends the existing K3s CoreDNS with authoritative DNS for kragh.dev
-# Uses the built-in extension mechanism: import /etc/coredns/custom/*.server
+# CoreDNS ConfigMap replacement for K3s with custom kragh.dev zone
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: coredns-custom
+  name: coredns
   namespace: kube-system
   labels:
-    app.kubernetes.io/name: coredns-custom
+    app.kubernetes.io/name: coredns
     app.kubernetes.io/component: dns
-    k8s-app: kube-dns  # Ensure it's selected by CoreDNS deployment
 data:
-  # This file will be imported by the main CoreDNS via *.server import
-  kragh.dev.server: |
+  Corefile: |
+    .:53 {
+        errors
+        health {
+           lameduck 5s
+        }
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+           pods insecure
+           fallthrough in-addr.arpa ip6.arpa
+           ttl 30
+        }
+        prometheus :9153
+        forward . /etc/resolv.conf {
+           max_concurrent 1000
+        }
+        cache 30
+        loop
+        reload
+        loadbalance
+    }
+    
     kragh.dev:53 {
         errors
         ready
@@ -99,6 +116,13 @@ data:
             to 213.133.105.6    # ns2.first-ns.de  
             to 88.198.229.192   # ns3.first-ns.de
         }
-        
-        # No fallback needed - main CoreDNS handles that
     }
+  NodeHosts: |
+    ::1 localhost ip6-localhost ip6-loopback
+    100.85.12.115 beelink
+    100.117.97.65 gigabyte
+    127.0.0.1 localhost
+    198.55.102.244 kragh.dev
+    fe00::0 ip6-mcastprefix
+    fe00::1 ip6-allnodes
+    fe00::2 ip6-allrouters
