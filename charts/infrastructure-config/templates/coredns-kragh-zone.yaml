@@ -25,7 +25,17 @@ data:
     
     ; NS Records - Name Servers  
     @    IN    NS     dns.kragh.dev.
-    @    IN    NS     hydrogen.ns.hetzner.com.  ; Secondary NS at Hetzner
+    @    IN    NS     ns1.first-ns.de.
+    @    IN    NS     robotns2.second-ns.de.
+    @    IN    NS     robotns3.second-ns.com.
+
+    ; Hetzner Name Server A/AAAA Records (for zone transfer/AXFR)
+    ns1.first-ns.de.      IN    A      213.239.242.238
+    ns1.first-ns.de.      IN    AAAA   2a01:4f8:0:a101::a:1
+    robotns2.second-ns.de. IN   A      213.133.100.103
+    robotns2.second-ns.de. IN   AAAA   2a01:4f8:0:1::5ddc:2
+    robotns3.second-ns.com. IN  A      193.47.99.3
+    robotns3.second-ns.com. IN  AAAA   2001:67c:192c::add:a3
     
     ; A Records - IPv4 addresses
     @         IN    A      198.55.102.244  ; kragh.dev
