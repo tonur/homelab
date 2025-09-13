@@ -31,25 +31,19 @@ data:
         loadbalance
     }
     
-    # Internal cluster DNS for kragh.dev services
-    # This provides internal resolution for cluster services
-    # External DNS queries should still go to Hetzner DNS
+    # Authoritative DNS server for kragh.dev domain
     kragh.dev {
         errors
         ready
         log
         
-        # Internal cluster services - these IPs are for internal access
-        hosts {
-            # Internal cluster service IPs
-            10.43.0.100 json-resume.kragh.dev  # Example internal service IP
-            10.43.0.101 api.kragh.dev          # Example internal service IP
-            10.43.0.102 home.kragh.dev         # Example internal service IP
-            
-            # For external services, fall through to upstream DNS
-            fallthrough
+        # Enable AXFR zone transfers for secondary servers
+        transfer {
+            to *
         }
         
-        # Forward kragh.dev queries to upstream DNS (Hetzner) if not found locally
-        forward . 1.1.1.1 8.8.8.8
+        # Complete authoritative zone data for kragh.dev
+        file /etc/coredns/zones/kragh.dev.zone kragh.dev {
+            reload 30s
+        }
     }

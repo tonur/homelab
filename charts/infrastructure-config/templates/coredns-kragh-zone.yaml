@@ -1,0 +1,51 @@
+---
+# ConfigMap containing the authoritative zone file for kragh.dev
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-kragh-zone
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: coredns
+    app.kubernetes.io/component: dns-zone
+data:
+  kragh.dev.zone: |
+    $ORIGIN kragh.dev.
+    $TTL 3600
+    
+    ; SOA Record - Start of Authority
+    ; Format: domain admin serial refresh retry expire minimum
+    @    IN    SOA    ns1.kragh.dev. admin.kragh.dev. (
+                        2025091301  ; Serial number (YYYYMMDDNN format)
+                        86400       ; Refresh (24 hours)
+                        7200        ; Retry (2 hours)
+                        604800      ; Expire (7 days)
+                        3600        ; Minimum TTL (1 hour)
+                      )
+    
+    ; NS Records - Name Servers
+    @    IN    NS     ns1.kragh.dev.
+    @    IN    NS     hydrogen.ns.hetzner.com.  ; Secondary NS at Hetzner
+    
+    ; A Records - IPv4 addresses
+    @         IN    A      198.55.102.244  ; kragh.dev
+    ns1       IN    A      198.55.102.244  ; ns1.kragh.dev (this CoreDNS instance)
+    www       IN    A      198.55.102.244  ; www.kragh.dev
+    api       IN    A      198.55.102.244  ; api.kragh.dev
+    home      IN    A      198.55.102.244  ; home.kragh.dev
+    json-resume IN A      198.55.102.244  ; json-resume.kragh.dev
+    
+    ; MX Records - Mail Exchange (from your current setup)
+    @    IN    MX    10    mail.protonmail.ch.
+    @    IN    MX    20    mailsec.protonmail.ch.
+    
+    ; TXT Records - Text records (from your current setup)
+    @    IN    TXT   "google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A"
+    @    IN    TXT   "v=spf1 include:_spf.protonmail.ch mx ~all"
+    @    IN    TXT   "protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4"
+    
+    ; CNAME Records - Canonical Name records
+    ; (Add any CNAME records you might have)
+    
+    ; Wildcard record for any undefined subdomains
+    *    IN    A      198.55.102.244
