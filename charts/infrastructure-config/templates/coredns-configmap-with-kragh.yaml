@@ -1,6 +1,5 @@
 ---
-# Simple CoreDNS replacement with kragh.dev zone
-# Replaces the main CoreDNS ConfigMap with a version that includes kragh.dev
+# Simple CoreDNS replacement with basic kragh.dev zone
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -37,84 +36,23 @@ data:
         ready
         log
         
-        # SOA record
-        template IN SOA kragh.dev {
-            answer "kragh.dev 3600 IN SOA ns1.kragh.dev. admin.kragh.dev. 2025090902 86400 10800 3600000 3600"
+        # Use file plugin for simple A record responses
+        hosts {
+            198.55.102.244 kragh.dev
+            198.55.102.244 ns1.kragh.dev  
+            198.55.102.244 www.kragh.dev
+            198.55.102.244 api.kragh.dev
+            198.55.102.244 home.kragh.dev
+            198.55.102.244 json-resume.kragh.dev
+            104.21.16.201 mail.kragh.dev
+            104.21.16.201 webmail.kragh.dev
+            172.67.215.230 pop3.kragh.dev
+            fallthrough
         }
         
-        # NS records  
-        template IN NS kragh.dev {
-            answer "kragh.dev 3600 IN NS ns1.kragh.dev."
-            answer "kragh.dev 3600 IN NS helium.ns.hetzner.de."
-            answer "kragh.dev 3600 IN NS hydrogen.ns.hetzner.com."
-            answer "kragh.dev 3600 IN NS oxygen.ns.hetzner.com."
-            additional "ns1.kragh.dev 300 IN A 198.55.102.244"
-        }
-        
-        # MX records
-        template IN MX kragh.dev {
-            match "^kragh\.dev\.$"
-            answer "kragh.dev 3600 IN MX 10 mail.protonmail.ch."
-            answer "kragh.dev 3600 IN MX 20 mailsec.protonmail.ch."
-        }
-        
-        # A records - Root domain
-        template IN A kragh.dev {
-            match "^kragh\.dev\.$"
-            answer "kragh.dev 300 IN A 198.55.102.244"
-        }
-        
-        # A records - Wildcard for all subdomains
+        # Wildcard for any other subdomains
         template IN A kragh.dev {
             match ".*\.kragh\.dev\.$"
             answer "{{ .Name }} 300 IN A 198.55.102.244"
         }
-        
-        # Specific mail service A records
-        template IN A kragh.dev {
-            match "^(imap|mail|pop3|smtp|webmail)\.kragh\.dev\.$"
-            answer "{{ .Name }} 3600 IN A 104.21.16.201"
-            fallthrough
-        }
-        
-        template IN A kragh.dev {
-            match "^pop3\.kragh\.dev\.$"
-            answer "pop3.kragh.dev 3600 IN A 172.67.215.230"
-        }
-        
-        # TXT records
-        template IN TXT kragh.dev {
-            match "^kragh\.dev\.$"
-            answer "kragh.dev 3600 IN TXT \"v=spf1 include:_spf.protonmail.ch mx ~all\""
-            answer "kragh.dev 3600 IN TXT \"protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4\""
-            answer "kragh.dev 300 IN TXT \"google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A\""
-        }
-        
-        template IN TXT kragh.dev {
-            match "^_dmarc\.kragh\.dev\.$"
-            answer "_dmarc.kragh.dev 3600 IN TXT \"v=DMARC1; p=quarantine\""
-        }
-        
-        # CNAME records for ProtonMail DKIM
-        template IN CNAME kragh.dev {
-            match "^protonmail\._domainkey\.kragh\.dev\.$"
-            answer "protonmail._domainkey.kragh.dev 3600 IN CNAME protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
-        }
-        
-        template IN CNAME kragh.dev {
-            match "^protonmail2\._domainkey\.kragh\.dev\.$"
-            answer "protonmail2._domainkey.kragh.dev 3600 IN CNAME protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
-        }
-        
-        template IN CNAME kragh.dev {
-            match "^protonmail3\._domainkey\.kragh\.dev\.$"
-            answer "protonmail3._domainkey.kragh.dev 3600 IN CNAME protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
-        }
-        
-        # Transfer block - allow AXFR to Hetzner  
-        # transfer {
-        #     to 213.239.242.238  # ns1.first-ns.de
-        #     to 213.133.105.6    # ns2.first-ns.de  
-        #     to 88.198.229.192   # ns3.first-ns.de
-        # }
     }
