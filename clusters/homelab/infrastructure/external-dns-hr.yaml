@@ -35,7 +35,7 @@ spec:
   values:
     # Global settings
     interval: 1m
-    logLevel: info
+    logLevel: debug
     logFormat: text
 
     # DNS provider - Start with inmemory to test functionality
