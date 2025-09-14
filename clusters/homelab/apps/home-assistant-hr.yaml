@@ -104,6 +104,30 @@ spec:
             - home.kragh.dev
           secretName: home-assistant-tls
 
+    # Additional volumes for USB device access
+    additionalVolumes:
+      - hostPath:
+          path: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_25_9B_C8_2C-if00-port0
+          type: CharDevice
+        name: zigbee-usb
+
+    # Additional volume mounts for USB device access
+    additionalMounts:
+      - mountPath: /dev/ttyUSB0
+        name: zigbee-usb
+
+    # Node selector to ensure deployment on node with USB device
+    nodeSelector:
+      kubernetes.io/hostname: gigabyte
+
+    # Enable host network for Bluetooth access
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+
+    # Security context - privileged required for USB/Bluetooth access
+    securityContext:
+      privileged: true
+
 ---
 # DNSEndpoint for external-dns integration
 apiVersion: externaldns.k8s.io/v1alpha1
