@@ -24,7 +24,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: bjw-s
-        namespace: home-assistant
+        namespace: apps
   install:
     createNamespace: true
     remediation:
