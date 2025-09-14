@@ -69,6 +69,8 @@ spec:
     configuration:
       # Enable the configuration setup
       enabled: true
+      # Force init will merge the current configuration file with the default configuration on every start
+      forceInit: true
       # List of trusted proxies to fix reverse proxy errors
       trusted_proxies:
         - 10.42.0.0/16 # k3s pod network (includes 10.42.0.14)
