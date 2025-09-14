@@ -15,8 +15,8 @@ data:
     
     ; SOA Record - Start of Authority
     ; Format: domain admin serial refresh retry expire minimum
-    @    IN    SOA    dns.kragh.dev. admin.kragh.dev. (
-                        2025091302  ; Serial number (YYYYMMDDNN format) - incremented
+    @    IN    SOA    ns1.tonur.dk. admin.kragh.dev. (
+                        2025091303  ; Serial number (YYYYMMDDNN format) - incremented
                         86400       ; Refresh (24 hours)
                         7200        ; Retry (2 hours)
                         604800      ; Expire (7 days)
@@ -24,7 +24,7 @@ data:
                       )
     
     ; NS Records - Name Servers  
-    @    IN    NS     dns.kragh.dev.
+    @    IN    NS     ns1.tonur.dk.
     @    IN    NS     ns1.first-ns.de.
     @    IN    NS     robotns2.second-ns.de.
     @    IN    NS     robotns3.second-ns.com.
