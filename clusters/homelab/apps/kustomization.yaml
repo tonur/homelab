@@ -7,7 +7,7 @@ resources:
   - namespace.yaml
   # Apply individual apps
   - json-resume-hr.yaml
-  # - home-assistant-hr.yaml # Temp disabled for now until external-dns is working
+  - home-assistant-hr.yaml
 # Future apps will be added here:
 #   - nextcloud
 #   - etc
