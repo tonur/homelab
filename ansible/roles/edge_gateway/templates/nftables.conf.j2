@@ -56,6 +56,12 @@ table inet filter {
 {% if edge_gateway_mode == 'dnat' %}
 # DNAT mode NAT table
 table ip nat {
+  set rfc1918 {
+    type ipv4_addr
+    flags interval
+    elements = { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 }
+  }
+  
   chain prerouting {
     type nat hook prerouting priority -100;
     # DNAT inbound HTTP/HTTPS to Traefik VIP
@@ -67,15 +73,21 @@ table ip nat {
   }
   chain postrouting {
     type nat hook postrouting priority 100;
-    # MASQUERADE DNS traffic to fix asymmetric routing  
-    oif "wg0" udp dport {{ edge_gateway_coredns_nodeport_udp }} masquerade
-    oif "wg0" tcp dport {{ edge_gateway_coredns_nodeport_tcp }} masquerade
+    # SNAT external clients only (not RFC1918), preserve internal client IPs
+    oif "wg0" ip saddr != @rfc1918 udp dport {{ edge_gateway_coredns_nodeport_udp }} snat to 10.172.90.2
+    oif "wg0" ip saddr != @rfc1918 tcp dport {{ edge_gateway_coredns_nodeport_tcp }} snat to 10.172.90.2
     # No MASQUERADE for HTTP/HTTPS to preserve client IP (requires symmetric routing)
   }
 }
 {% else %}
 # Proxy mode: DNS uses DNAT (HAProxy doesn't support UDP), HTTP/HTTPS use HAProxy
 table ip nat {
+  set rfc1918 {
+    type ipv4_addr
+    flags interval
+    elements = { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 }
+  }
+  
   chain prerouting {
     type nat hook prerouting priority -100;
     # DNAT inbound DNS to CoreDNS NodePorts (HAProxy can't handle UDP)
@@ -85,9 +97,8 @@ table ip nat {
   }
   chain postrouting {
     type nat hook postrouting priority 100;
-    # MASQUERADE DNS traffic to fix asymmetric routing
-    oif "wg0" udp dport {{ edge_gateway_coredns_nodeport_udp }} masquerade
-    oif "wg0" tcp dport {{ edge_gateway_coredns_nodeport_tcp }} masquerade
+    # dnsdist handles DNS forwarding locally, only MASQUERADE its outbound traffic  
+    oif "wg0" masquerade
     # No MASQUERADE for HTTP/HTTPS to preserve client IP
   }
 }
