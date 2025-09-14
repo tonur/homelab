@@ -15,6 +15,7 @@ metadata:
   namespace: infrastructure
 spec:
   interval: 15m
+  releaseName: external-dns
   targetNamespace: external-dns
   chart:
     spec:
@@ -37,6 +38,10 @@ spec:
     interval: 1m
     logLevel: debug
     logFormat: text
+
+    # Default targets for ingress resources without LoadBalancer IPs
+    defaultTargets:
+      - "198.55.102.244" # Our VPS external IP
 
     # DNS provider - Start with inmemory to test functionality
     provider: inmemory # This will log what it would do without making real changes
