@@ -42,6 +42,7 @@ spec:
     # Extra arguments to provide to ExternalDNS
     extraArgs:
       - --default-targets=198.55.102.244
+      - --publish-internal-services=true
 
     # DNS provider - Start with inmemory to test functionality
     provider: inmemory # This will log what it would do without making real changes
@@ -49,11 +50,6 @@ spec:
     # Domain filtering
     domainFilters:
       - kragh.dev # Only manage records for this domain
-
-    # Sources to monitor for DNS records
-    sources:
-      - ingress
-      - service # For LoadBalancer services
 
     # Policy for existing records
     policy: upsert-only # Only create/update, never delete
