@@ -64,29 +64,18 @@ spec:
         size: 5Gi
         storageClass: "local-path"
         accessMode: ReadWriteOnce
-      
-      # HTTP configuration for reverse proxy
-      configuration: |
-        # Loads default set of integrations. Do not remove.
-        default_config:
 
-        # Load frontend themes from the themes folder
-        frontend:
-          themes: !include_dir_merge_named themes
-
-        # HTTP Configuration for reverse proxy support
-        http:
-          use_x_forwarded_for: true
-          trusted_proxies:
-            - 10.42.0.0/16    # k3s pod network
-            - 10.43.0.0/16    # k3s service network  
-            - 172.16.0.0/12   # Docker default bridge networks
-            - 192.168.0.0/16  # Private networks
-            - 127.0.0.1       # Localhost
-
-        automation: !include automations.yaml
-        script: !include scripts.yaml
-        scene: !include scenes.yaml
+    # Configuration for Home Assistant
+    configuration:
+      # Enable the configuration setup
+      enabled: true
+      # List of trusted proxies to fix reverse proxy errors
+      trusted_proxies:
+        - 10.42.0.0/16    # k3s pod network (includes 10.42.0.14)
+        - 10.43.0.0/16    # k3s service network  
+        - 172.16.0.0/12   # Docker default bridge networks
+        - 192.168.0.0/16  # Private networks
+        - 127.0.0.0/8     # Localhost range
 
     # Service configuration
     service:
