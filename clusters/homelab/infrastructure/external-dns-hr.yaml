@@ -38,8 +38,8 @@ spec:
     logLevel: info
     logFormat: text
 
-    # DNS provider - Start with dry-run to see what records would be created
-    provider: dry-run # This will log what it would do without making changes
+    # DNS provider - Start with inmemory to test functionality
+    provider: inmemory # This will log what it would do without making real changes
 
     # Domain filtering
     domainFilters:
