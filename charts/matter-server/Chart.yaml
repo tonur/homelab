@@ -1,0 +1,7 @@
+apiVersion: v2
+name: matter-server
+description: A Helm chart for Python Matter Server for Home Assistant
+version: 0.1.0
+home: https://github.com/home-assistant-libs/python-matter-server
+sources:
+  - https://github.com/home-assistant-libs/python-matter-server

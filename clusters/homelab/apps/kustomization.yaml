@@ -8,6 +8,7 @@ resources:
   # Apply individual apps
   - json-resume-hr.yaml
   - home-assistant-hr.yaml
+  - matter-server-hr.yaml
 # Future apps will be added here:
 #   - nextcloud
 #   - etc
