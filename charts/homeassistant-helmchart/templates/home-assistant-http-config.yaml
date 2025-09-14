@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: home-assistant-http-config
+  namespace: home-assistant
+data:
+  http.yaml: |
+    # HTTP Configuration for Home Assistant
+    # This file configures trusted proxies for reverse proxy support
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 10.42.0.0/16    # k3s pod network
+        - 10.43.0.0/16    # k3s service network  
+        - 172.16.0.0/12   # Docker default bridge networks
+        - 192.168.0.0/16  # Private networks
+        - 127.0.0.1       # Localhost

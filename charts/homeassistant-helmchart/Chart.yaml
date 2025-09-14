@@ -1,0 +1,5 @@
+apiVersion: v2
+name: homeassistant-config
+description: Additional configuration for Home Assistant deployment
+version: 0.1.0
+appVersion: "2025.9.1"
