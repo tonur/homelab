@@ -67,7 +67,10 @@ table ip nat {
   }
   chain postrouting {
     type nat hook postrouting priority 100;
-    # No MASQUERADE to preserve client IP (requires symmetric routing)
+    # MASQUERADE DNS traffic to fix asymmetric routing  
+    oif "wg0" udp dport {{ edge_gateway_coredns_nodeport_udp }} masquerade
+    oif "wg0" tcp dport {{ edge_gateway_coredns_nodeport_tcp }} masquerade
+    # No MASQUERADE for HTTP/HTTPS to preserve client IP (requires symmetric routing)
   }
 }
 {% else %}
@@ -82,7 +85,10 @@ table ip nat {
   }
   chain postrouting {
     type nat hook postrouting priority 100;
-    # No MASQUERADE to preserve client IP
+    # MASQUERADE DNS traffic to fix asymmetric routing
+    oif "wg0" udp dport {{ edge_gateway_coredns_nodeport_udp }} masquerade
+    oif "wg0" tcp dport {{ edge_gateway_coredns_nodeport_tcp }} masquerade
+    # No MASQUERADE for HTTP/HTTPS to preserve client IP
   }
 }
 {% endif %}
