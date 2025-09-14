@@ -1,0 +1,14 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: test-home-kragh-dev
+  namespace: home-assistant
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "test.kragh.dev"
+spec:
+  endpoints:
+    - dnsName: test.kragh.dev
+      recordTTL: 300
+      recordType: A
+      targets:
+        - 198.55.102.244
