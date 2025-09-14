@@ -151,6 +151,7 @@ homelab/
 - [x] Configure service-based load balancing for multi-node clusters
 
 ### **Infrastructure 🚧 In Progress**
+- [ ] Consider a solution where ExternalDNS is not necessary, and instead a wildcard domain solves all issues, so we do not have to deal with CoreDNS.
 - [ ] Set up automated backups with Restic
 - [ ] Configure monitoring with Prometheus/Grafana
 - [ ] Implement log aggregation and centralized logging

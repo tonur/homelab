@@ -58,12 +58,12 @@ spec:
         fsGroup: 568
         fsGroupChangePolicy: "OnRootMismatch"
 
-      # Persistence configuration
-      persistence:
-        enabled: true
-        size: 5Gi
-        storageClass: "local-path"
-        accessMode: ReadWriteOnce
+    # Persistence configuration (at root level, not under homeassistant)
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: "local-path"
+      accessMode: ReadWriteOnce
 
     # Configuration for Home Assistant
     configuration:
