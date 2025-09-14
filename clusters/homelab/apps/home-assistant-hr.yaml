@@ -2,11 +2,11 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: bjw-s
+  name: pajikos
   namespace: apps
 spec:
   interval: 24h
-  url: https://bjw-s-labs.github.io/helm-charts
+  url: https://pajikos.github.io/home-assistant-helm-chart/
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -17,13 +17,14 @@ metadata:
 spec:
   interval: 15m
   targetNamespace: home-assistant
+  releaseName: home-assistant
   chart:
     spec:
-      chart: app-template
-      version: "4.2.0"
+      chart: home-assistant
+      version: "0.2.76"
       sourceRef:
         kind: HelmRepository
-        name: bjw-s
+        name: pajikos
         namespace: apps
   install:
     createNamespace: true
@@ -34,136 +35,97 @@ spec:
     remediation:
       retries: 3
   values:
-    # Configure options applied to all pods
-    defaultPodOptions:
-      automountServiceAccountToken: false
+    # Home Assistant configuration
+    homeassistant:
+      # Resource configuration
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 2Gi
+        requests:
+          cpu: 100m
+          memory: 512Mi
+      
+      # Environment variables
+      env:
+        TZ: "UTC"
+        HASS_SERVER_HOST: "0.0.0.0"
+      
+      # Security context
       securityContext:
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: "OnRootMismatch"
-
-    controllers:
-      # Configure the main controller
-      main:
-        type: statefulset
-        annotations:
-          reloader.stakater.com/auto: "true"
-
-        containers:
-          # Configure the main application container
-          main:
-            image:
-              # Official Home Assistant image
-              repository: ghcr.io/home-assistant/home-assistant
-              # Latest stable version
-              tag: "2025.9.1"
-
-            resources:
-              limits:
-                cpu: 2000m
-                memory: 2Gi
-              requests:
-                cpu: 100m
-                memory: 512Mi
-
-            env:
-              TZ: "UTC"
-              # Disable privileged mode for security
-              HASS_SERVER_HOST: "0.0.0.0"
-
-            probes:
-              liveness:
-                enabled: true
-                spec:
-                  httpGet:
-                    path: /api/
-                    port: 8123
-                  initialDelaySeconds: 60
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 3
-
-              readiness:
-                enabled: true
-                spec:
-                  httpGet:
-                    path: /api/
-                    port: 8123
-                  initialDelaySeconds: 30
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
-
-    service:
-      # Configure a service for the main application
-      main:
-        controller: main
-        type: ClusterIP
-        ports:
-          http:
-            port: 8123
-
-    ingress:
-      # Configure an Ingress for the main application
-      main:
-        annotations:
-          # Enable external-dns to create DNS records automatically
-          external-dns.alpha.kubernetes.io/hostname: "home.kragh.dev"
-          # Optional: specify TTL for the DNS record
-          external-dns.alpha.kubernetes.io/ttl: "300"
-          # Enable cert-manager to create certificates automatically
-          cert-manager.io/cluster-issuer: "letsencrypt-prod"
-        hosts:
-          - host: &host "home.kragh.dev"
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: main
-                  port: http
-        tls:
-          - hosts:
-              - *host
-            secretName: home-assistant-tls
-
-    persistence:
-      # Configure the main configuration storage location
-      config:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
+      
+      # Persistence configuration
+      persistence:
+        enabled: true
         size: 5Gi
         storageClass: "local-path"
-        globalMounts:
-          - path: /config
+        accessMode: ReadWriteOnce
+      
+      # HTTP configuration for reverse proxy
+      configuration: |
+        # Loads default set of integrations. Do not remove.
+        default_config:
 
-      # Configure HTTP settings for reverse proxy support
-      http-config:
-        type: configMap
-        name: home-assistant-http-config
-        globalMounts:
-          - path: /config/http.yaml
-            subPath: http.yaml
+        # Load frontend themes from the themes folder
+        frontend:
+          themes: !include_dir_merge_named themes
 
-      # Configure temporary storage for logs
-      tmp:
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
-            subPath: tmp
+        # HTTP Configuration for reverse proxy support
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+            - 10.42.0.0/16    # k3s pod network
+            - 10.43.0.0/16    # k3s service network  
+            - 172.16.0.0/12   # Docker default bridge networks
+            - 192.168.0.0/16  # Private networks
+            - 127.0.0.1       # Localhost
 
-    configMaps:
-      home-assistant-http-config:
-        enabled: true
-        data:
-          http.yaml: |
-            # HTTP Configuration for Home Assistant
-            # This file configures trusted proxies for reverse proxy support
-            http:
-              use_x_forwarded_for: true
-              trusted_proxies:
-                - 10.42.0.0/16    # k3s pod network
-                - 10.43.0.0/16    # k3s service network  
-                - 172.16.0.0/12   # Docker default bridge networks
-                - 192.168.0.0/16  # Private networks
-                - 127.0.0.1       # Localhost
+        automation: !include automations.yaml
+        script: !include scripts.yaml
+        scene: !include scenes.yaml
+
+    # Service configuration
+    service:
+      type: ClusterIP
+      port: 8123
+
+    # Ingress configuration
+    ingress:
+      enabled: true
+      annotations:
+        # Enable external-dns to create DNS records automatically
+        external-dns.alpha.kubernetes.io/hostname: "home.kragh.dev"
+        # Optional: specify TTL for the DNS record
+        external-dns.alpha.kubernetes.io/ttl: "300"
+        # Enable cert-manager to create certificates automatically
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      hosts:
+        - host: home.kragh.dev
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - home.kragh.dev
+          secretName: home-assistant-tls
+
+---
+# DNSEndpoint for external-dns integration
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: home-assistant-dns
+  namespace: home-assistant
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "home.kragh.dev"
+spec:
+  endpoints:
+    - dnsName: home.kragh.dev
+      recordTTL: 300
+      recordType: A
+      targets:
+        - 198.55.102.244
