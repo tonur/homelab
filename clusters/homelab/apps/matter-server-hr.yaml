@@ -37,6 +37,10 @@ spec:
     nodeSelector:
       kubernetes.io/hostname: gigabyte
 
+    # Enable host network for Thread/Matter network discovery
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+
     # USB device configuration for Zigbee stick
     usbDevice:
       hostPath: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_25_9B_C8_2C-if00-port0
