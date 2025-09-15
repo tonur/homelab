@@ -88,10 +88,6 @@ spec:
     ingress:
       enabled: true
       annotations:
-        # Enable external-dns to create DNS records automatically
-        external-dns.alpha.kubernetes.io/hostname: "home.kragh.dev"
-        # Optional: specify TTL for the DNS record
-        external-dns.alpha.kubernetes.io/ttl: "300"
         # Enable cert-manager to create certificates automatically
         cert-manager.io/cluster-issuer: "letsencrypt-prod"
       hosts:
@@ -127,20 +123,3 @@ spec:
     # Security context - privileged required for USB/Bluetooth access
     securityContext:
       privileged: true
-
----
-# DNSEndpoint for external-dns integration
-apiVersion: externaldns.k8s.io/v1alpha1
-kind: DNSEndpoint
-metadata:
-  name: home-assistant-dns
-  namespace: home-assistant
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: "home.kragh.dev"
-spec:
-  endpoints:
-    - dnsName: home.kragh.dev
-      recordTTL: 300
-      recordType: A
-      targets:
-        - 198.55.102.244

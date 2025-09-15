@@ -11,5 +11,3 @@ resources:
   - infrastructure-external-secrets-config-hr.yaml
   - external-secrets-hr.yaml
   - infrastructure-config-hr.yaml
-  # Enable external-dns (in dry-run mode initially)
-  - external-dns-hr.yaml

@@ -32,4 +32,3 @@ backend be_https
   server traefik_https {{ edge_gateway_traefik_vip }}:{{ edge_gateway_proxy_backend_https_port }} send-proxy-v2
 
 # NOTE: Ensure Traefik entryPoints web & websecure enable proxyProtocol and trust {{ edge_gateway_wg_local }}.
-# NOTE: DNS on port 53 is handled by nftables DNAT rules directly to NodePort 31053
