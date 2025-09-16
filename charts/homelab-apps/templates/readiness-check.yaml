@@ -14,8 +14,8 @@ spec:
       restartPolicy: OnFailure
       containers:
       - name: readiness-check
-        image: rancher/kubectl:v1.29.2
-        command: ["sh", "-c"]
+        image: alpine/k8s:1.33.4
+        command: ["/bin/sh", "-c"]
         args:
         - |
           release_name="{{ .Release.Name }}"
