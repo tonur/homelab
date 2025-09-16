@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: otbr
+  labels:
+    app: otbr
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: web-ui
+      protocol: TCP
+      name: web-ui
+    - port: 49152
+      targetPort: border-router
+      protocol: TCP
+      name: border-router
+  selector:
+    app: otbr

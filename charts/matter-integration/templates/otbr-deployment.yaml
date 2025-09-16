@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otbr
+  labels:
+    app: otbr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otbr
+  template:
+    metadata:
+      labels:
+        app: otbr
+    spec:
+      serviceAccountName: matter-integration
+      nodeSelector:
+        kubernetes.io/hostname: gigabyte
+      containers:
+        - name: otbr
+          image: "{{ .Values.otbr.image.repository }}:{{ .Values.otbr.image.tag }}"
+          securityContext:
+            privileged: true
+          ports:
+            - name: otbr-web
+              containerPort: 80   # Web UI
+            - name: otbr-agent
+              containerPort: 49191  # OTBR agent socket
+          resources:
+            {{- toYaml .Values.otbr.resources | nindent 12 }}
+          args:
+            - --radio-url
+            - "{{ .Values.otbr.radioUrl }}"
+            - --enable-auto-attach
+          volumeMounts:
+            - name: usb-device
+              mountPath: /dev/ttyUSB0
+      volumes:
+        - name: usb-device
+          hostPath:
+            path: {{ .Values.otbr.usbDevicePath }}
+            type: CharDevice

@@ -1,0 +1,24 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: matter-integration
+  namespace: apps
+spec:
+  interval: 15m
+  targetNamespace: home-assistant
+  releaseName: matter-integration
+  chart:
+    spec:
+      chart: ./charts/matter-integration
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
