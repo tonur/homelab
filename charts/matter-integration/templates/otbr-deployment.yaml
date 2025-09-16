@@ -29,7 +29,7 @@ spec:
               containerPort: 49191  # OTBR agent socket
           env:
             - name: OTBR_AGENT_OPTS
-              value: "{{ .Values.otbr.radioUrl }}"
+              value: "spinel+hdlc+uart://{{ .Values.otbr.usbDevicePath }}?uart-baudrate=115200"
           resources:
             {{- toYaml .Values.otbr.resources | nindent 12 }}
           volumeMounts:
