@@ -9,6 +9,6 @@ subjects:
   name: test-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: test-{{ .Release.Name }}
   apiGroup: rbac.authorization.k8s.io
