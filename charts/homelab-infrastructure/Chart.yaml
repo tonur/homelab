@@ -1,5 +1,4 @@
 apiVersion: v2
 name: homelab-infrastructure
 description: Homelab infrastructure components including cert-manager, external-secrets, and traefik
-version: 0.0.0-dev
-type: application
+version: 0.0.0-local

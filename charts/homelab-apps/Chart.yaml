@@ -1,5 +1,4 @@
 apiVersion: v2
 name: homelab-apps
 description: Homelab application components including home-assistant, json-resume, and matter-integration
-version: 0.0.0-dev
-type: application
+version: 0.0.0-local
