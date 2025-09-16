@@ -11,6 +11,7 @@ spec:
   chart:
     spec:
       chart: ./charts/matter-integration
+      version: "*"
       sourceRef:
         kind: GitRepository
         name: homelab
@@ -20,5 +21,6 @@ spec:
       retries: 3
   upgrade:
     cleanupOnFail: true
+    force: true
     remediation:
       retries: 3
