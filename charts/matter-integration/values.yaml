@@ -20,7 +20,7 @@ matterServer:
 otbr:
   # OTBR image configuration
   image:
-    repository: ghcr.io/openthread/otbr
+    repository: docker.io/openthread/border-router
     tag: "latest"
 
   # Radio URL configuration for the Thread radio
