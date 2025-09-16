@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: readiness-check-{{ .Release.Revision }}
+  name: test-{{ .Release.Name }}-{{ .Release.Revision }}
   namespace: {{ .Release.Namespace }}
   annotations:
     helm.sh/hook: post-install,post-upgrade
