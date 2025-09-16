@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: matter-server-data
   annotations:
-    "helm.sh/resource-policy": keep
   labels:
     app: matter-server
 spec:
