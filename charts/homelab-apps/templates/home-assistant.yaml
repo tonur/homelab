@@ -35,10 +35,6 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  # Ensure Home Assistant server waits for Matter Integration to be ready
-  dependsOn:
-    - name: matter-integration
-      namespace: apps
   values:
     # Home Assistant configuration
     homeassistant:

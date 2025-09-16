@@ -25,4 +25,7 @@ spec:
     force: true
     remediation:
       retries: 3
+  dependsOn:
+    - name: home-assistant
+      namespace: apps
 {{- end }}
