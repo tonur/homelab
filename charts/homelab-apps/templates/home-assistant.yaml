@@ -1,3 +1,4 @@
+{{- if .Values.homeAssistant.enabled }}
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
@@ -127,3 +128,4 @@ spec:
     # Security context - privileged required for USB/Bluetooth access
     securityContext:
       privileged: true
+{{- end }}

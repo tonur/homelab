@@ -1,0 +1,13 @@
+# Apps configuration
+apps:
+  enabled: true
+
+# Application toggles
+homeAssistant:
+  enabled: true
+
+jsonResume:
+  enabled: true
+
+matterIntegration:
+  enabled: true

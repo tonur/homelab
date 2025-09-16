@@ -1,3 +1,4 @@
+{{- if .Values.traefik.enabled }}
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
@@ -54,3 +55,4 @@ spec:
         forwardedHeaders:
           trustedIPs:
             - 10.172.90.2
+{{- end }}

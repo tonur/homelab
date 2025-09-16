@@ -11,18 +11,59 @@ spec:
   ref:
     branch: main
 ---
-# Root Kustomization - Entry point for all cluster configuration
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
+# Infrastructure Helm Release - Deploy all infrastructure components
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
 metadata:
-  name: homelab-cluster
+  name: homelab-infrastructure
   namespace: default
 spec:
-  interval: 1m
-  path: "./clusters/homelab"
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: homelab
-  timeout: 10m
-  wait: true
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/homelab-infrastructure
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+      interval: 1m
+      reconcileStrategy: Revision
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    force: true
+    remediation:
+      retries: 3
+  timeout: 15m
+---
+# Apps Helm Release - Deploy all application components
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homelab-apps
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/homelab-apps
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+      interval: 1m
+      reconcileStrategy: Revision
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    force: true
+    remediation:
+      retries: 3
+  timeout: 15m
+  dependsOn:
+    - name: homelab-infrastructure
+      namespace: default

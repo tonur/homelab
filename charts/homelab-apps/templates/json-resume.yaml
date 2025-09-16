@@ -1,27 +1,34 @@
+{{- if .Values.jsonResume.enabled }}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: infrastructure-config
-  namespace: infrastructure
+  name: json-resume
+  namespace: apps
 spec:
-  interval: 10m
+  interval: 5m
   chart:
     spec:
-      chart: ./charts/infrastructure-config
+      chart: ./charts/json-resume
       version: "*"
       sourceRef:
         kind: GitRepository
         name: homelab
         namespace: default
-      interval: 5m
+      interval: 1m
       reconcileStrategy: Revision # Local chart
   install:
     remediation:
       retries: 3
   upgrade:
+    force: true
     remediation:
       retries: 3
-  dependsOn:
-    - name: cert-manager
-    - name: external-secrets
+  values:
+    # Override values if needed
+    ingress:
+      host: kragh.dev
+
+    webServer:
+      replicas: 1
+{{- end }}
