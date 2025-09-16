@@ -22,14 +22,16 @@ spec:
           image: "{{ .Values.otbr.image.repository }}:{{ .Values.otbr.image.tag }}"
           securityContext:
             privileged: true
+          command: ["otbr-agent"]
+          args:
+            - "-I"
+            - "wpan0"
+            - "spinel+hdlc+uart://{{ .Values.otbr.usbDevicePath }}?uart-baudrate=115200"
           ports:
             - name: otbr-web
               containerPort: 80   # Web UI
             - name: otbr-agent
               containerPort: 49191  # OTBR agent socket
-          env:
-            - name: OTBR_RADIO_URL
-              value: "spinel+hdlc+uart://{{ .Values.otbr.usbDevicePath }}?uart-baudrate=115200"
           resources:
             {{- toYaml .Values.otbr.resources | nindent 12 }}
           volumeMounts:
