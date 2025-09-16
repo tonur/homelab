@@ -1,0 +1,45 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: infrastructure-readiness-check-{{ .Release.Revision }}
+  namespace: infrastructure
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: readiness-check
+        image: rancher/kubectl:v1.29.2
+        command: ["sh", "-c"]
+        args:
+        - |
+          release_name="{{ .Release.Name }}"
+          echo "Discovering $release_name HelmReleases..."
+
+          # Get all HelmReleases with the parent chart label
+          RELEASES=$(kubectl get helmrelease -A -l "helm.toolkit.fluxcd.io/name=$release_name" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}')
+
+          if [ -z "$RELEASES" ]; then
+            echo "No child HelmReleases found with label helm.toolkit.fluxcd.io/name=$release_name"
+            exit 0
+          fi
+          
+          echo "Found HelmReleases:"
+          echo "$RELEASES"
+          echo ""
+          
+          # Wait for each HelmRelease
+          echo "$RELEASES" | while IFS=/ read -r namespace name; do
+            if [ -n "$name" ] && [ -n "$namespace" ]; then
+              echo "Waiting for $name in namespace $namespace..."
+              kubectl wait --for=condition=Ready helmrelease "$name" -n "$namespace" --timeout=600s
+              echo "✅ $name is ready"
+            fi
+          done
+
+          echo "🎉 All $release_name components ready!"
