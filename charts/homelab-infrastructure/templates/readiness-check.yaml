@@ -19,27 +19,27 @@ spec:
         args:
         - |
           release_name="{{ .Release.Name }}"
-          echo "Discovering $release_name HelmReleases..."
+          interval=10
 
-          # Get all HelmReleases with the parent chart label
-          RELEASES=$(kubectl get helmrelease -A -l "helm.toolkit.fluxcd.io/name=$release_name" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}')
-
-          if [ -z "$RELEASES" ]; then
-            echo "No child HelmReleases found with label helm.toolkit.fluxcd.io/name=$release_name"
-            exit 0
-          fi
-          
-          echo "Found HelmReleases:"
-          echo "$RELEASES"
-          echo ""
-          
-          # Wait for each HelmRelease
-          echo "$RELEASES" | while IFS=/ read -r namespace name; do
-            if [ -n "$name" ] && [ -n "$namespace" ]; then
-              echo "Waiting for $name in namespace $namespace..."
-              kubectl wait --for=condition=Ready helmrelease "$name" -n "$namespace" --timeout=600s
-              echo "✅ $name is ready"
+          child_hr_ready() {
+            if kubectl wait --for=condition=Ready helmrelease "$name" -n "$namespace" --timeout=100s; then
+              return 0
+            else
+              return 1
             fi
+          }
+
+          helm_release=$(kubectl get helmrelease -A -l "helm.toolkit.fluxcd.io/name=$release_name" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}')
+
+          for helm_release in $helm_release; do
+            namespace=$(echo "$helm_release" | cut -d'/' -f1)
+            name=$(echo "$helm_release" | cut -d'/' -f2)
+
+            until child_hr_ready; do
+              echo "Child HelmRelease $name is not ready, retrying in $interval seconds.."
+              sleep $interval
+            done
+
           done
 
-          echo "🎉 All $release_name components ready!"
+          echo "All child HelmReleases are ready."
