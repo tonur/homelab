@@ -27,12 +27,11 @@ spec:
               containerPort: 80   # Web UI
             - name: otbr-agent
               containerPort: 49191  # OTBR agent socket
+          env:
+            - name: OTBR_AGENT_OPTS
+              value: "{{ .Values.otbr.radioUrl }}"
           resources:
             {{- toYaml .Values.otbr.resources | nindent 12 }}
-          args:
-            - --radio-url
-            - "{{ .Values.otbr.radioUrl }}"
-            - --enable-auto-attach
           volumeMounts:
             - name: usb-device
               mountPath: /dev/ttyUSB0
