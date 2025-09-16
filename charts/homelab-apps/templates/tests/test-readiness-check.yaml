@@ -11,6 +11,7 @@ metadata:
 spec:
   template:
     spec:
+      serviceAccount: test-{{ .Release.Name }}
       restartPolicy: OnFailure
       containers:
       - name: readiness-check
