@@ -27,7 +27,7 @@ otbr:
   radioUrl: "spinel+hdlc+uart:///dev/ttyUSB0?uart-baudrate=115200"
 
   # USB device path on the host
-  usbDevicePath: /dev/serial/by-id/usb-Silicon_Labs_slae.sh_cc2652rb_stick_-_slaesh_s_iot_stuff_00_12_4B_00_25_9B_C8_2C-if00-port0
+  usbDevicePath: /dev/ttyUSB0
 
   # Resource limits for OTBR
   resources:

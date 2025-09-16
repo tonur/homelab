@@ -34,7 +34,7 @@ spec:
             {{- toYaml .Values.otbr.resources | nindent 12 }}
           volumeMounts:
             - name: usb-device
-              mountPath: /dev/ttyUSB0
+              mountPath: {{ .Values.otbr.usbDevicePath }}
       volumes:
         - name: usb-device
           hostPath:
