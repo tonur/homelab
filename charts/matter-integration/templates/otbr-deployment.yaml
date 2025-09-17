@@ -29,7 +29,7 @@ spec:
               containerPort: 49191  # OTBR agent socket
           env:
             - name: OT_RCP_DEVICE
-              value: "spinel+hdlc+uart://{{ .Values.otbr.usbDevicePath }}?uart-baudrate=115200"
+              value: "spinel+hdlc+uart://{{ .Values.otbr.usbDevicePath }}?uart-baudrate=1000000"
           resources:
             {{- toYaml .Values.otbr.resources | nindent 12 }}
           volumeMounts:
