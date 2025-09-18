@@ -8,6 +8,3 @@ homeAssistant:
 
 jsonResume:
   enabled: true
-
-zigbee2mqtt:
-  enabled: true
