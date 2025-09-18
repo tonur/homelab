@@ -1,7 +1,0 @@
-apiVersion: v2
-name: matter-integration
-description: A Helm chart for integrating Matter for Home Assistant with a python server and OpenThread Border Router
-version: 0.0.0-local
-sources:
-  - https://github.com/home-assistant-libs/python-matter-server
-  - https://github.com/openthread/ot-br-posix/tree/main/etc/docker/border-router
