@@ -34,6 +34,8 @@ spec:
     remediation:
       retries: 3
   values:
+    experimental:
+      kubernetesGateway: true
     providers:
       kubernetesGateway:
         enabled: true

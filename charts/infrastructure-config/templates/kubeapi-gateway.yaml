@@ -18,7 +18,7 @@ spec:
           from: All
 
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: TLSRoute
 metadata:
   name: kubeapi-tlsroute
