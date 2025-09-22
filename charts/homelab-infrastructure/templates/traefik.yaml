@@ -34,6 +34,9 @@ spec:
     remediation:
       retries: 3
   values:
+    providers:
+      kubernetesGateway:
+        enabled: true
     service:
       type: NodePort
       spec:
