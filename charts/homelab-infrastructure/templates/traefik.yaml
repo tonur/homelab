@@ -35,7 +35,8 @@ spec:
       retries: 3
   values:
     experimental:
-      kubernetesGateway: true
+      kubernetesGateway:
+        enabled: true
     providers:
       kubernetesGateway:
         enabled: true
