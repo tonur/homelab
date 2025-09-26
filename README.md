@@ -161,10 +161,9 @@ homelab/
   - [x] Configure static site hosting
   - [x] Implement automated TLS certificates
   - [x] Optimize Traefik routing with IngressRoute
-- [ ] **Home Assistant**: Deploy smart home automation
-  - [ ] Configure device integrations
-  - [ ] Set up automation rules
-  - [ ] Implement secure external access
+- [x] **Home Assistant**: Deploy smart home automation
+  - [x] Configure device integrations
+  - [x] Implement secure external access
 - [ ] **Jellyfin Media Server**: Deploy media streaming
   - [ ] Configure media storage
   - [ ] Set up hardware transcoding

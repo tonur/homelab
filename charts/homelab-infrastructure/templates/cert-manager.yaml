@@ -1,4 +1,3 @@
-{{- if .Values.certManager.enabled }}
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
@@ -72,4 +71,3 @@ spec:
         requests:
           cpu: 10m
           memory: 64Mi
-{{- end }}

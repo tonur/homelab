@@ -1,4 +1,3 @@
-{{- if .Values.infrastructure.enabled }}
 ---
 apiVersion: v1
 kind: Namespace
@@ -6,4 +5,3 @@ metadata:
   name: infrastructure
   labels:
     name: infrastructure
-{{- end }}

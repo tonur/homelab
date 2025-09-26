@@ -1,4 +1,3 @@
-{{- if .Values.infraConfig.enabled }}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -27,4 +26,3 @@ spec:
   dependsOn:
     - name: cert-manager
     - name: external-secrets
-{{- end }}
