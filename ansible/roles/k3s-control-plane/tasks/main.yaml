@@ -20,6 +20,7 @@
     mode: '0755'
 
 - name: Install k3s control plane
+  shell: /tmp/k3s-install.sh
   environment:
     INSTALL_K3S_EXEC: >
       --disable traefik
@@ -27,7 +28,7 @@
       --advertise-address {{ current_tailscale_ip }}
       --flannel-iface tailscale0
       --node-ip {{ current_tailscale_ip }}
-  shell: /tmp/k3s-install.sh
+      --write-kubeconfig-mode 644
   args:
     creates: /usr/local/bin/k3s
 
