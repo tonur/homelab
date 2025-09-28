@@ -35,15 +35,6 @@ spec:
   dependsOn:
     - name: infrastructure-tailscale-operator-config
       namespace: infrastructure
-  valuesFrom:
-    - kind: Secret
-      name: operator-oauth
-      valuesKey: client_id
-      targetPath: oauth.clientId
-    - kind: Secret
-      name: operator-oauth
-      valuesKey: client_secret
-      targetPath: oauth.clientSecret
   values:
     # Resource settings
     resources:
