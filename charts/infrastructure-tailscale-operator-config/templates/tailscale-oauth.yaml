@@ -6,7 +6,7 @@ metadata:
   name: tailscale-oauth
   namespace: tailscale
 spec:
-  refreshInterval: 24h
+  refreshInterval: 5m
   secretStoreRef:
     name: bitwarden-secrets-manager
     kind: ClusterSecretStore
