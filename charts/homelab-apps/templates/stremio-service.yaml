@@ -104,3 +104,17 @@ spec:
           - hosts:
               - *host
             secretName: stremio-tls
+
+    persistence:
+      root:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        globalMounts:
+          - path: /root
+
+      # Configure temporary storage for logs
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /
