@@ -38,12 +38,25 @@ spec:
     controllers:
       # Configure the main controller
       main:
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+
         containers:
           # Configure the main application container
           main:
             image:
               repository: stremio/server
               tag: "latest"
+
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 1000
+              readOnlyRootFilesystem: true
+              allowPrivilegeEscalation: false
 
             resources:
               limits:
