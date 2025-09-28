@@ -38,13 +38,15 @@ spec:
     controllers:
       # Configure the main controller
       main:
-
+        annotations:
+          container.apparmor.security.beta.kubernetes.io/main: "unconfined"
+        
         pod:
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
+        
         containers:
           # Configure the main application container
           main:
@@ -53,10 +55,10 @@ spec:
               tag: "latest"
 
             securityContext:
-              runAsNonRoot: true
-              runAsUser: 1000
-              readOnlyRootFilesystem: true
-              allowPrivilegeEscalation: false
+              runAsNonRoot: false
+              runAsUser: 0
+              readOnlyRootFilesystem: false
+              allowPrivilegeEscalation: true
 
             resources:
               limits:
