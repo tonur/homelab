@@ -90,18 +90,29 @@ spec:
                   failureThreshold: 3
 
     service:
-      # Configure a service for the main application
+      # Main service for internal cluster access
       main:
         controller: main
-        annotations:
-          tailscale.com/expose: "true"
-          # Tailscale service for private access (creates stremio.pirate-acrux.ts.net)
-          tailscale.com/hostname: "stremio"
         ports:
           http:
             port: 11470
           https:
             port: 12470
+      
+      # Tailscale LoadBalancer service for external Tailscale access
+      tailscale:
+        controller: main
+        type: LoadBalancer
+        loadBalancerClass: tailscale
+        annotations:
+          tailscale.com/hostname: "stremio"
+        ports:
+          http:
+            port: 80
+            targetPort: 11470
+          https:
+            port: 443
+            targetPort: 11470
 
     # ingress:
     #   # Configure an Ingress for the main application
