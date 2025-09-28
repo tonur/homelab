@@ -64,4 +64,3 @@ spec:
     operatorConfig:
       defaultTags:
         - "k8s-operator"
-        - "homelab"
