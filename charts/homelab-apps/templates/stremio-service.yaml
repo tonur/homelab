@@ -96,39 +96,19 @@ spec:
         ports:
           http:
             port: 11470
-          https:
-            port: 12470
-      
-      # Tailscale LoadBalancer service for external Tailscale access
-      tailscale:
-        controller: main
-        type: LoadBalancer
-        loadBalancerClass: tailscale
-        annotations:
-          tailscale.com/hostname: "stremio"
-        ports:
-          http:
-            port: 80
-            targetPort: 11470
-          https:
-            port: 443
-            targetPort: 12470
 
-    # ingress:
-    #   # Configure an Ingress for the main application
-    #   main:
-    #     annotations:
-    #       # Enable cert-manager to create certificates automatically
-    #       cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    #     hosts:
-    #       - host: &host "stremio.kragh.dev"
-    #         paths:
-    #           - path: /
-    #             pathType: Prefix
-    #             service:
-    #               identifier: main
-    #               port: http
-    #     tls:
-    #       - hosts:
-    #           - *host
-    #         secretName: stremio-tls
+    ingress:
+      # Configure a Tailscale Ingress for automatic HTTPS
+      tailscale:
+        className: tailscale
+        hosts:
+          - host: stremio
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - stremio
