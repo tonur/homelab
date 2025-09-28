@@ -102,11 +102,7 @@ spec:
       # Tailscale service for private access (creates stremio.gigabyte.pirate-acrux.ts.net)
       tailscale:
         controller: main
-        type: LoadBalancer
         loadBalancerClass: tailscale
-        annotations:
-          tailscale.com/expose: "true"
-          tailscale.com/hostname: "stremio"
         ports:
           http:
             port: 80
