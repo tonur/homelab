@@ -15,7 +15,7 @@ spec:
   data:
   - secretKey: clientId
     remoteRef:
-      key: tailscale_operator_client_id
+      key: tailscale-operator-client-id
   - secretKey: clientSecret
     remoteRef:
-      key: tailscale_operator_client_secret
+      key: tailscale-operator-client-secret
