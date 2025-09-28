@@ -63,4 +63,4 @@ spec:
     # Enable ingress certificate provisioning
     operatorConfig:
       defaultTags:
-        - "k8s-operator"
+        - "tag:k8s-operator"
