@@ -38,27 +38,13 @@ spec:
     controllers:
       # Configure the main controller
       main:
-        annotations:
-          container.apparmor.security.beta.kubernetes.io/main: "unconfined"
-        
-        pod:
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            fsGroup: 0
-        
+
         containers:
           # Configure the main application container
           main:
             image:
               repository: stremio/server
               tag: "latest"
-
-            securityContext:
-              runAsNonRoot: false
-              runAsUser: 0
-              readOnlyRootFilesystem: false
-              allowPrivilegeEscalation: true
 
             resources:
               limits:
@@ -119,18 +105,3 @@ spec:
           - hosts:
               - *host
             secretName: stremio-tls
-
-    persistence:
-      # Stremio server data directory
-      stremio-data:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 1Gi
-        globalMounts:
-          - path: /root/.stremio-server
-
-      # Configure temporary storage for logs
-      tmp:
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
