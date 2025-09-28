@@ -38,6 +38,14 @@ spec:
     controllers:
       # Configure the main controller
       main:
+        annotations:
+          container.apparmor.security.beta.kubernetes.io/main: "unconfined"
+        
+        pod:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
 
         containers:
           # Configure the main application container
@@ -45,6 +53,12 @@ spec:
             image:
               repository: stremio/server
               tag: "latest"
+
+            securityContext:
+              runAsNonRoot: false
+              runAsUser: 0
+              readOnlyRootFilesystem: false
+              allowPrivilegeEscalation: true
 
             resources:
               limits:
@@ -58,8 +72,7 @@ spec:
               liveness:
                 enabled: true
                 spec:
-                  httpGet:
-                    path: /
+                  tcpSocket:
                     port: 11470
                   initialDelaySeconds: 60
                   periodSeconds: 30
@@ -69,8 +82,7 @@ spec:
               readiness:
                 enabled: true
                 spec:
-                  httpGet:
-                    path: /
+                  tcpSocket:
                     port: 11470
                   initialDelaySeconds: 30
                   periodSeconds: 10
@@ -100,7 +112,7 @@ spec:
                 pathType: Prefix
                 service:
                   identifier: main
-                  port: https
+                  port: http
         tls:
           - hosts:
               - *host
