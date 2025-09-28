@@ -96,6 +96,7 @@ spec:
       main:
         annotations:
           tailscale.com/expose: "true"
+          tailscale.com/hostname: "stremio"
         controller: main
         ports:
           http:
