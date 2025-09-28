@@ -92,6 +92,10 @@ spec:
     service:
       # Configure a service for the main application
       main:
+        annotations:
+          tailscale.com/expose: "true"
+          tailscale.com/hostname: "gigabyte"
+          tailscale.com/cert: "true"
         controller: main
         ports:
           http:

@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: infrastructure-config
+  name: infrastructure-tailscale-operator-config
   namespace: infrastructure
 spec:
   interval: 10m
   chart:
     spec:
-      chart: ./charts/infrastructure-config
+      chart: ./charts/infrastructure-tailscale-operator-config
       version: "*"
       sourceRef:
         kind: GitRepository
@@ -24,6 +24,4 @@ spec:
     remediation:
       retries: 3
   dependsOn:
-    - name: cert-manager
     - name: external-secrets
-    - name: tailscale-operator
