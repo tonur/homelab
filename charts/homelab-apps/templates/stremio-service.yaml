@@ -35,6 +35,8 @@ spec:
     remediation:
       retries: 3
   values:
+    # Minimal configuration - just specify the service prefix
+    hostPrefix: "stremio"
     controllers:
       # Configure the main controller
       main:
@@ -90,27 +92,38 @@ spec:
                   failureThreshold: 3
 
     service:
-      # Configure a service for the main application
+      # Main service for the application
       main:
-        annotations:
-          tailscale.com/expose: "true"
-          tailscale.com/hostname: "gigabyte"
-          tailscale.com/cert: "true"
         controller: main
         ports:
           http:
             port: 11470
           https:
             port: 12470
+      
+      # Tailscale service for private access (creates stremio.gigabyte.pirate-acrux.ts.net)
+      tailscale:
+        controller: main
+        type: LoadBalancer
+        loadBalancerClass: tailscale
+        annotations:
+          tailscale.com/expose: "true"
+          tailscale.com/hostname: "stremio"
+        ports:
+          http:
+            port: 80
+            targetPort: 11470
+          https:
+            port: 443
+            targetPort: 11470
 
     ingress:
-      # Configure an Ingress for the main application
+      # Public ingress (creates stremio.kragh.dev)
       main:
         annotations:
-          # Enable cert-manager to create certificates automatically
           cert-manager.io/cluster-issuer: "letsencrypt-prod"
         hosts:
-          - host: &host "stremio.kragh.dev"
+          - host: &publicHost "stremio.kragh.dev"
             paths:
               - path: /
                 pathType: Prefix
@@ -119,5 +132,5 @@ spec:
                   port: http
         tls:
           - hosts:
-              - *host
-            secretName: stremio-tls
+              - *publicHost
+            secretName: "stremio-public-tls"
