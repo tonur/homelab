@@ -93,23 +93,15 @@ spec:
       # Configure a service for the main application
       main:
         controller: main
+        annotations:
+          tailscale.com/expose: "true"
+          # Tailscale service for private access (creates stremio.pirate-acrux.ts.net)
+          tailscale.com/hostname: "stremio"
         ports:
           http:
             port: 11470
           https:
             port: 12470
-
-      # Tailscale service for private access (creates stremio.gigabyte.pirate-acrux.ts.net)
-      tailscale:
-        controller: main
-        loadBalancerClass: tailscale
-        ports:
-          http:
-            port: 80
-            targetPort: 11470
-          https:
-            port: 443
-            targetPort: 11470
 
     # ingress:
     #   # Configure an Ingress for the main application
