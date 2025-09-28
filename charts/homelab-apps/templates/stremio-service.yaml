@@ -1,0 +1,106 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: bjw-s
+  namespace: apps
+spec:
+  interval: 24h
+  url: https://bjw-s-labs.github.io/helm-charts
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: stremio-service
+  namespace: apps
+spec:
+  interval: 15m
+  targetNamespace: stremio-service
+  releaseName: stremio-service
+  chart:
+    spec:
+      chart: app-template
+      version: "4.2.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: apps
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      # Configure the main controller
+      main:
+        containers:
+          # Configure the main application container
+          main:
+            image:
+              repository: stremio/server
+              tag: "latest"
+
+            resources:
+              limits:
+                cpu: 2000m
+                memory: 2Gi
+              requests:
+                cpu: 100m
+                memory: 512Mi
+
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 11470
+                  initialDelaySeconds: 60
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+
+              readiness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 11470
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+
+    service:
+      # Configure a service for the main application
+      main:
+        controller: main
+        ports:
+          http:
+            port: 11470
+          https:
+            port: 12470
+
+    ingress:
+      # Configure an Ingress for the main application
+      main:
+        annotations:
+          # Enable cert-manager to create certificates automatically
+          cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        hosts:
+          - host: &host "stremio.kragh.dev"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: https
+        tls:
+          - hosts:
+              - *host
+            secretName: stremio-tls
