@@ -112,7 +112,7 @@ spec:
             targetPort: 11470
           https:
             port: 443
-            targetPort: 11470
+            targetPort: 12470
 
     # ingress:
     #   # Configure an Ingress for the main application
