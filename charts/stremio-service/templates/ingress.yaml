@@ -6,11 +6,17 @@ metadata:
   namespace: traefik
 spec:
   ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: traefik
-      port:
-        number: 80
+  rules:
+    - host: stremio.pirate-acrux.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: traefik
+                port:
+                  number: 80
   tls:
     - hosts:
         - stremio.pirate-acrux.ts.net
@@ -20,8 +26,6 @@ kind: Ingress
 metadata:
   name: stremio-traefik
   namespace: stremio
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
   rules:
