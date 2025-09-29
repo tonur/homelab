@@ -26,6 +26,8 @@ kind: Ingress
 metadata:
   name: stremio-traefik
   namespace: stremio
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
 spec:
   ingressClassName: traefik
   rules:
