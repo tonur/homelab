@@ -11,10 +11,13 @@ spec:
   chart:
     spec:
       chart: ./charts/stremio-service
+      version: "*"
       sourceRef:
         kind: GitRepository
         name: homelab
         namespace: default
+      interval: 1m
+      reconcileStrategy: Revision # Local chart
   install:
     createNamespace: true
     remediation:
