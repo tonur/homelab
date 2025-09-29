@@ -38,7 +38,7 @@ spec:
           serversTransport: "kube-ca-transport"
   tls:
     secretName: kubeapi-cert-tls
----
+--- # I have no idea why this does not trigger certificate issues with the kube api, but it works
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
