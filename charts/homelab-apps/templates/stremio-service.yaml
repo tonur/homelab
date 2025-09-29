@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: stremio
+  name: stremio-service
   namespace: apps
 spec:
   interval: 15m
@@ -10,11 +10,11 @@ spec:
   releaseName: stremio
   chart:
     spec:
-      chart: ./charts/stremio
+      chart: ./charts/stremio-service
       sourceRef:
         kind: GitRepository
-        name: homelab-flux-system
-        namespace: flux-system
+        name: homelab
+        namespace: default
   install:
     createNamespace: true
     remediation:
