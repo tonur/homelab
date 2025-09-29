@@ -110,8 +110,7 @@ spec:
         annotations:
         defaultBackend:
           service:
-            name: stremio-service-main
-            identifier: main
+            name: main
             port:
               number: 11470
         tls:
