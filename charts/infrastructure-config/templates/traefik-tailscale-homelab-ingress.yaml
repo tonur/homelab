@@ -2,12 +2,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: traefik-tailscale-homelab
+  name: traefik-tailscale
   namespace: traefik
+  annotations:
+    tailscale.com/hostname: homelab
 spec:
   ingressClassName: tailscale
+  tls:
+    - hosts:
+        - homelab.pirate-acrux.ts.net
   rules:
-    - host: "*.homelab.pirate-acrux.ts.net"
+    - host: homelab.pirate-acrux.ts.net
       http:
         paths:
           - path: /
@@ -17,6 +22,3 @@ spec:
                 name: traefik
                 port:
                   number: 80
-  tls:
-    - hosts:
-        - "*.homelab.pirate-acrux.ts.net"
