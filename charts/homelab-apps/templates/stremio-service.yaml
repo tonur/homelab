@@ -107,12 +107,11 @@ spec:
     ingress:
       tailscale:
         className: tailscale
-        annotations:
         defaultBackend:
           service:
-            name: main
+            name: stremio-service
             port:
               number: 11470
         tls:
           - hosts:
-              - stremio.pirate-acrux.ts.net
+              - kube.pirate-acrux.ts.net
