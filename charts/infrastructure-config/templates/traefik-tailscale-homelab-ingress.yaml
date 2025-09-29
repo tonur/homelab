@@ -8,17 +8,11 @@ metadata:
     tailscale.com/hostname: homelab
 spec:
   ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: traefik
+      port:
+        number: 80
   tls:
     - hosts:
         - homelab.pirate-acrux.ts.net
-  rules:
-    - host: homelab.pirate-acrux.ts.net
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: traefik
-                port:
-                  number: 80
