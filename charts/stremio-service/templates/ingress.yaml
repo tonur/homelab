@@ -12,6 +12,7 @@ metadata:
   name: traefik-proxygroup
   namespace: traefik
 spec:
+  type: ingress
   dnsName: stremio.pirate-acrux.ts.net
   proxies:
   - classRef:
