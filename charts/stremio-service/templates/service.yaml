@@ -4,6 +4,9 @@ kind: Service
 metadata:
   name: stremio-service
   namespace: stremio
+  annotations:
+    tailscale.com/proxy-group: stremio-proxygroup
+    tailscale.com/hostname: stremio.pirate-acrux.ts.net
 spec:
   type: ClusterIP
   selector:
