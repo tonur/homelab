@@ -54,6 +54,13 @@ spec:
               repository: stremio/server
               tag: "latest"
 
+            # Configure Stremio to use internal URLs for media streaming
+            env:
+              # Force Stremio to use HTTP internally for media URLs
+              STREAMING_SERVER_URL: "http://localhost:11470"
+              # Alternative: Use the service DNS name
+              # STREAMING_SERVER_URL: "http://stremio-service.stremio-service.svc.cluster.local:11470"
+
             securityContext:
               runAsNonRoot: false
               runAsUser: 0
@@ -96,19 +103,22 @@ spec:
         ports:
           http:
             port: 11470
-      
-      # Tailscale LoadBalancer service for better streaming performance
+
+    ingress:
+      # Tailscale Ingress for private network access with performance optimizations
       tailscale:
-        controller: main
-        type: LoadBalancer
-        loadBalancerClass: tailscale
+        className: tailscale
         annotations:
-          tailscale.com/hostname: "stremio"
+          # Optimize for media streaming
           tailscale.com/tags: "tag:streaming"
-        ports:
-          http:
-            port: 80
-            targetPort: 11470
-          https:
-            port: 443
-            targetPort: 11470
+        hosts:
+          - host: stremio
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
+        tls:
+          - hosts:
+              - stremio
