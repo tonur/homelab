@@ -1,0 +1,16 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stremio-tailscale
+  namespace: stremio-service
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: stremio
+      port:
+        name: http
+  tls:
+  - hosts:
+    - stremio.pirate-acrux.ts.net

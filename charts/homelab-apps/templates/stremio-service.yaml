@@ -1,31 +1,20 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: HelmRepository
-metadata:
-  name: bjw-s
-  namespace: apps
-spec:
-  interval: 24h
-  url: https://bjw-s-labs.github.io/helm-charts
-
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: stremio-service
+  name: stremio
   namespace: apps
 spec:
   interval: 15m
   targetNamespace: stremio-service
-  releaseName: stremio-service
+  releaseName: stremio
   chart:
     spec:
-      chart: app-template
-      version: "4.2.0"
+      chart: ./charts/stremio
       sourceRef:
-        kind: HelmRepository
-        name: bjw-s
-        namespace: apps
+        kind: GitRepository
+        name: homelab-flux-system
+        namespace: flux-system
   install:
     createNamespace: true
     remediation:
@@ -34,84 +23,3 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  values:
-    controllers:
-      # Configure the main controller
-      main:
-        annotations:
-          container.apparmor.security.beta.kubernetes.io/main: "unconfined"
-        
-        pod:
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            fsGroup: 0
-
-        containers:
-          # Configure the main application container
-          main:
-            image:
-              repository: stremio/server
-              tag: "latest"
-
-            # Configure Stremio to use internal URLs for media streaming
-            env:
-              # Force Stremio to use HTTP internally for media URLs
-              STREAMING_SERVER_URL: "http://localhost:11470"
-              # Alternative: Use the service DNS name
-              # STREAMING_SERVER_URL: "http://stremio-service.stremio-service.svc.cluster.local:11470"
-
-            securityContext:
-              runAsNonRoot: false
-              runAsUser: 0
-              readOnlyRootFilesystem: false
-              allowPrivilegeEscalation: true
-
-            resources:
-              limits:
-                cpu: 2000m
-                memory: 4Gi
-              requests:
-                cpu: 400m
-                memory: 2Gi
-
-            probes:
-              liveness:
-                enabled: true
-                spec:
-                  tcpSocket:
-                    port: 11470
-                  initialDelaySeconds: 60
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-                  failureThreshold: 3
-
-              readiness:
-                enabled: true
-                spec:
-                  tcpSocket:
-                    port: 11470
-                  initialDelaySeconds: 30
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
-
-    service:
-      # Main service for internal cluster access
-      main:
-        controller: main
-        ports:
-          http:
-            port: 11470
-
-    ingress:
-      tailscale:
-        className: tailscale
-        defaultBackend:
-          service:
-            name: stremio-service
-            port:
-              number: 11470
-        tls:
-          - hosts:
-              - stremio.pirate-acrux.ts.net

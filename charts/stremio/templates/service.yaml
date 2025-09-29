@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stremio
+  namespace: stremio-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 11470
+    protocol: TCP
+    name: http
+  - port: 12470
+    protocol: TCP
+    name: http
