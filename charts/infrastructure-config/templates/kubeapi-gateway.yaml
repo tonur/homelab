@@ -35,11 +35,5 @@ spec:
         - name: kubernetes
           port: 443
           serversTransport: "skipverify"
-    - match: Host(`kube.pirate-acrux.ts.net`)
-      kind: Rule
-      services:
-        - name: kubernetes
-          port: 443
-          serversTransport: "skipverify"
   tls:
     secretName: kubeapi-cert-tls
