@@ -2,11 +2,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stremio
+  name: stremio-service
   namespace: stremio-service
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stremio-service
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stremio-service
     spec:
       containers:
       - name: stremio
