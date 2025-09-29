@@ -1,31 +1,20 @@
-# ---
-# apiVersion: networking.k8s.io/v1
-# kind: Ingress
-# metadata:
-#   name: stremio-tailscale
-#   namespace: stremio
-# spec:
-#   ingressClassName: traefik
-#   rules:
-#   - host: stremio.pirate-acrux.ts.net
-#     http:
-#       paths:
-#       - path: /
-#         pathType: Prefix
-#         backend:
-#           service:
-#             name: stremio-service
-#             port:
-#               number: 11470
-#   tls:
-#   - hosts:
-#     - stremio.pirate-acrux.ts.net
-#     secretName: stremio-tailscale-tls
+---
 apiVersion: tailscale.com/v1alpha1
-kind: ProxyGroup
+kind: Connector
 metadata:
-  name: traefik-proxygroup
+  name: traefik-connector
   namespace: tailscale
 spec:
-  type: ingress
-  hostnamePrefix: traefik-ing
+  hostname: traefik
+  appConnector: {}         # acts as an app connector to expose cluster services
+  advertiseRoutes:
+    - 10.42.0.0/16        # your cluster services CIDR
+  proxyClass: ""           # optional, default configuration is fine
+---
+apiVersion: tailscale.com/v1alpha1
+kind: DNSConfig
+metadata:
+  name: tailscale-dns
+  namespace: tailscale
+spec:
+  nameserver: {}           # defaults to tailscale/k8s-nameserver:unstable
