@@ -1,43 +1,35 @@
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: tailscale.com/v1alpha1
+kind: IngressBackend
 metadata:
-  name: stremio-tailscale
+  name: stremio-traefik-tailscale
   namespace: traefik
 spec:
-  ingressClassName: tailscale
-  rules:
-    - host: stremio.pirate-acrux.ts.net
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: traefik
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - stremio.pirate-acrux.ts.net
+  mode: tcp
+  dnsName: stremio.pirate-acrux.ts.net
+  backendRef:
+    name: traefik
+    port: 443
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: stremio-traefik
+  name: stremio-tailscale
   namespace: stremio
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
 spec:
   ingressClassName: traefik
   rules:
-    - host: stremio.pirate-acrux.ts.net
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: stremio-service
-                port:
-                  number: 11470
+  - host: stremio.pirate-acrux.ts.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: stremio-service
+            port:
+              number: 11470
+  tls:
+  - hosts:
+    - stremio.pirate-acrux.ts.net
+    secretName: stremio-tailscale-tls
