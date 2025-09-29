@@ -6,8 +6,12 @@ metadata:
   namespace: stremio
 spec:
   type: ClusterIP
+  selector:
+    app.kubernetes.io/name: json-resume
   ports:
   - port: 11470
+    protocol: TCP
     name: http
   - port: 12470
+    protocol: TCP
     name: https
