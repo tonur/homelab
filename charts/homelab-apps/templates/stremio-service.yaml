@@ -105,20 +105,13 @@ spec:
             port: 11470
 
     ingress:
-      # Tailscale Ingress for private network access with performance optimizations
       tailscale:
-        className: tailscale
+        ingressClassName: tailscale
         annotations:
-          # Optimize for media streaming
-          tailscale.com/tags: "tag:streaming"
-        hosts:
-          - host: stremio
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: main
-                  port: http
+        defaultBackend:
+          service:
+            identifier: main
+            port: http
         tls:
           - hosts:
-              - stremio
+              - stremio.pirate-acrux.ts.net
