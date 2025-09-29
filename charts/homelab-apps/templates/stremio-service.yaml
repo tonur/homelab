@@ -96,22 +96,19 @@ spec:
         ports:
           http:
             port: 11470
-
-    ingress:
-      # Tailscale Ingress for private network access with performance optimizations
+      
+      # Tailscale LoadBalancer service for better streaming performance
       tailscale:
-        className: tailscale
+        controller: main
+        type: LoadBalancer
+        loadBalancerClass: tailscale
         annotations:
-          # Optimize for media streaming
+          tailscale.com/hostname: "stremio"
           tailscale.com/tags: "tag:streaming"
-        hosts:
-          - host: stremio
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: main
-                  port: http
-        tls:
-          - hosts:
-              - stremio
+        ports:
+          http:
+            port: 80
+            targetPort: 11470
+          https:
+            port: 443
+            targetPort: 11470
