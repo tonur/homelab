@@ -6,17 +6,11 @@ metadata:
   namespace: traefik
 spec:
   ingressClassName: tailscale
-  rules:
-    - host: stremio.pirate-acrux.ts.net
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: traefik
-                port:
-                  number: 80
+  defaultBackend:
+    service:
+      name: traefik
+      port:
+        number: 80
   tls:
     - hosts:
         - homelab.pirate-acrux.ts.net
