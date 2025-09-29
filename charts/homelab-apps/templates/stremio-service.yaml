@@ -6,8 +6,8 @@ metadata:
   namespace: apps
 spec:
   interval: 15m
-  targetNamespace: stremio-service
-  releaseName: stremio
+  targetNamespace: stremio
+  releaseName: stremio-service
   chart:
     spec:
       chart: ./charts/stremio-service
