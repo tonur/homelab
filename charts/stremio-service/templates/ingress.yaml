@@ -4,6 +4,11 @@ kind: Ingress
 metadata:
   name: stremio-service-tailscale
   namespace: stremio
+  annotations:
+    # Force backend protocol to HTTP to avoid HTTPS loops
+    traefik.ingress.kubernetes.io/service.serversscheme: "http"
+    # Disable automatic HTTPS redirect
+    traefik.ingress.kubernetes.io/redirect-entry-point: ""
 spec:
   ingressClassName: tailscale
   rules:
