@@ -23,7 +23,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: kubeapi-ingress
+  name: kubeapi-ingress-public
   namespace: default
 spec:
   entryPoints:
@@ -37,3 +37,21 @@ spec:
           serversTransport: "skipverify"
   tls:
     secretName: kubeapi-cert-tls
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kubeapi-ingress-tailscale
+  namespace: default
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`kube.pirate-acrux.ts.net`)
+      kind: Rule
+      services:
+        - name: kubernetes
+          port: 443
+          serversTransport: "skipverify"
+  tls:
+    certResolver: tailscale

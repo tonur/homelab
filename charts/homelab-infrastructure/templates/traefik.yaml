@@ -54,3 +54,10 @@ spec:
         forwardedHeaders:
           trustedIPs:
             - 10.172.90.2
+    # Certificate resolvers configuration
+    certificatesResolvers:
+      tailscale:
+        tailscale: {}
+    # Additional configuration to enable certificate resolvers
+    additionalArguments:
+      - "--certificatesresolvers.tailscale.tailscale"
