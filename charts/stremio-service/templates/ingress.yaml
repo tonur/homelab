@@ -1,30 +1,25 @@
----
-apiVersion: tailscale.com/v1alpha1
-kind: ProxyClass
-metadata:
-  name: traefik-tcp
-spec:
-  mode: tcp
----
 apiVersion: tailscale.com/v1alpha1
 kind: ProxyGroup
 metadata:
   name: traefik-proxygroup
-  namespace: traefik
+  namespace: tailscale
 spec:
   type: ingress
-  dnsName: stremio.pirate-acrux.ts.net
-  proxies:
-  - classRef:
-      name: traefik-tcp
-    backendRef:
-      name: traefik
-      port: 443
-  - classRef:
-      name: traefik-tcp
-    backendRef:
-      name: traefik
-      port: 80
+  ingress:
+    hosts:
+      - host: stremio.pirate-acrux.ts.net
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: traefik
+                namespace: traefik
+                port:
+                  number: 443
+    tls:
+      - hosts:
+          - stremio.pirate-acrux.ts.net
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
