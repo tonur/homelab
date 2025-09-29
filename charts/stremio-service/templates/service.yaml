@@ -8,8 +8,6 @@ spec:
   type: ClusterIP
   ports:
   - port: 11470
-    protocol: TCP
     name: http
   - port: 12470
-    protocol: TCP
     name: https

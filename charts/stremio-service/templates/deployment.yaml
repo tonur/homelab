@@ -14,6 +14,8 @@ spec:
         ports:
         - containerPort: 11470
           name: http
+        - containerPort: 12470
+          name: https
         resources:
           limits:
             cpu: 2000m
