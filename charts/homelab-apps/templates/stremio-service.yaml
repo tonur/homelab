@@ -114,4 +114,4 @@ spec:
               number: 11470
         tls:
           - hosts:
-              - kube.pirate-acrux.ts.net
+              - stremio.pirate-acrux.ts.net
