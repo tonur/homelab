@@ -2,12 +2,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: traefik-tailscale
+  name: stremio-tailscale
   namespace: traefik
 spec:
   ingressClassName: tailscale
   rules:
-    - host: homelab.pirate-acrux.ts.net
+    - host: stremio.pirate-acrux.ts.net
       http:
         paths:
           - path: /
@@ -24,14 +24,14 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: stremio-homelab
+  name: stremio-traefik
   namespace: stremio
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
   rules:
-    - host: homelab.pirate-acrux.ts.net
+    - host: stremio.pirate-acrux.ts.net
       http:
         paths:
           - path: /
