@@ -106,12 +106,14 @@ spec:
 
     ingress:
       tailscale:
-        ingressClassName: tailscale
+        className: tailscale
         annotations:
         defaultBackend:
           service:
+            name: stremio-service-main
             identifier: main
-            port: http
+            port:
+              number: 11470
         tls:
           - hosts:
               - stremio.pirate-acrux.ts.net
