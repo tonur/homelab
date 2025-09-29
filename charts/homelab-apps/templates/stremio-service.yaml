@@ -96,18 +96,31 @@ spec:
         ports:
           http:
             port: 11470
+      
+      # Headless service for direct pod access via Tailscale
+      headless:
+        controller: main
+        type: ClusterIP
+        clusterIP: None
+        ports:
+          http:
+            port: 11470
+            targetPort: 11470
 
     ingress:
-      # Configure a Tailscale Ingress for automatic HTTPS
+      # Configure a Tailscale Ingress for automatic HTTPS with optimized routing
       tailscale:
         className: tailscale
+        annotations:
+          # Optimize for streaming performance
+          tailscale.com/experimental.web-client.reverse-proxy-timeout: "300s"
         hosts:
           - host: stremio
             paths:
               - path: /
                 pathType: Prefix
                 service:
-                  identifier: main
+                  identifier: headless
                   port: http
         tls:
           - hosts:

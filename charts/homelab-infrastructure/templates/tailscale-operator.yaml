@@ -64,3 +64,15 @@ spec:
     operatorConfig:
       defaultTags:
         - "tag:k8s-operator"
+    
+    # Proxy configuration for better performance
+    proxyConfig:
+      image:
+        tag: "v1.78.3"
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 512Mi
+        requests:
+          cpu: 200m
+          memory: 256Mi
