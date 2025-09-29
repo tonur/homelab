@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: tailscale
   rules:
-    - host: *.homelab.pirate-acrux.ts.net
+    - host: "*.homelab.pirate-acrux.ts.net"
       http:
         paths:
           - path: /
@@ -19,4 +19,4 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - *.homelab.pirate-acrux.ts.net
+        - "*.homelab.pirate-acrux.ts.net"
