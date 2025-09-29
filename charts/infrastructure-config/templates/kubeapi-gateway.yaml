@@ -51,5 +51,6 @@ spec:
       port:
         number: 443
   tls:
-    - hosts:
-        - kube
+    certResolver: tailscale
+    domains:
+      - main: kube.pirate-acrux.ts.net
