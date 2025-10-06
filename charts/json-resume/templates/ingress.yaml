@@ -1,28 +1,25 @@
-{{- if .Values.ingress.enabled }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.app.name }}
-  namespace: {{ .Values.app.namespace }}
+  name: json-resume
+  namespace: json-resume
   labels:
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: ingress
 spec:
   rules:
-    - host: {{ .Values.ingress.host }}
+    - host: resume.kragh.dev
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.app.name }}
+                name: json-resume
                 port:
-                  number: {{ .Values.service.port }}
+                  number: 80
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: {{ .Values.app.name }}-tls
-{{- end }}
+        - resume.kragh.dev
+      secretName: json-resume-tls

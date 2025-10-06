@@ -2,11 +2,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.app.name }}-data
-  namespace: {{ .Values.app.namespace }}
+  name: json-resume-data
+  namespace: json-resume
   labels:
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: data
   annotations:
     checksum/json-resume: {{ .Files.Get "json-resume.json" | sha256sum }}

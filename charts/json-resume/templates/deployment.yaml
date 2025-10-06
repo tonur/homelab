@@ -2,23 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.app.name }}
-  namespace: {{ .Values.app.namespace }}
+  name: json-resume
+  namespace: json-resume
   labels:
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: frontend
 spec:
-  replicas: {{ .Values.webServer.replicas }}
+  replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.app.name }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/name: json-resume
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.app.name }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/name: json-resume
         app.kubernetes.io/component: frontend
       annotations:
         checksum/json-resume: {{ .Files.Get "json-resume.json" | sha256sum }}
@@ -32,8 +29,8 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: install-resume-cli
-          image: "{{ .Values.resumeBuilder.image.repository }}:{{ .Values.resumeBuilder.image.tag }}"
-          imagePullPolicy: {{ .Values.resumeBuilder.image.pullPolicy }}
+          image: "node:24-alpine"
+          imagePullPolicy: IfNotPresent
           command:
             - sh
             - -c
@@ -56,8 +53,8 @@ spec:
             - name: tmp
               mountPath: /tmp
         - name: build-resume
-          image: "{{ .Values.resumeBuilder.image.repository }}:{{ .Values.resumeBuilder.image.tag }}"
-          imagePullPolicy: {{ .Values.resumeBuilder.image.pullPolicy }}
+          image: "node:24-alpine"
+          imagePullPolicy: IfNotPresent
           command:
             - sh
             - -c
@@ -86,13 +83,18 @@ spec:
             - name: tmp
               mountPath: /tmp
           resources:
-            {{- toYaml .Values.resumeBuilder.resources | nindent 12 }}
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
       containers:
       - name: nginx
-        image: "{{ .Values.webServer.image.repository }}:{{ .Values.webServer.image.tag }}"
-        imagePullPolicy: {{ .Values.webServer.image.pullPolicy }}
+        image: "nginx:alpine"
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: {{ .Values.service.targetPort }}
+        - containerPort: 80
           name: http
         securityContext:
           allowPrivilegeEscalation: false
@@ -101,7 +103,12 @@ spec:
             drop:
             - ALL
         resources:
-          {{- toYaml .Values.webServer.resources | nindent 10 }}
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
         volumeMounts:
         - name: generated-html
           mountPath: /usr/share/nginx/html
@@ -129,7 +136,7 @@ spec:
         emptyDir: {}
       - name: resume-data
         configMap:
-          name: {{ .Values.app.name }}-data
+          name: json-resume-data
       - name: shared-tools
         emptyDir: {}
       - name: tmp

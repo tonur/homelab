@@ -2,19 +2,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.app.name }}
-  namespace: {{ .Values.app.namespace }}
+  name: json-resume
+  namespace: json-resume
   labels:
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: frontend
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   selector:
-    app.kubernetes.io/name: {{ .Values.app.name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: json-resume
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
+    - port: 80
+      targetPort: 80
       protocol: TCP
       name: http
