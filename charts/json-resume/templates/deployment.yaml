@@ -36,13 +36,20 @@ spec:
             - -c
             - |
               cd /shared
-              export node_path=/shared/node_modules
+              export NODE_PATH=/shared/node_modules
               export npm_config_cache=/shared/.npm
               export npm_config_prefix=/shared
               mkdir -p /shared/.npm
 
-              npm install resume-cli
-              npm install jsonresume-theme-stackoverflow
+              # Check if tools are already installed
+              if [ ! -f "/shared/node_modules/.bin/resume" ]; then
+                echo "Installing npm tools..."
+                npm install resume-cli
+                npm install jsonresume-theme-stackoverflow
+                echo "Installation complete"
+              else
+                echo "Tools already installed, skipping installation"
+              fi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -50,7 +57,7 @@ spec:
               drop:
                 - ALL
           volumeMounts:
-            - name: shared-tools
+            - name: npm-tools-pvc
               mountPath: /shared
         - name: build-resume
           image: "node:24-alpine"
@@ -60,8 +67,9 @@ spec:
             - -c
             - |
               cd /workspace
+              export NODE_PATH=/shared/node_modules
               ls -la /shared/ || echo "No shared directory"
-              /shared/resume export /workspace/index.html --resume /workspace/resume.json --theme stackoverflow
+              /shared/node_modules/.bin/resume export /workspace/index.html --resume /workspace/resume.json --theme stackoverflow
               echo "Resume built successfully"
               ls -la /workspace/
           securityContext:
@@ -77,7 +85,7 @@ spec:
               readOnly: true
             - name: generated-html
               mountPath: /workspace
-            - name: shared-tools
+            - name: npm-tools-pvc
               mountPath: /shared
               readOnly: true
             - name: tmp
@@ -137,8 +145,9 @@ spec:
       - name: resume-data
         configMap:
           name: json-resume-data
-      - name: shared-tools
-        emptyDir: {}
+      - name: npm-tools-pvc
+        persistentVolumeClaim:
+          claimName: json-resume-npm-tools
       - name: tmp
         emptyDir: {}
       - name: cache
