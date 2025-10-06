@@ -38,13 +38,7 @@ spec:
               cd /tmp
               npm install resume-cli
               npm install jsonresume-theme-stackoverflow
-              cp -r node_modules /shared/
-              echo '#!/bin/sh' > /shared/resume
-              echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
-              chmod +x /shared/resume
-              cd /workspace
-              ls -la /shared/ || echo "No shared directory"
-              NODE_PATH=/shared/node_modules /shared/resume export index.html --resume resume.json --theme stackoverflow
+              NODE_PATH=./node_modules ./node_modules/.bin/resume export /workspace/index.html --resume resume.json --theme stackoverflow
               echo "Resume built successfully"
               ls -la /workspace/
           securityContext:
@@ -54,8 +48,6 @@ spec:
               drop:
                 - ALL
           volumeMounts:
-            - name: shared-tools
-              mountPath: /shared
             - name: resume-data
               mountPath: /workspace/resume.json
               subPath: json-resume.json
@@ -119,8 +111,6 @@ spec:
       - name: resume-data
         configMap:
           name: json-resume-data
-      - name: shared-tools
-        emptyDir: {}
       - name: tmp
         emptyDir: {}
       - name: cache
