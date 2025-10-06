@@ -28,7 +28,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
-        - name: install-resume-cli
+        - name: build-resume
           image: "node:24-alpine"
           imagePullPolicy: IfNotPresent
           command:
@@ -42,24 +42,6 @@ spec:
               echo '#!/bin/sh' > /shared/resume
               echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
               chmod +x /shared/resume
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            capabilities:
-              drop:
-                - ALL
-          volumeMounts:
-            - name: shared-tools
-              mountPath: /shared
-            - name: tmp
-              mountPath: /tmp
-        - name: build-resume
-          image: "node:24-alpine"
-          imagePullPolicy: IfNotPresent
-          command:
-            - sh
-            - -c
-            - |
               cd /workspace
               ls -la /shared/ || echo "No shared directory"
               NODE_PATH=/shared/node_modules /shared/resume export index.html --resume resume.json --theme stackoverflow
@@ -72,6 +54,8 @@ spec:
               drop:
                 - ALL
           volumeMounts:
+            - name: shared-tools
+              mountPath: /shared
             - name: resume-data
               mountPath: /workspace/resume.json
               subPath: json-resume.json
