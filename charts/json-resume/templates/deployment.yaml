@@ -37,6 +37,7 @@ spec:
             - |
               cd /tmp
               npm install resume-cli
+              npm install jsonresume-theme-elegant
               cp -r node_modules /shared/
               echo '#!/bin/sh' > /shared/resume
               echo 'cd /workspace && /shared/node_modules/.bin/resume "$@"' >> /shared/resume
