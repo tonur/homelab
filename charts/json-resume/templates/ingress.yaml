@@ -4,7 +4,7 @@ kind: Ingress
 metadata:
   name: json-resume
   namespace: json-resume
-  labels:
+  annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
