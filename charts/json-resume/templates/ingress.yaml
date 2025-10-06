@@ -8,7 +8,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
-    - host: resume.kragh.dev
+    - host: kragh.dev
       http:
         paths:
           - path: /
@@ -20,5 +20,5 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - resume.kragh.dev
+        - kragh.dev
       secretName: json-resume-tls
