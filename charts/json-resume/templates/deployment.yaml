@@ -61,7 +61,7 @@ spec:
             - |
               cd /workspace
               ls -la /shared/ || echo "No shared directory"
-              NODE_PATH=/shared/node_modules /shared/resume export index.html --resume resume.json
+              NODE_PATH=/shared/node_modules /shared/resume export index.html --resume resume.json --theme elegant
               echo "Resume built successfully"
               ls -la /workspace/
           securityContext:
