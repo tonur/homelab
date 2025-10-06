@@ -37,6 +37,9 @@ spec:
             - |
               cd /tmp
               export NODE_PATH=/tmp/node_modules
+              export npm_config_cache=/tmp/.npm
+              export npm_config_prefix=/tmp
+              mkdir -p /tmp/.npm
               npm install resume-cli
               npm install jsonresume-theme-stackoverflow
               /tmp/node_modules/.bin/resume export /workspace/index.html --resume /workspace/resume.json --theme stackoverflow
