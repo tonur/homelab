@@ -28,6 +28,30 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       initContainers:
+        - name: install-resume-cli
+          image: "node:24-alpine"
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              cd /shared
+              export node_path=/shared/node_modules
+              export npm_config_cache=/shared/.npm
+              export npm_config_prefix=/shared
+              mkdir -p /shared/.npm
+
+              npm install resume-cli
+              npm install jsonresume-theme-stackoverflow
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: shared-tools
+              mountPath: /shared
         - name: build-resume
           image: "node:24-alpine"
           imagePullPolicy: IfNotPresent
@@ -35,14 +59,9 @@ spec:
             - sh
             - -c
             - |
-              cd /tmp
-              export NODE_PATH=/tmp/node_modules
-              export npm_config_cache=/tmp/.npm
-              export npm_config_prefix=/tmp
-              mkdir -p /tmp/.npm
-              npm install resume-cli
-              npm install jsonresume-theme-stackoverflow
-              /tmp/node_modules/.bin/resume export /workspace/index.html --resume /workspace/resume.json --theme stackoverflow
+              cd /workspace
+              ls -la /shared/ || echo "No shared directory"
+              /shared/resume export /workspace/index.html --resume /workspace/resume.json --theme stackoverflow
               echo "Resume built successfully"
               ls -la /workspace/
           securityContext:
@@ -58,6 +77,9 @@ spec:
               readOnly: true
             - name: generated-html
               mountPath: /workspace
+            - name: shared-tools
+              mountPath: /shared
+              readOnly: true
             - name: tmp
               mountPath: /tmp
           resources:
@@ -115,6 +137,8 @@ spec:
       - name: resume-data
         configMap:
           name: json-resume-data
+      - name: shared-tools
+        emptyDir: {}
       - name: tmp
         emptyDir: {}
       - name: cache
