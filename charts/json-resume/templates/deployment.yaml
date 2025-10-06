@@ -62,9 +62,6 @@ spec:
               readOnly: true
             - name: generated-html
               mountPath: /workspace
-            - name: shared-tools
-              mountPath: /shared
-              readOnly: true
             - name: tmp
               mountPath: /tmp
           resources:
