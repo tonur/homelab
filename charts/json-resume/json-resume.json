@@ -40,7 +40,6 @@
     {
       "name": "Energinet",
       "position": "DevOps Engineer",
-      "url": "",
       "startDate": "2024-08-01",
       "summary": "",
       "highlights": []
@@ -48,7 +47,6 @@
     {
       "name": "Schneider Electric",
       "position": "DevOps Design Engineer",
-      "url": "",
       "startDate": "2023-01-01",
       "endDate": "2024-07-01",
       "summary": "Seeking further experience and taking the opportunity to work in a larger environment to be a part of a bigger puzzle at the Platform Team in Schneider Electric IT (Earlier APC), working with Ecostruxure - IT Advisor and IT Expert.",
@@ -57,7 +55,6 @@
     {
       "name": "Unik System Design",
       "position": "DevOps Engineer",
-      "url": "",
       "startDate": "2022-07-01",
       "endDate": "2022-12-01",
       "summary": "Working in Team Fellowship of the Iron Stack to develop Unik's new SaaS platform. Using my Software Developer skills to manage infrastructure.",
@@ -66,7 +63,6 @@
     {
       "name": "Unik System Design",
       "position": "Full Stack Developer",
-      "url": "",
       "startDate": "2022-01-01",
       "endDate": "2022-03-01",
       "summary": "Internship in Team Dataspecialisterne via Bachelor in Software Development education",
@@ -75,7 +71,6 @@
     {
       "name": "Unik System Design",
       "position": "Full Stack Developer",
-      "url": "",
       "startDate": "2020-08-01",
       "endDate": "2020-10-01",
       "summary": "Internship in Team Dataspecialisterne via AP Graduate in Computer Science education",
@@ -84,7 +79,6 @@
     {
       "name": "Unik System Design",
       "position": "Full Stack Developer",
-      "url": "",
       "startDate": "2020-01-01",
       "endDate": "2022-06-01",
       "summary": "Working in Team Dataspecialisterne",
@@ -94,7 +88,6 @@
   "education": [
     {
       "institution": "UCL Erhvervsakademi og Professionshøjskole",
-      "url": "",
       "area": "",
       "studyType": "Bachelor in Software Development",
       "startDate": "2021-02-01",
@@ -104,7 +97,6 @@
     },
     {
       "institution": "UCL Erhvervsakademi og Professionshøjskole",
-      "url": "",
       "area": "",
       "studyType": "AP Graduate in Computer Science",
       "startDate": "2018-09-01",
@@ -114,7 +106,6 @@
     },
     {
       "institution": "Vejle Tekniske Gymnasium",
-      "url": "",
       "area": "",
       "studyType": "HTX",
       "startDate": "2013-08-01",
@@ -278,8 +269,7 @@
       "startDate": "2019-09-01",
       "endDate": "2020-01-01",
       "description": "",
-      "highlights": [],
-      "url": ""
+      "highlights": []
     }
   ]
 }
