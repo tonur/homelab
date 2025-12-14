@@ -37,7 +37,7 @@ spec:
               mkdir -p /tmp/.npm /tmp/npm-global &&
               npm install resume-cli &&
               npm init -y &&
-              npm install jsonresume-theme-stackoverflow
+              npm install jsonresume-theme-jacrys
           env:
             - name: NPM_CONFIG_CACHE
               value: /tmp/.npm
@@ -61,7 +61,7 @@ spec:
             - "/app/node_modules/.bin/resume"
             - "serve"
             - "--theme"
-            - "/app/node_modules/jsonresume-theme-stackoverflow"
+            - "/app/node_modules/jsonresume-theme-jacrys"
             - "--resume"
             - "/workspace/resume.json"
             - "--port"
