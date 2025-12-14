@@ -66,6 +66,7 @@ spec:
             - "/workspace/resume.json"
             - "--port"
             - "80"
+            - "--no-open"
           ports:
           - containerPort: 80
             name: http
