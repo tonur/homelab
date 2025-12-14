@@ -66,6 +66,9 @@ spec:
             - "/workspace/resume.json"
             - "--port"
             - "80"
+          ports:
+          - containerPort: 80
+            name: http
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
