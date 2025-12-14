@@ -91,6 +91,6 @@ spec:
         emptyDir: {}
       - name: resume-data
         configMap:
-          name: resume-data
+          name: json-resume-data
       - name: tmp
         emptyDir: {}
