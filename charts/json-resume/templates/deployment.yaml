@@ -45,7 +45,7 @@ spec:
               if [ ! -f "/shared/node_modules/.bin/resume" ]; then
                 echo "Installing npm tools..."
                 npm install resume-cli
-                npm install jsonresume-theme-stackoverflow
+                npm install jsonresume-theme-jacrys
                 echo "Installation complete"
               else
                 echo "Tools already installed, skipping installation"
@@ -69,7 +69,7 @@ spec:
               cd /workspace
               export NODE_PATH=/shared/node_modules
               ls -la /shared/ || echo "No shared directory"
-              /shared/node_modules/.bin/resume export /workspace/index.html --resume /workspace/resume.json --theme stackoverflow
+              /shared/node_modules/.bin/resume export /workspace/index.html --resume /workspace/resume.json --theme jsonresume-theme-jacrys
               echo "Resume built successfully"
               ls -la /workspace/
           securityContext:
