@@ -61,12 +61,11 @@ spec:
             - "/app/node_modules/.bin/resume"
             - "serve"
             - "--theme"
-            - "/app/node_modules/jsonresume-theme-stackoverflow"
+            - "/app"
             - "--resume"
             - "/workspace/resume.json"
             - "--port"
             - "80"
-            - "--no-open"
           ports:
           - containerPort: 80
             name: http
