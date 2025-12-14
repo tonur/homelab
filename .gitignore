@@ -31,7 +31,3 @@ __pycache__/
 *.dec.yml
 
 old-attempts/
-
-node_modules/
-package-lock.json
-package.json

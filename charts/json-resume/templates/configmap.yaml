@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: resume-data
+  name: json-resume-data
   namespace: json-resume
   labels:
     app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: data
   annotations:
-    checksum/json-resume: {{ .Files.Get "resume.json" | sha256sum }}
+    checksum/json-resume: {{ .Files.Get "json-resume.json" | sha256sum }}
 data:
-  resume.json: |
-{{ .Files.Get "resume.json" | indent 4 }}
+  json-resume.json: |
+{{ .Files.Get "json-resume.json" | indent 4 }}
