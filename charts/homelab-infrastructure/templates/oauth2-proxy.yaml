@@ -1,0 +1,70 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: oauth2-proxy
+  namespace: infrastructure
+spec:
+  interval: 24h
+  url: https://oauth2-proxy.github.io/manifests
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy
+  namespace: infrastructure
+spec:
+  interval: 15m
+  releaseName: oauth2-proxy
+  targetNamespace: infrastructure
+  chart:
+    spec:
+      chart: oauth2-proxy
+      version: "7.10.3" 
+      sourceRef:
+        kind: HelmRepository
+        name: oauth2-proxy
+        namespace: infrastructure
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    config:
+      clientID: "357873147879470828" # Replace with your actual Client ID if different secret
+      configFile: |-
+        email_domains = ["*"]
+        upstreams = [ "static://200" ]
+        provider = "oidc"
+        oidc_issuer_url = "https://homelab-wzcnuv.us1.zitadel.cloud"
+        scope = "openid profile email"
+        whitelist_domains = [".kragh.dev"]
+        cookie_domains = [".kragh.dev"]
+        cookie_secure = true
+        cookie_httponly = true
+        reverse_proxy = true
+    
+    # We will use an external secret to inject the client secret and cookie secret
+    extraEnv:
+      - name: OAUTH2_PROXY_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: oauth2-proxy-secrets
+            key: client-secret
+
+    ingress:
+      enabled: true
+      className: traefik
+      path: /
+      pathType: Prefix
+      hosts:
+        - oidc.kragh.dev
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      tls:
+        - secretName: oidc-kragh-dev-tls
+          hosts:
+            - oidc.kragh.dev
