@@ -34,7 +34,7 @@ spec:
       retries: 3
   values:
     config:
-      clientID: "357873147879470828" # Replace with your actual Client ID if different secret
+      clientID: "357890574222860083"
       configFile: |-
         email_domains = ["*"]
         upstreams = [ "static://200" ]
