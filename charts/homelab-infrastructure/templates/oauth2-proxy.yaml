@@ -35,16 +35,6 @@ spec:
   values:
     config:
       clientID: "357873147879470828" # Replace with your actual Client ID if different secret
-      clientSecret:
-        valueFrom:
-          secretKeyRef:
-            name: oauth2-proxy-secrets
-            key: client-secret
-      cookieSecret:
-        valueFrom:
-          secretKeyRef:
-            name: oauth2-proxy-secrets
-            key: cookie-secret
       configFile: |-
         email_domains = ["*"]
         upstreams = [ "static://200" ]
@@ -59,7 +49,11 @@ spec:
         pass_access_token = true
         set_xauthrequest = true
         set_authorization_header = true
-
+    
+    # Use existing secret created by External Secrets
+    existingSecret: oauth2-proxy-secrets
+    existingSecretPerKey: false
+    
     ingress:
       enabled: true
       className: traefik
