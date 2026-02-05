@@ -5,7 +5,7 @@ metadata:
   name: oidc-admin-binding
 subjects:
   - kind: Group
-    name: "oidc-admin"
+    name: "ckp@kragh.dev"
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
