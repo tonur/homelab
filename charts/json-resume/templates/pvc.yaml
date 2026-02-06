@@ -12,7 +12,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.npmTools.storage | default "1Gi" }}
-  {{- if .Values.npmTools.storageClass }}
-  storageClassName: {{ .Values.npmTools.storageClass }}
-  {{- end }}
+      storage: 1Gi

@@ -16,16 +16,14 @@ spec:
         name: homelab
         namespace: default
       interval: 1m
-      reconcileStrategy: Revision # Local chart
+      reconcileStrategy: Revision
   install:
     remediation:
       retries: 3
   upgrade:
-    force: true
     remediation:
       retries: 3
   values:
-    # Override values if needed
     ingress:
       host: kragh.dev
 
