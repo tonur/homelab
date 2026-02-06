@@ -25,6 +25,8 @@ This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The
 
 ⚠️ **IMPORTANT**: Agents cannot commit git changes unless explicitly granted permission by the user.
 
+**PLEASE** also understand that this project is GitOps, which means that any changes will need to be pushed to Git and reconciled (potentially automatically) by Flux CD.
+
 ## Project Structure
 
 ```tree
@@ -49,3 +51,11 @@ homelab/
 - **Avoid unnecessary abstractions**: Don't use helper templates, values files, or complex conditionals
 - **Direct is better**: Use static manifests with simple substitutions where needed
 - **Focus on working, not elegant**: Deployments that work are more important than perfectly templated charts
+
+## Container Registry
+
+- **Self-hosted registry**: `registry.kragh.dev` (Docker Registry v2)
+- **Proxy caching**: Automatically caches images from Docker Hub
+- **No authentication required**: Internal cluster access only
+- **Storage**: 20Gi PVC (local-path storage class)
+- **Usage**: Build images locally → `docker push registry.kragh.dev/myimage:tag`
