@@ -19,6 +19,7 @@ This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The
 - Never commit secrets to Git (use Bitwarden + External Secrets)
 - Respect dependency order: cert-manager → config → external-secrets → secrets-config → ingress → apps
 - Use `flux reconcile kustomization flux-system --with-source` to sync changes
+- **Flux timeout**: Always use prefix `timeout 10` for flux commands to avoid hanging indefinitely
 
 ## Agent Restrictions
 
