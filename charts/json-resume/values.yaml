@@ -4,4 +4,4 @@ npmTools:
   # Storage size for npm tools cache
   storage: "1Gi"
   # Optional: specify storage class
-  # storageClass: "fast-ssd"
+  storageClass: "local-path"
