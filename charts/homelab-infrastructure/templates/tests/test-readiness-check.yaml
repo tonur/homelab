@@ -1,6 +1,6 @@
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: v1
+kind: Pod
 metadata:
   name: test-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
@@ -9,38 +9,36 @@ metadata:
     helm.sh/hook-weight: "10"
     helm.sh/hook-delete-policy: before-hook-creation
 spec:
-  template:
-    spec:
-      serviceAccount: test-{{ .Release.Name }}
-      restartPolicy: OnFailure
-      containers:
-      - name: readiness-check
-        image: alpine/k8s:1.33.4
-        command: ["/bin/sh", "-c"]
-        args:
-        - |
-          release_name="{{ .Release.Name }}"
-          interval=10
+  serviceAccount: test-{{ .Release.Name }}
+  restartPolicy: Never
+  containers:
+  - name: readiness-check
+    image: alpine/k8s:1.33.4
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      release_name="{{ .Release.Name }}"
+      interval=10
 
-          child_hr_ready() {
-            if kubectl wait --for=condition=Ready helmrelease "$name" -n "$namespace" --timeout=100s; then
-              return 0
-            else
-              return 1
-            fi
-          }
+      child_hr_ready() {
+        if kubectl wait --for=condition=Ready helmrelease "$name" -n "$namespace" --timeout=100s; then
+          return 0
+        else
+          return 1
+        fi
+      }
 
-          helm_release=$(kubectl get helmrelease -A -l "helm.toolkit.fluxcd.io/name=$release_name" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}')
+      helm_release=$(kubectl get helmrelease -A -l "helm.toolkit.fluxcd.io/name=$release_name" -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{"\n"}{end}')
 
-          for helm_release in $helm_release; do
-            namespace=$(echo "$helm_release" | cut -d'/' -f1)
-            name=$(echo "$helm_release" | cut -d'/' -f2)
+      for helm_release in $helm_release; do
+        namespace=$(echo "$helm_release" | cut -d'/' -f1)
+        name=$(echo "$helm_release" | cut -d'/' -f2)
 
-            until child_hr_ready; do
-              echo "Child HelmRelease $name is not ready, retrying in $interval seconds.."
-              sleep $interval
-            done
+        until child_hr_ready; do
+          echo "Child HelmRelease $name is not ready, retrying in $interval seconds.."
+          sleep $interval
+        done
 
-          done
+      done
 
-          echo "All child HelmReleases are ready."
+      echo "All child HelmReleases are ready."
