@@ -27,6 +27,8 @@ This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The
 
 **PLEASE** also understand that this project is GitOps, which means that any changes will need to be pushed to Git and reconciled (potentially automatically) by Flux CD.
 
+**DO NOT** apply kubectl files directly without asking for permission. You can use kubectl and delete stuff if you have permission, but most changes should go through Git and Flux for consistency and traceability.
+
 ## Project Structure
 
 ```tree
@@ -59,3 +61,4 @@ homelab/
 - **Immutable PVCs**: For bound PVCs, ensure Chart.yaml version is incremented to force recreation rather than update
 - **App chart structure**: Each app has its own chart in `charts/<app>/` with individual manifest files (deployment.yaml, service.yaml, ingress.yaml, pvc.yaml, externalsecret.yaml) without app name prefixes
 - **HelmReleases**: Add HelmRelease to `charts/homelab-apps/templates/<app>.yaml` referencing `./charts/<app>`
+- **Bitwarden/ExternalSecrets**: Always use the secret store of "bitwarden-secrets-manager" to get secrets
