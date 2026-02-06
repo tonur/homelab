@@ -52,10 +52,10 @@ homelab/
 - **Direct is better**: Use static manifests with simple substitutions where needed
 - **Focus on working, not elegant**: Deployments that work are more important than perfectly templated charts
 
-## Container Registry
+## Other notes
 
-- **Self-hosted registry**: `registry.kragh.dev` (Docker Registry v2)
-- **Proxy caching**: Automatically caches images from Docker Hub
-- **No authentication required**: Internal cluster access only
-- **Storage**: 20Gi PVC (local-path storage class)
-- **Usage**: Build images locally → `docker push registry.kragh.dev/myimage:tag`
+- **Cloud registry with proxy**: Use Ollama Cloud or similar services for application deployments
+- **External Secrets v1**: Always use `apiVersion: external-secrets.io/v1` for ExternalSecret manifests
+- **Immutable PVCs**: For bound PVCs, ensure Chart.yaml version is incremented to force recreation rather than update
+- **App chart structure**: Each app has its own chart in `charts/<app>/` with individual manifest files (deployment.yaml, service.yaml, ingress.yaml, pvc.yaml, externalsecret.yaml) without app name prefixes
+- **HelmReleases**: Add HelmRelease to `charts/homelab-apps/templates/<app>.yaml` referencing `./charts/<app>`
