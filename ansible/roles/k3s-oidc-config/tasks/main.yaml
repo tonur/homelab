@@ -1,0 +1,49 @@
+---
+- name: Get current host's Tailscale IP
+  command: tailscale status --json
+  register: tailscale_status
+  
+- name: Parse Tailscale status to get current host IP
+  set_fact:
+    current_tailscale_ip: "{{ (tailscale_status.stdout | from_json).Self.TailscaleIPs[0] }}"
+
+- name: Get k3s service configuration
+  command: systemctl cat k3s
+  register: k3s_service_config
+  ignore_errors: true
+
+- name: Check if OIDC config already exists in k3s service
+  shell: |
+    systemctl cat k3s | grep -q "oidc-" && echo "present" || echo "absent"
+  register: oidc_config_status
+  changed_when: false
+
+- name: Stop k3s service to modify configuration
+  service:
+    name: k3s
+    state: stopped
+  when: oidc_config_status.stdout == "absent"
+
+- name: Create systemd service directory for k3s
+  file:
+    path: /etc/systemd/system/k3s.service.d
+    state: directory
+    mode: '0755'
+  when: oidc_config_status.stdout == "absent"
+
+- name: Create OIDC configuration for k3s
+  template:
+    src: k3s-oidc.j2
+    dest: /etc/systemd/system/k3s.service.d/oidc.conf
+  when: oidc_config_status.stdout == "absent"
+
+- name: Create OIDC configuration for k3s
+  template:
+    src: k3s-oidc.j2
+    dest: /etc/systemd/system/k3s.service.d/oidc.conf
+  notify: restart k3s
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  notify: restart k3s

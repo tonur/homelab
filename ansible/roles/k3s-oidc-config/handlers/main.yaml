@@ -1,0 +1,11 @@
+---
+- name: restart k3s
+  service:
+    name: k3s
+    state: restarted
+  
+- name: wait for kube-apiserver
+  wait_for:
+    port: 6443
+    host: "{{ current_tailscale_ip }}"
+    timeout: 60

@@ -1,0 +1,15 @@
+[Service]
+# OIDC Configuration for k3s
+ExecStart=
+ExecStart=/usr/local/bin/k3s server \
+  --disable traefik \
+  --bind-address {{ current_tailscale_ip }} \
+  --advertise-address {{ current_tailscale_ip }} \
+  --flannel-iface tailscale0 \
+  --node-ip {{ current_tailscale_ip }} \
+  --write-kubeconfig-mode 644 \
+  --kube-apiserver-arg=oidc-issuer-url=https://homelab-wzcnuv.us1.zitadel.cloud \
+  --kube-apiserver-arg=oidc-client-id=358725964722679905 \
+  --kube-apiserver-arg=oidc-username-claim=email \
+  --kube-apiserver-arg=oidc-groups-claim=groups \
+  --kube-apiserver-arg=oidc-user-info-prefix=profile

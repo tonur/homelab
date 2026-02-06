@@ -30,6 +30,21 @@ This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The
 homelab/
 ├── ansible/          # Infrastructure provisioning (Ansible)
 ├── charts/           # Helm charts for applications
-├── docs/             # Documentation
+├── README.md         # Main project documentation
+├── AGENT.md          # Agent guidelines and project context
 └── scripts/          # Utility scripts
 ```
+
+## Documentation Policy
+
+- **No docs/ folder**: All documentation deleted
+- **Only README.md and AGENT.md**: These are the sole documentation files
+- **Self-documenting code**: Code should be clear and comments only where necessary
+
+## Helm Chart Guidelines
+
+- **No complex templating**: Keep charts as simple as possible
+- **No Helm best practices needed**: These charts are only used by you, not shared
+- **Avoid unnecessary abstractions**: Don't use helper templates, values files, or complex conditionals
+- **Direct is better**: Use static manifests with simple substitutions where needed
+- **Focus on working, not elegant**: Deployments that work are more important than perfectly templated charts
