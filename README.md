@@ -7,24 +7,24 @@ A complete infrastructure-as-code solution for a self-hosted homelab that provid
 ## 🏗️ Architecture
 
 ```raw
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   VPS Edge      │    │    Gigabyte     │    │    Beelink      │
-│   (k3s agent)   │    │  (k3s server)   │    │  (k3s agent)    │
-│                 │    │                 │    │                 │
-│ - Public access │    │ - Control plane │    │ - Worker node   │
-│ - Load balancer │    │ - GitOps        │    │ - Applications  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Tailscale     │
-                    │  Mesh Network   │
-                    │                 │
-                    │ - Secure VPN    │
-                    │ - Zero-config   │
-                    │ - Auto-discovery│
-                    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐
+│   VPS Edge      │    │    Gigabyte     │
+│   (k3s agent)   │    │  (k3s server)   │
+│                 │    │                 │
+│ - Public access │    │ - Control plane │
+│ - Load balancer │    │ - GitOps        │
+└─────────────────┘    │ - Applications  │
+          │            └─────────────────┘
+          └─────────────┘
+                                  │
+                     ┌─────────────────┐
+                     │   Tailscale     │
+                     │  Mesh Network   │
+                     │                 │
+                     │ - Secure VPN    │
+                     │ - Zero-config   │
+                     │ - Auto-discovery│
+                     └─────────────────┘
 ```
 
 ## 🔧 Technology Stack
@@ -135,12 +135,6 @@ homelab/
   - **Security**: Automated TLS certificates via Let's Encrypt
   - **Status**: Production-ready ✅
 
-#### 🚧 **Planned Applications**
-- **Home Assistant**: Smart home automation platform
-- **Jellyfin**: Media server for movies, TV shows, and music
-- **Nextcloud**: Self-hosted cloud storage and productivity suite
-- **Vaultwarden**: Self-hosted Bitwarden-compatible password manager
-
 ## 📋 Todo List
 
 ### **Infrastructure ✅ Complete**
@@ -161,17 +155,6 @@ homelab/
   - [x] Configure static site hosting
   - [x] Implement automated TLS certificates
   - [x] Optimize Traefik routing with IngressRoute
-- [x] **Home Assistant**: Deploy smart home automation
-  - [x] Configure device integrations
-  - [x] Implement secure external access
-- [ ] **Jellyfin Media Server**: Deploy media streaming
-  - [ ] Configure media storage
-  - [ ] Set up hardware transcoding
-  - [ ] Configure user accounts and libraries
-- [ ] **Nextcloud**: Deploy cloud storage
-  - [ ] Configure persistent storage
-  - [ ] Set up user accounts
-  - [ ] Configure external access
 
 ### **Operations**
 - [x] Document deployment procedures

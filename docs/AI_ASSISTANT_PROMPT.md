@@ -7,7 +7,7 @@ Note from developer: please use "flux reconcile kustomization flux-system --with
 Use this as system context when working with this homelab repository.
 
 ## Quick Overview
-- **k3s cluster**: Gigabyte (control) + Beelink (worker) (former edge VPS removed; future BGP/pfSense LB planned)
+- **k3s cluster**: Gigabyte (control) (former edge VPS and Beelink removed; future BGP/pfSense LB planned)
 - **GitOps**: FluxCD manages everything from Git
 - **Networking**: Tailscale mesh + Traefik ingress
 - **Secrets**: External Secrets Operator + Bitwarden

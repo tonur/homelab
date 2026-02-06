@@ -10,30 +10,29 @@ This is a fully automated, GitOps-based homelab for the `kragh.dev` domain using
 ## Architecture
 
 ### Physical Infrastructure
-- **2 machines** connected via Tailscale mesh network:
+- **1 machine** connected via Tailscale mesh network:
   - **Gigabyte** (192.168.50.16) - k3s control plane/server (local)
-  - **Beelink** (192.168.50.220) - k3s worker node (local)  
 
 (Future: reinstate external exposure via BGP / pfSense + LoadBalancer IP; former standalone VPS edge node has been decommissioned.)
 
 ### Network Topology
 
 ```text
-┌─────────────────┐    ┌─────────────────┐
-│    Gigabyte     │    │    Beelink      │
-│  (k3s server)   │    │  (k3s agent)    │
-│                 │    │                 │
-│ - Control plane │    │ - Applications  │
-│ - GitOps        │    │ - Local storage │
-└─────────────────┘    └─────────────────┘
-          │                 │
-          └─────────────────┘
-                 │
-        ┌─────────────────┐
-        │   Tailscale     │
-        │  Mesh Network   │
-        │ (100.x.x.x IPs) │
-        └─────────────────┘
+┌─────────────────┐
+│    Gigabyte     │
+│  (k3s server)   │
+│                 │
+│ - Control plane │
+│ - GitOps        │
+│ - Applications  │
+│ - Local storage │
+└─────────────────┘
+          │
+    ┌─────────────────┐
+    │   Tailscale     │
+    │  Mesh Network   │
+    │ (100.x.x.x IPs) │
+    └─────────────────┘
 ```
 
 ## Technology Stack
@@ -81,7 +80,7 @@ spec:
 ansible/
 ├── site.yaml                    # Main playbook orchestrating all roles
 ├── inventory/
-│   ├── hosts.yaml              # Server inventory (2 machines + legacy entries retained)
+│   ├── hosts.yaml              # Server inventory (single machine)
 │   └── group_vars/all.yml      # Global variables
 ├── secrets/
 │   └── homelab.yaml           # SOPS-encrypted secrets
@@ -89,7 +88,6 @@ ansible/
     ├── base/                   # Base system setup (all nodes)
     ├── tailscale/             # Tailscale mesh networking
     ├── k3s-control-plane/     # Kubernetes control plane (gigabyte)
-    ├── k3s-worker-nodes/      # Worker node setup (beelink)
     └── gitops-bootstrap/      # Flux CD bootstrap
 ```
 
@@ -128,19 +126,13 @@ FluxCD manages staged deployment with proper dependencies:
 
 ### Ansible Inventory (`ansible/inventory/hosts.yaml`)
 
-(Edge node entries retained in repository at user request; active cluster currently uses only Gigabyte + Beelink.)
+(Edge node entries retained in repository at user request; active cluster currently uses only Gigabyte.)
 
 ```yaml
 k3s_server:
   hosts:
     gigabyte:
       ansible_host: 192.168.50.16
-      ansible_user: chkpe
-
-k3s_agents:
-  hosts:
-    beelink:
-      ansible_host: 192.168.50.220
       ansible_user: chkpe
 ```
 

@@ -9,12 +9,6 @@ all:
           ansible_host: 192.168.50.16
           ansible_user: chkpe
           ansible_become_password: "{{ gigabyte_password }}"
-    k3s_agents:
-      hosts:
-        beelink:
-          ansible_host: 192.168.50.220
-          ansible_user: chkpe
-          ansible_become_password: "{{ beelink_password }}"
     edge:
       hosts:
         vps1:

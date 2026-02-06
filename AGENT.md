@@ -6,7 +6,7 @@ This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The
 
 ## Key Components
 
-- **Kubernetes**: k3s cluster (Gigabyte control plane)
+- **Kubernetes**: k3s cluster (single node: Gigabyte)
 - **GitOps**: Flux CD manages all deployments from Git repository
 - **Networking**: Tailscale VPN + Traefik ingress with native load balancing
 - **Secrets**: External Secrets Operator + Bitwarden integration
