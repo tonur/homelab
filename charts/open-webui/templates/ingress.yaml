@@ -1,0 +1,23 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: open-webui
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: open-webui
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`open-webui.kragh.dev`)
+      kind: Rule
+      services:
+        - name: open-webui
+          port: 8080
+          nativeLB: true
+      middlewares:
+        - name: oidc
+          namespace: traefik
+  tls:
+    secretName: open-webui-kragh-dev-tls

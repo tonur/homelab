@@ -1,13 +1,14 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: nanobot-assistant
+  name: open-webui
   namespace: apps
 spec:
   interval: 5m
   chart:
     spec:
-      chart: ./charts/nanobot-assistant
+      chart: ./charts/open-webui
       version: "*"
       sourceRef:
         kind: GitRepository
@@ -18,7 +19,6 @@ spec:
   install:
     remediation:
       retries: 3
-    createNamespace: true
   upgrade:
     force: true
     remediation:
