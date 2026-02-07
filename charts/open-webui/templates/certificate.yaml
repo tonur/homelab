@@ -9,4 +9,4 @@ spec:
     - open-webui.kragh.dev
   issuerRef:
     name: letsencrypt-prod
-    kind: Issuer
+    kind: ClusterIssuer
