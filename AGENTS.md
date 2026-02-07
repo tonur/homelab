@@ -27,7 +27,6 @@
 
 - **Cloud registry with proxy**: Use Ollama Cloud or similar services for application deployments
 - **External Secrets v1**: Always use `apiVersion: external-secrets.io/v1` for ExternalSecret manifests
-- **Immutable PVCs**: For bound PVCs, ensure Chart.yaml version is incremented to force recreation rather than update
 - **App chart structure**: Each app has its own chart in `charts/<app>/` with individual manifest files (deployment.yaml, service.yaml, ingress.yaml, pvc.yaml, externalsecret.yaml) without app name prefixes
 - **HelmReleases**: Add HelmRelease to `charts/homelab-apps/templates/<app>.yaml` referencing `./charts/<app>`
 - **Bitwarden/ExternalSecrets**: Always use the secret store of "bitwarden-secrets-manager" to get secrets
