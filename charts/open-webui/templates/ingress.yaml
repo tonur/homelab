@@ -17,7 +17,6 @@ spec:
           port: 8080
           nativeLB: true
       middlewares:
-        - name: oidc
-          namespace: traefik
+        - name: oidc@traefik
   tls:
     secretName: open-webui-kragh-dev-tls
