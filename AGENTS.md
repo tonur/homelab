@@ -33,13 +33,13 @@
 
 ## Project Overview
 
-This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The infrastructure uses Flux CD for continuous deployment from Git.
+This is a GitOps-managed homelab running k3s. The infrastructure uses Flux CD for continuous deployment from Git - not via Kustomization, everything is via HelmReleases.
 
 ## Key Components
 
 - **Kubernetes**: k3s cluster (single node: Gigabyte)
 - **GitOps**: Flux CD manages all deployments from Git repository
-- **Networking**: Tailscale VPN + Traefik ingress with native load balancing
+- **Networking**: Traefik ingress with native load balancing
 - **Secrets**: External Secrets Operator + Bitwarden integration
 - **Provisioning**: Ansible automation with SOPS-encrypted secrets
 - **Domain**: kragh.dev with automated TLS via cert-manager
@@ -49,7 +49,6 @@ This is a GitOps-managed homelab running k3s with Tailscale mesh networking. The
 - All infrastructure changes go through Git → Flux
 - Never commit secrets to Git (use Bitwarden + External Secrets)
 - Respect dependency order: cert-manager → config → external-secrets → secrets-config → ingress → apps
-- Use `flux reconcile kustomization flux-system --with-source` to sync changes
 - **Flux timeout**: Always use prefix `timeout 10` for flux commands to avoid hanging indefinitely
 
 ## Project Structure
