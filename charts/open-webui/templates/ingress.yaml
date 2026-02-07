@@ -3,7 +3,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: open-webui
-  namespace: infrastructure
+  namespace: open-webui
 spec:
   entryPoints:
     - websecure
@@ -13,6 +13,7 @@ spec:
       services:
         - name: oauth2-proxy
           port: 80
+          namespace: infrastructure
           nativeLB: true
   tls:
     secretName: open-webui-tls
