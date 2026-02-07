@@ -2,7 +2,7 @@
 
 ## Agent Restrictions
 
-⚠️ **IMPORTANT**: Agents cannot commit git changes unless explicitly granted permission by the user.
+⚠️ **IMPORTANT**: Agents cannot commit git changes unless explicitly granted permission by the user. ASK EACH TIME YOU WANT TO COMMIT CHANGES.
 
 **PLEASE** also understand that this project is GitOps, which means that any changes will need to be pushed to Git and reconciled (potentially automatically) by Flux CD.
 
