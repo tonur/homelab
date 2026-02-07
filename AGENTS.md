@@ -21,6 +21,7 @@
 - **Avoid unnecessary abstractions**: Don't use helper templates, values files, or complex conditionals
 - **Direct is better**: Use static manifests with simple substitutions where needed
 - **Focus on working, not elegant**: Deployments that work are more important than perfectly templated charts
+- **Versioning**: Use `version: 0.0.0-local` for all charts to avoid confusion with actual versioning - it will update automatically when you commit changes
 
 ## Other notes
 
