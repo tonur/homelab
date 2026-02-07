@@ -2,7 +2,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: oidc
-  namespace: traefik
+  namespace: open-webui
 spec:
   forwardAuth:
     address: http://oauth2-proxy.infrastructure.svc.cluster.local/oauth2/auth
@@ -12,4 +12,3 @@ spec:
       - "X-Auth-Request-Email"
       - "X-Auth-Request-Access-Token"
       - "Authorization"
-
