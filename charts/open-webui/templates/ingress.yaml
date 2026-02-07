@@ -13,10 +13,9 @@ spec:
     - match: Host(`open-webui.kragh.dev`)
       kind: Rule
       services:
-        - name: open-webui
-          port: 8080
+        - name: oauth2-proxy
+          port: 80
+          namespace: infrastructure
           nativeLB: true
-      middlewares:
-        - name: oidc
   tls:
     secretName: open-webui-tls
