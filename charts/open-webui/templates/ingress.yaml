@@ -19,4 +19,4 @@ spec:
       middlewares:
         - name: oidc
   tls:
-    secretName: open-webui-kragh-dev-tls
+    secretName: open-webui-tls
