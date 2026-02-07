@@ -17,7 +17,6 @@ spec:
         app.kubernetes.io/name: open-webui
     spec:
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       containers:
