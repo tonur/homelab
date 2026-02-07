@@ -9,7 +9,6 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
 spec:
-  volumeName: open-webui-data-pvc
   accessModes:
     - ReadWriteOnce
   resources:
