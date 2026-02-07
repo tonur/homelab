@@ -6,6 +6,8 @@ metadata:
   namespace: open-webui
   labels:
     app.kubernetes.io/name: open-webui
+  annotations:
+    helm.sh/resource-policy: keep
 spec:
   accessModes:
     - ReadWriteOnce
