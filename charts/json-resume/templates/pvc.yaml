@@ -7,9 +7,8 @@ metadata:
   labels:
     app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: storage
-  annotations:
-    helm.sh/resource-policy: keep
 spec:
+  volumeName: json-resume-npm-tools-pvc
   accessModes:
     - ReadWriteOnce
   resources:
