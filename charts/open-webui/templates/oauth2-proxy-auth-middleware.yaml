@@ -6,7 +6,7 @@ metadata:
   namespace: open-webui
 spec:
   forwardAuth:
-    address: http://oauth2-proxy.infrastructure.svc.cluster.local:4180
+    address: http://oauth2-proxy.infrastructure.svc.cluster.local:80
     authResponseHeaders:
       - X-Auth-Request-User
       - X-Auth-Request-Email
