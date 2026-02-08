@@ -10,7 +10,7 @@ PostDown = sysctl -w net.ipv4.ip_forward=0
 [Peer]
 # Home peer
 PublicKey = {{ edge_gateway_wg_peer_public_key }}
-AllowedIPs = {{ edge_gateway_cluster_cidr }}, {{ edge_gateway_wg_peer }}/32
+AllowedIPs = {{ edge_gateway_cluster_cidr }}, {{ edge_gateway_wg_peer }}/32, {{ edge_gateway_wg_local }}/32
 PersistentKeepalive = 25
 Endpoint = {{ edge_gateway_wg_peer_endpoint }}
 {% else %}
