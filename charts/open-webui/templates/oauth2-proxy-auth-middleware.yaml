@@ -4,6 +4,7 @@ kind: Middleware
 metadata:
   name: oauth2-proxy-auth
   namespace: open-webui
+spec:
   forwardAuth:
     address: http://oauth2-proxy.infrastructure.svc.cluster.local:4180
     authResponseHeaders:
