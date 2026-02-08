@@ -3,7 +3,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: oauth2-proxy-auth
-  namespace: infrastructure
+  namespace: open-webui
 spec:
   forwardAuth:
     address: http://oauth2-proxy.infrastructure.svc.cluster.local:4180
