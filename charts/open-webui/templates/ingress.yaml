@@ -17,5 +17,6 @@ spec:
           nativeLB: true
       middlewares:
         - name: oauth2-proxy-auth
+          namespace: traefik
   tls:
     secretName: open-webui-tls
