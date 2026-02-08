@@ -16,7 +16,6 @@ spec:
           namespace: infrastructure
           nativeLB: true
       middlewares:
-        - name: oauth2-proxy-auth
-          namespace: open-webui
+        - name: infrastructure-oauth2-proxy-auth@kubernetescrd
   tls:
     secretName: open-webui-tls
