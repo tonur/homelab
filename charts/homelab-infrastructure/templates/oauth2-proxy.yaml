@@ -50,6 +50,13 @@ spec:
 
         redirect_url = "https://oauth2-proxy.kragh.dev/oauth2/callback"
         whitelist_domains = ".kragh.dev"
+        upstreams = ["file:///dev/null"]
+        
+        # Important: these settings enable proper redirects
+        pass_access_token = true
+        set_xauthrequest = true
+        set_authorization_header = true
+        skip_auth_strip_headers = false
 
         # Email validation
         email_domains = ["*"]
@@ -72,3 +79,8 @@ spec:
         - secretName: oidc-kragh-dev-tls
           hosts:
             - oidc.kragh.dev
+
+    extraArgs:
+      verbose: "true"
+      show-debug-on-error: "true"
+      logging-level: "debug"
