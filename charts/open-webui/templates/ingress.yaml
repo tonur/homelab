@@ -16,7 +16,6 @@ spec:
           namespace: infrastructure
           nativeLB: true
       middlewares:
-        - name: oidc
-          namespace: traefik
+        - name: oauth2-proxy-auth
   tls:
     secretName: open-webui-tls
