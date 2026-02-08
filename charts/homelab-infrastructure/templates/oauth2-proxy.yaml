@@ -33,22 +33,27 @@ spec:
     remediation:
       retries: 3
   values:
+    # https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml
     config:
       clientID: "357890574222860083"
       configFile: |-
-        email_domains = ["*"]
-        upstreams = [ "static://200" ]
-        provider = "oidc"
+        providers = ["oidc"]
+        provider-display-name = "Zitadel"
+
+        # Zitadel OIDC Configuration
         oidc_issuer_url = "https://homelab-wzcnuv.us1.zitadel.cloud"
-        scope = "openid profile email groups"
-        whitelist_domains = [".kragh.dev"]
-        cookie_domains = [".kragh.dev"]
+
+        # Cookie configuration
+        cookie_domains = ".kragh.dev"
         cookie_secure = true
         cookie_httponly = true
-        reverse_proxy = true
-        pass_access_token = true
-        set_xauthrequest = true
-        set_authorization_header = true
+
+
+        redirect_url = "https://oauth2-proxy.kragh.dev/oauth2/callback"
+        whitelist_domains = ".kragh.dev"
+
+        # Email validation
+        email_domains = ["*"]
     
     # Use existing secret created by External Secrets
     existingSecret: oauth2-proxy-secrets
