@@ -67,6 +67,7 @@ spec:
         - oidc.kragh.dev
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
+        traefik.ingress.kubernetes.io/router.middlewares: infrastructure-oauth2-proxy-auth@kubernetescrd
       tls:
         - secretName: oidc-kragh-dev-tls
           hosts:
