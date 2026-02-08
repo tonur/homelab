@@ -1,5 +1,8 @@
 # Homelab Agent Guidelines
 
+When you need to search docs, use `context7` tools.
+If you are unsure how to do something, use `gh_grep` tools to search code examples from GitHub.
+
 ## Agent Restrictions
 
 ⚠️ **IMPORTANT**: Agents cannot commit git changes unless explicitly granted permission by the user. ASK EACH TIME YOU WANT TO COMMIT CHANGES.
