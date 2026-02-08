@@ -37,7 +37,7 @@ spec:
     config:
       clientID: "357890574222860083"
       configFile: |-
-        providers = "oidc"
+        provider = "oidc"
         
         # Zitadel OIDC Configuration
         oidc_issuer_url = "https://homelab-wzcnuv.us1.zitadel.cloud"
