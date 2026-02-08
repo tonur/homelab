@@ -15,5 +15,8 @@ spec:
           port: 80
           namespace: infrastructure
           nativeLB: true
+      middlewares:
+        - name: oidc
+          namespace: traefik
   tls:
     secretName: open-webui-tls
