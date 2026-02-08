@@ -33,6 +33,9 @@ spec:
     remediation:
       retries: 3
   values:
+    providers:
+      kubernetesCRD:
+        allowCrossNamespace: true
     service:
       type: NodePort
       spec:
