@@ -83,4 +83,3 @@ spec:
     extraArgs:
       verbose: "true"
       show-debug-on-error: "true"
-      logging-level: "debug"
