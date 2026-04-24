@@ -14,14 +14,26 @@ spec:
       labels:
         app: {{ $name }}
     spec:
+      initContainers:
+      - name: init-permissions
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /data/custom_server && chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data"]
+        volumeMounts:
+        - name: game-storage
+          mountPath: /data
       containers:
       - name: steam-server
         image: {{ $defaults.image }}
         env:
         - name: STEAM_APP_ID
           value: {{ $config.appId | quote }}
+        - name: PUID
+          value: {{ $defaults.puid | quote }}
+        - name: PGID
+          value: {{ $defaults.pgid | quote }}
         - name: TZ
           value: {{ $defaults.tz | quote }}
+        # ... keep your other env vars ...
         volumeMounts:
         - name: game-storage
           mountPath: /data
