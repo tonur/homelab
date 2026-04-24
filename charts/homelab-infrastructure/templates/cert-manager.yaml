@@ -29,11 +29,11 @@ spec:
     createNamespace: true
     crds: CreateReplace
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     crds: CreateReplace
     remediation:
-      retries: 3
+      retries: -1
   values:
     # Install CRDs as part of the release
     installCRDs: true

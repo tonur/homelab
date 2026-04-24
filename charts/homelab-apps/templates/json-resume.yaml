@@ -19,10 +19,10 @@ spec:
       reconcileStrategy: Revision
   install:
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     remediation:
-      retries: 3
+      retries: -1
   values:
     ingress:
       host: kragh.dev

@@ -30,11 +30,11 @@ spec:
   install:
     createNamespace: true
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     cleanupOnFail: true
     remediation:
-      retries: 3
+      retries: -1
   values:
     # Home Assistant configuration
     homeassistant:

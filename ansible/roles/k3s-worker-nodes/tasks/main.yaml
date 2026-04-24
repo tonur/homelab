@@ -34,7 +34,7 @@
   command: tailscale status --json
   register: worker_tailscale_status
   # Provide clearer failure if tailscale not ready yet
-  retries: 3
+  retries: -1
   delay: 2
   until: worker_tailscale_status.rc == 0
   changed_when: false

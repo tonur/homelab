@@ -18,10 +18,10 @@ spec:
       reconcileStrategy: Revision # Local chart
   install:
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     force: true
     remediation:
-      retries: 3
+      retries: -1
   dependsOn:
     - name: external-secrets

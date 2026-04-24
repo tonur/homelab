@@ -31,11 +31,11 @@ spec:
       reconcileStrategy: Revision
   install:
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     force: true
     remediation:
-      retries: 3
+      retries: -1
   timeout: 15m
 ---
 # Apps Helm Release - Deploy all application components
@@ -58,11 +58,11 @@ spec:
       reconcileStrategy: Revision
   install:
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     force: true
     remediation:
-      retries: 3
+      retries: -1
   timeout: 15m
   dependsOn:
     - name: homelab-infrastructure
