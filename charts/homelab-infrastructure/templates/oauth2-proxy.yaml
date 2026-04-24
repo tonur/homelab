@@ -79,7 +79,3 @@ spec:
         - secretName: oidc-kragh-dev-tls
           hosts:
             - oidc.kragh.dev
-
-    extraArgs:
-      verbose: "true"
-      show-debug-on-error: "true"
