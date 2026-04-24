@@ -1,0 +1,14 @@
+{{- range $name, $config := .Values.servers }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}-data-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ $.Values.defaults.storageClass }}
+  resources:
+    requests:
+      storage: {{ $.Values.defaults.storageSize }}
+{{- end }}

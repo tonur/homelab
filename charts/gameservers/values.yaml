@@ -1,0 +1,11 @@
+defaults:
+  image: thetestgame/steam:stable
+  tz: "Europe/Copenhagen"  # Set to Denmark/Copenhagen
+  puid: "50520"
+  pgid: "50520"
+  storageClass: "local-path" # Replace with your cluster's storage class
+  storageSize: "20Gi"
+
+servers:
+  windrose:
+    appId: 3041230

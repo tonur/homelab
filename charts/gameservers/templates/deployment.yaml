@@ -1,0 +1,33 @@
+{{- $defaults := .Values.defaults -}}
+{{- range $name, $config := .Values.servers }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      containers:
+      - name: steam-server
+        image: {{ $defaults.image }}
+        env:
+        - name: STEAM_APP_ID
+          value: {{ $config.appId | quote }}
+        - name: TZ
+          value: {{ $defaults.tz | quote }}
+        volumeMounts:
+        - name: game-storage
+          mountPath: /data
+      volumes:
+      - name: game-storage
+        persistentVolumeClaim:
+          claimName: {{ $name }}-data-pvc
+---
+{{- end }}

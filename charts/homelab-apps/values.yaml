@@ -8,3 +8,6 @@ homeAssistant:
 
 jsonResume:
   enabled: true
+
+gameservers:
+  enabled: true

@@ -1,0 +1,26 @@
+{{- if .Values.gameservers.enabled }}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gameservers
+  namespace: apps
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/gameservers
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+      interval: 1m
+      reconcileStrategy: Revision
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+{{- end }}

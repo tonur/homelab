@@ -1,0 +1,29 @@
+{{- range $name, $config := .Values.servers }}
+# Handling the Steam Query/Game Traffic (UDP)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: {{ $name }}-udp
+spec:
+  entryPoints:
+    - game-udp # This name must match the entryPoint in your Traefik config
+  routes:
+    - services:
+        - name: {{ $name }}-svc
+          port: 27015
+---
+# Handling the RCON or specific TCP traffic
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: {{ $name }}-tcp
+spec:
+  entryPoints:
+    - game-tcp
+  routes:
+    - match: HostSNI(`*`) # UDP/TCP doesn't support hostnames like HTTP does
+      services:
+        - name: {{ $name }}-svc
+          port: 27015
+---
+{{- end }}
