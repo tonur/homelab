@@ -1,5 +1,6 @@
 {{- $defaults := .Values.defaults -}}
 {{- range $name, $config := .Values.servers }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -40,5 +41,4 @@ spec:
       - name: game-storage
         persistentVolumeClaim:
           claimName: {{ $name }}-data-pvc
----
 {{- end }}

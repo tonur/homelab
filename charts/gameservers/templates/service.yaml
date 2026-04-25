@@ -1,5 +1,6 @@
 {{- range $name, $config := .Values.servers }}
 {{- $port := include "game.port" $name -}}
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,5 +18,4 @@ spec:
       protocol: TCP
       port: {{ $port }}
       targetPort: 27015
----
 {{- end }}

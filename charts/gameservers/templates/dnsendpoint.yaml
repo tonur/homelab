@@ -1,21 +1,21 @@
+---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: game-server-dns
 spec:
   endpoints:
-    {{- range $name, $config := .Values.servers }}
-    {{- $port := include "game.port" $name -}}
+  {{- range $name, $config := .Values.servers }}
+  {{- $port := include "game.port" $name -}}
+  # A Record
+  - dnsName: {{ printf "%s.%s" $name $domain }}
+    recordType: A
+    targets: [ {{ $.Values.defaults.publicIP | quote }} ]
     
-    # A Record
-    - dnsName: {{ printf "%s.%s" $name $domain }}
-      recordType: A
-      targets: [ {{ $.Values.defaults.publicIP | quote }} ]
 
-    # SRV Record (Pointing the game to the hashed port)
-    - dnsName: {{ printf "_hl2._udp.%s.%s" $name $domain }}
-      recordType: SRV
-      targets:
-        - {{ printf "0 5 %s %s.%s" $port $name $domain | quote }}
-    ---
-    {{- end }}
+  # SRV Record (Pointing the game to the hashed port)
+  - dnsName: {{ printf "_hl2._udp.%s.%s" $name $domain }}
+  recordType: SRV
+  targets:
+      - {{ printf "0 5 %s %s.%s" $port $name $domain | quote }}
+  {{- end }}
