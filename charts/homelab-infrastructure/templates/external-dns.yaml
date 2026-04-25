@@ -25,9 +25,38 @@ spec:
         kind: HelmRepository
         name: external-dns
         namespace: infrastructure
-  install:
-    crds: CreateReplace
-    remediation:
-      retries: -1
-  upgrade:
-    crds: CreateReplace
+  values:
+    provider:
+      name: webhook
+    
+    # Arguments for the main External-DNS container
+    extraArgs:
+      - --webhook-provider-url=http://localhost:8888
+      - --source=service
+      - --source=ingress
+      - --domain-filter=kragh.dev
+      - --txt-owner-id=homelab # Unique ID for your cluster
+    
+    # The deSEC Webhook Sidecar
+    extraContainers:
+      - name: desec-webhook
+        image: ghcr.io/n6g7/external-dns-desec-webhook:latest
+        ports:
+          - containerPort: 8888
+            name: webhook
+        env:
+          - name: DESEC_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: desec-token
+                key: token
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: webhook
+          initialDelaySeconds: 5
+          periodSeconds: 10
+    sources:
+      - service
+      - ingress
+      - crd
