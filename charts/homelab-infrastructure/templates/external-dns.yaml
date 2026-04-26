@@ -39,10 +39,14 @@ spec:
     - name: infrastructure-cluster-secret-store
       namespace: infrastructure
   values:
-    rbac:
-      create: true
-    serviceAccount:
-      create: true
+    sources:
+      - crd
+      - service
+      - ingress
+    domainFilters:
+      - kragh.dev
+    domainFilters:
+      - kube.pirate-acrux.ts.net
     provider:
       name: webhook
       webhook:
@@ -55,10 +59,6 @@ spec:
               secretKeyRef:
                 name: desec-token
                 key: token
-          - name: WEBHOOK_DOMAINFILTERS
-            value: "kragh.dev"
-          - name: WEBHOOK_EXCLUDEDOMAINS
-            value: "kube.pirate-acrux.ts.net"
         livenessProbe:
           httpGet:
             path: /healthz
