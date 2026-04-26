@@ -6,6 +6,7 @@ metadata:
 spec:
   endpoints:
     - dnsName: kragh.dev
+      subname: "@"
       recordType: MX
       targets:
         - "10 mail.protonmail.ch"
@@ -13,6 +14,7 @@ spec:
       ttl: 3600
 
     - dnsName: kragh.dev
+      subname: "@"
       recordType: TXT
       targets:
         # Use escaped double quotes for the content
