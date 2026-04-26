@@ -45,7 +45,7 @@ spec:
       - ingress
     domainFilters:
       - kragh.dev
-    domainFilters:
+    excludeDomains:
       - kube.pirate-acrux.ts.net
     provider:
       name: webhook
