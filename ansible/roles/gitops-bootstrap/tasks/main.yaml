@@ -103,6 +103,24 @@
   when: flux_install_result is defined and flux_install_result.changed
   become: false
 
+- name: Create Bitwarden credentials secret in default namespace for ESO bootstrap
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: bitwarden-credentials
+        namespace: default
+      type: Opaque
+      stringData:
+        BW_ACCESS_TOKEN: "{{ bw_access_token }}"
+    state: present
+  delegate_to: localhost
+  run_once: true
+  environment: "{{ kubeconfig_env }}"
+  no_log: true
+  become: false
+
 - name: Bootstrap GitOps - Apply Git repository and cluster kustomization
   kubernetes.core.k8s:
     state: present
