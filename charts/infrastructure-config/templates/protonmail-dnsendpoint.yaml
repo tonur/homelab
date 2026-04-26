@@ -15,15 +15,16 @@ spec:
     - dnsName: ""
       recordType: TXT
       targets:
-        - "'google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A'"
-        - "'protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4'"
-        - "'v=spf1 include:_spf.protonmail.ch mx ~all'"
+        # Use escaped double quotes for the content
+        - "\"google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A\""
+        - "\"protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4\""
+        - "\"v=spf1 include:_spf.protonmail.ch mx ~all\""
       ttl: 3600
 
     - dnsName: _dmarc.kragh.dev
       recordType: TXT
       targets:
-        - "'v=DMARC1; p=quarantine'"
+        - "\"v=DMARC1; p=quarantine\""
       ttl: 3600
 
     - dnsName: protonmail._domainkey.kragh.dev
