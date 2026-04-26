@@ -5,14 +5,14 @@ metadata:
   namespace: infrastructure
 spec:
   endpoints:
-    - dnsName: ""
+    - dnsName: kragh.dev
       recordType: MX
       targets:
         - "10 mail.protonmail.ch"
         - "20 mailsec.protonmail.ch"
       ttl: 3600
 
-    - dnsName: ""
+    - dnsName: kragh.dev
       recordType: TXT
       targets:
         # Use escaped double quotes for the content
