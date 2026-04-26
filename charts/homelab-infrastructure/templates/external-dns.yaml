@@ -48,6 +48,12 @@ spec:
       - kragh.dev
     excludeDomains:
       - kube.pirate-acrux.ts.net
+    managedRecordTypes:
+      - A
+      - AAAA
+      - CNAME
+      - TXT
+      - MX
     provider:
       name: webhook
       webhook:
