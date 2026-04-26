@@ -59,6 +59,10 @@ spec:
               secretKeyRef:
                 name: desec-token
                 key: token
+          - name: WEBHOOK_DOMAINFILTERS
+            value: "kragh.dev"
+          - name: WEBHOOK_EXCLUDEDOMAINS
+            value: "kube.pirate-acrux.ts.net"
         livenessProbe:
           httpGet:
             path: /healthz
