@@ -36,6 +36,8 @@ spec:
   dependsOn:
     - name: infrastructure-external-dns-config
       namespace: infrastructure
+    - name: infrastructure-cluster-secret-store
+      namespace: infrastructure
   values:
     rbac:
       create: true
