@@ -37,6 +37,10 @@ spec:
     - name: infrastructure-external-dns-config
       namespace: infrastructure
   values:
+    rbac:
+      create: true
+    serviceAccount:
+      create: true
     provider:
       name: webhook
       webhook:
@@ -51,6 +55,8 @@ spec:
                 key: token
           - name: WEBHOOK_DOMAINFILTERS
             value: "kragh.dev"
+          - name: WEBHOOK_EXCLUDEDOMAINS
+            value: "kube.pirate-acrux.ts.net"
         livenessProbe:
           httpGet:
             path: /healthz
