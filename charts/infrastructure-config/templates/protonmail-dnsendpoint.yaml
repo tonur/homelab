@@ -8,8 +8,8 @@ spec:
     - dnsName: kragh.dev
       recordType: MX
       targets:
-      - "10 mail.protonmail.ch."
-      - "20 mailsec.protonmail.ch."
+      - "10 mail.protonmail.ch"
+      - "20 mailsec.protonmail.ch"
       ttl: 3600
 
     - dnsName: kragh.dev
@@ -29,17 +29,17 @@ spec:
     - dnsName: protonmail._domainkey.kragh.dev
       recordType: CNAME
       targets:
-      - "protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
+      - "protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
       ttl: 3600
     - dnsName: protonmail2._domainkey.kragh.dev
       recordType: CNAME
       targets:
-      - "protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
+      - "protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
       ttl: 3600
     - dnsName: protonmail3._domainkey.kragh.dev
       recordType: CNAME
       targets:
-      - "protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
+      - "protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
       ttl: 3600
 
     - dnsName: imap.kragh.dev
