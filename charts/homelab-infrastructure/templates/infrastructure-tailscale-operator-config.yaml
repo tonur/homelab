@@ -24,4 +24,4 @@ spec:
     remediation:
       retries: -1
   dependsOn:
-    - name: external-secrets
+    - name: infrastructure-cluster-secret-store
