@@ -8,13 +8,13 @@ spec:
   {{- range $name, $config := .Values.servers }}
   {{- $port := include "game.port" $name -}}
   # A Record
-  - dnsName: {{ printf "%s.%s" $name $domain }}
+  - dnsName: {{ printf "%s.%s" $name "kragh.dev" }}
     recordType: A
     targets: [ {{ $.Values.defaults.publicIP | quote }} ]
     
 
   # SRV Record (Pointing the game to the hashed port)
-  - dnsName: {{ printf "_hl2._udp.%s.%s" $name $domain }}
+  - dnsName: {{ printf "_hl2._udp.%s.%s" $name "kragh.dev" }}
   recordType: SRV
   targets:
       - {{ printf "0 5 %s %s.%s" $port $name $domain | quote }}
