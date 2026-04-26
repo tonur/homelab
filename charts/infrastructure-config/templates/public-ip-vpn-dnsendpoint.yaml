@@ -9,7 +9,7 @@ spec:
       recordType: A
       targets: [ "198.55.102.244" ]
       ttl: 3600
-    - dnsName: "@.kragh.dev"
+    - dnsName: ""
       recordType: A
       targets: [ "198.55.102.244" ]
       ttl: 3600

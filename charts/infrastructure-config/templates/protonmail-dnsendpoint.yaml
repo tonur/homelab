@@ -5,14 +5,14 @@ metadata:
   namespace: infrastructure
 spec:
   endpoints:
-    - dnsName: "@.kragh.dev"
+    - dnsName: ""
       recordType: MX
       targets:
         - "10 mail.protonmail.ch"
         - "20 mailsec.protonmail.ch"
       ttl: 3600
 
-    - dnsName: "@.kragh.dev"
+    - dnsName: ""
       recordType: TXT
       targets:
         - "'google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A'"
