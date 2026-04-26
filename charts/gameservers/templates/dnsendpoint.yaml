@@ -12,7 +12,7 @@ spec:
       targets: [ {{ $.Values.defaults.publicIP | quote }} ]
 
     - dnsName: {{ printf "_hl2._udp.%s.%s" $name "kragh.dev" }}
-    recordType: SRV
-    targets:
+      recordType: SRV
+      targets:
         - {{ printf "0 5 %s %s.%s" $port $name "kragh.dev" | quote }}
   {{- end }}
