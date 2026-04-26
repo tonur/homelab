@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: infrastructure-external-dns-config
+  namespace: infrastructure
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: ./charts/infrastructure-external-dns-config
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+      interval: 5m
+      reconcileStrategy: Revision # Local chart
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    force: true
+    remediation:
+      retries: -1
