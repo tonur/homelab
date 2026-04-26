@@ -9,4 +9,4 @@ defaults:
 
 servers:
   windrose:
-    appId: 3041230
+    appId: "3041230"
