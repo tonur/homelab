@@ -41,6 +41,9 @@ spec:
   values:
     txtPrefix: ""
     txtOwnerId: "homelab"
+    extraArgs:
+      - --txt-prefix=
+      - --txt-owner-id=homelab
     sources:
       - crd
       - service
