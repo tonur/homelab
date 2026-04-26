@@ -17,15 +17,6 @@ spec:
   interval: 15m
   releaseName: external-dns
   targetNamespace: external-dns
-  install:
-    createNamespace: true
-    crds: CreateReplace
-    remediation:
-      retries: -1
-  upgrade:
-    crds: CreateReplace
-    remediation:
-      retries: -1
   chart:
     spec:
       chart: external-dns
@@ -34,6 +25,17 @@ spec:
         kind: HelmRepository
         name: external-dns
         namespace: infrastructure
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: -1
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: -1
+  dependsOn:
+    - name: infrastructure-external-dns-config
+      namespace: infrastructure
   values:
     provider:
       name: webhook
