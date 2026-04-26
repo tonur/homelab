@@ -39,11 +39,12 @@ spec:
     - name: infrastructure-cluster-secret-store
       namespace: infrastructure
   values:
-    txtPrefix: ""
-    txtOwnerId: "homelab"
     extraArgs:
       - --txt-prefix=
       - --txt-owner-id=homelab
+      - --source=crd
+      - --source=service
+      - --source=ingress
     sources:
       - crd
       - service
