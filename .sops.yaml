@@ -1,4 +1,9 @@
-# SOPS configuration: define which files get encrypted and recipients
+# .sops.yaml
 creation_rules:
   - path_regex: ansible/secrets/.*\.ya?ml
+    age: age19cjycc6l8pnjxgmclp7jzfd6kx79v2w3vrn3y9xzhd2hkfmyvvls6jk3v7
+  - path_regex: .*\.yaml$
+    # This regex ensures we only encrypt the actual secret values, 
+    # leaving the metadata (name, kind, namespace) readable.
+    encrypted_regex: '^(data|stringData)$'
     age: age19cjycc6l8pnjxgmclp7jzfd6kx79v2w3vrn3y9xzhd2hkfmyvvls6jk3v7

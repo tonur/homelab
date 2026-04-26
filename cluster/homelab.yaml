@@ -1,0 +1,57 @@
+---
+# Infrastructure Helm Release - Deploy all infrastructure components
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homelab-infrastructure
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ../charts/homelab-infrastructure
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+      interval: 1m
+      reconcileStrategy: Revision
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    force: true
+    remediation:
+      retries: -1
+  timeout: 15m
+---
+# Apps Helm Release - Deploy all application components
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homelab-apps
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ../charts/homelab-apps
+      version: "*"
+      sourceRef:
+        kind: GitRepository
+        name: homelab
+        namespace: default
+      interval: 1m
+      reconcileStrategy: Revision
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    force: true
+    remediation:
+      retries: -1
+  timeout: 15m
+  dependsOn:
+    - name: homelab-infrastructure
+      namespace: default

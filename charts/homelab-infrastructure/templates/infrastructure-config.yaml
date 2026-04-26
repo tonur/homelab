@@ -25,5 +25,4 @@ spec:
       retries: -1
   dependsOn:
     - name: cert-manager
-    - name: external-secrets
     - name: tailscale-operator

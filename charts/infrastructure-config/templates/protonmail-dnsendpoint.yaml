@@ -1,0 +1,64 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: protonmail
+  namespace: infrastructure
+spec:
+  endpoints:
+    - dnsName: kragh.dev
+      recordType: MX
+      targets:
+      - "10 mail.protonmail.ch."
+      - "20 mailsec.protonmail.ch."
+      ttl: 3600
+
+    - dnsName: kragh.dev
+      recordType: TXT
+      targets:
+      - "google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A"
+      - "protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4"
+      - "v=spf1 include:_spf.protonmail.ch mx ~all"
+      ttl: 3600
+
+    - dnsName: _dmarc.kragh.dev
+      recordType: TXT
+      targets:
+      - "v=DMARC1; p=quarantine"
+      ttl: 3600
+
+    - dnsName: protonmail._domainkey.kragh.dev
+      recordType: CNAME
+      targets:
+      - "protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
+      ttl: 3600
+    - dnsName: protonmail2._domainkey.kragh.dev
+      recordType: CNAME
+      targets:
+      - "protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
+      ttl: 3600
+    - dnsName: protonmail3._domainkey.kragh.dev
+      recordType: CNAME
+      targets:
+      - "protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
+      ttl: 3600
+
+    - dnsName: imap.kragh.dev
+      recordType: A
+      targets: [ "104.21.16.201" ]
+      ttl: 3600
+    - dnsName: mail.kragh.dev
+      recordType: A
+      targets: [ "104.21.16.201" ]
+      ttl: 3600
+    - dnsName: pop3.kragh.dev
+      recordType: A
+      targets: [ "172.67.215.230" ]
+      ttl: 3600
+    - dnsName: smtp.kragh.dev
+      recordType: A
+      targets: [ "104.21.16.201" ]
+      ttl: 3600
+    - dnsName: webmail.kragh.dev
+      recordType: A
+      targets: [ "104.21.16.201" ]
+      ttl: 3600

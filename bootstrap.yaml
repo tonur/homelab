@@ -1,5 +1,4 @@
 ---
-# GitRepository - Source of truth for GitOps
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -11,59 +10,19 @@ spec:
   ref:
     branch: main
 ---
-# Infrastructure Helm Release - Deploy all infrastructure components
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
 metadata:
-  name: homelab-infrastructure
+  name: cluster-sync
   namespace: default
 spec:
-  interval: 5m
-  chart:
-    spec:
-      chart: ./charts/homelab-infrastructure
-      version: "*"
-      sourceRef:
-        kind: GitRepository
-        name: homelab
-        namespace: default
-      interval: 1m
-      reconcileStrategy: Revision
-  install:
-    remediation:
-      retries: -1
-  upgrade:
-    force: true
-    remediation:
-      retries: -1
-  timeout: 15m
----
-# Apps Helm Release - Deploy all application components
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: homelab-apps
-  namespace: default
-spec:
-  interval: 5m
-  chart:
-    spec:
-      chart: ./charts/homelab-apps
-      version: "*"
-      sourceRef:
-        kind: GitRepository
-        name: homelab
-        namespace: default
-      interval: 1m
-      reconcileStrategy: Revision
-  install:
-    remediation:
-      retries: -1
-  upgrade:
-    force: true
-    remediation:
-      retries: -1
-  timeout: 15m
-  dependsOn:
-    - name: homelab-infrastructure
-      namespace: default
+  interval: 1m
+  path: "./cluster/"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age

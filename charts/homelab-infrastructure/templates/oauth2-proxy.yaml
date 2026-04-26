@@ -61,7 +61,7 @@ spec:
         # Email validation
         email_domains = ["*"]
     
-    # Use existing secret created by External Secrets
+    # Use existing secret created by sops
     existingSecret: oauth2-proxy-secrets
     existingSecretPerKey: false
     

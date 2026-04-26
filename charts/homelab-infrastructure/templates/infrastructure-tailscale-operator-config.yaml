@@ -23,5 +23,3 @@ spec:
     force: true
     remediation:
       retries: -1
-  dependsOn:
-    - name: external-secrets
