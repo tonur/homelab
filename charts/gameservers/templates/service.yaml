@@ -1,5 +1,5 @@
+{{- $defaults := .Values.defaults -}}
 {{- range $name, $config := .Values.servers }}
-{{- $port := include "game.port" $name -}}
 ---
 apiVersion: v1
 kind: Service
@@ -7,15 +7,16 @@ metadata:
   name: {{ $name }}-svc
 spec:
   type: LoadBalancer
+  loadBalancerIP: {{ $defaults.publicIP }}
   selector:
     app: {{ $name }}
   ports:
     - name: game-udp
       protocol: UDP
-      port: {{ $port }}
+      port: {{ $config.port }}
       targetPort: 27015
     - name: game-tcp
       protocol: TCP
-      port: {{ $port }}
+      port: {{ $config.port }}
       targetPort: 27015
 {{- end }}

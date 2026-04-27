@@ -10,6 +10,7 @@ defaults:
 
 servers:
   windrose:
-    appId: "4129620"
     platform: "windows"
+    appId: "4129620"
+    port: 27015
     startCommand: 'xvfb-run --auto-servernum wine /data/server/WindroseServer.exe'
