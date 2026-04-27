@@ -40,3 +40,6 @@ edge_gateway_proxy_trusted_source_ips:
   - "{{ edge_gateway_wg_local }}"
 # Optional: add public IP if Traefik will also trust it (example placeholder)
 #  - "<edge-public-ip>"
+
+# Game server port range (DNAT direct to k3s node, bypasses HAProxy)
+edge_gateway_game_port_range: "27015-27099"
