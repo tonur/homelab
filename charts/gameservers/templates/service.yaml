@@ -7,7 +7,6 @@ metadata:
   name: {{ $name }}-svc
 spec:
   type: LoadBalancer
-  loadBalancerIP: {{ $defaults.publicIP }}
   selector:
     app: {{ $name }}
   ports:
