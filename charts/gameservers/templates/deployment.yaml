@@ -18,7 +18,19 @@ spec:
       initContainers:
       - name: init-permissions
         image: busybox
-        command: ["sh", "-c", "mkdir -p /data/custom_server && chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data"]
+        command:
+        - sh
+        - -c
+        - |
+          chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
+          if [ ! -f /data/custom_server ]; then
+            cat > /data/custom_server << 'EOF'
+          #!/bin/bash
+          su - steam -c "${SERVER_DIR}/srcds_run -console -game YOURGAME -port 27015"
+          EOF
+            chmod 0700 /data/custom_server
+            chown {{ $defaults.puid }}:{{ $defaults.pgid }} /data/custom_server
+          fi
         volumeMounts:
         - name: game-storage
           mountPath: /data
