@@ -44,24 +44,3 @@ spec:
       targets:
         - "protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
       ttl: 3600
-
-    - dnsName: imap.kragh.dev
-      recordType: A
-      targets: [ "104.21.16.201" ]
-      ttl: 3600
-    - dnsName: mail.kragh.dev
-      recordType: A
-      targets: [ "104.21.16.201" ]
-      ttl: 3600
-    - dnsName: pop3.kragh.dev
-      recordType: A
-      targets: [ "172.67.215.230" ]
-      ttl: 3600
-    - dnsName: smtp.kragh.dev
-      recordType: A
-      targets: [ "104.21.16.201" ]
-      ttl: 3600
-    - dnsName: webmail.kragh.dev
-      recordType: A
-      targets: [ "104.21.16.201" ]
-      ttl: 3600
