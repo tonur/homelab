@@ -12,4 +12,4 @@ servers:
   windrose:
     appId: "4129620"
     platform: "windows"
-    startCommand: 'xvfb-run --auto-servernum wine64 /data/server/WindroseServer.exe'
+    startCommand: 'xvfb-run --auto-servernum wine /data/server/WindroseServer.exe'
