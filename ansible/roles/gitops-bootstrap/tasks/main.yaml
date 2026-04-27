@@ -118,6 +118,9 @@
     state: present
   delegate_to: localhost
   run_once: true
+  vars:
+    infiscal_client_id: "{{ (lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml)['infiscal_client_id'] }}"
+    infiscal_client_secret: "{{ (lookup('community.sops.sops', 'secrets/homelab.yaml') | from_yaml)['infiscal_client_secret'] }}"
   environment: "{{ kubeconfig_env }}"
   no_log: true
   become: false

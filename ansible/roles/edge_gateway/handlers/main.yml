@@ -1,9 +1,4 @@
 ---
-- name: restart wireguard
-  systemd:
-    name: wg-quick@wg0
-    state: restarted
-
 - name: reload nftables
   systemd:
     name: nftables

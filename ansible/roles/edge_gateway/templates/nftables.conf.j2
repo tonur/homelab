@@ -1,20 +1,17 @@
 #!/usr/sbin/nft -f
 flush ruleset
 
-# edge_gateway_mode: {{ edge_gateway_mode }} (template rendered)
-
 table inet filter {
   chain input {
     type filter hook input priority 0;
     policy drop;
     ct state {established, related} accept
     iif lo accept
-    ip saddr 100.64.0.0/10 tcp dport 22 accept
-    ip saddr {{ edge_gateway_wg_peer }} tcp dport 22 accept
+    # SSH - always allow (fallback if Tailscale is down)
     tcp dport 22 accept
-    udp dport {{ edge_gateway_wireguard_port }} accept
+    # HTTP/HTTPS for HAProxy
     tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } accept
-    # Game server ports (DNAT passthrough, not terminating locally)
+    # Game server ports
     udp dport {{ edge_gateway_game_port_range }} accept
     tcp dport {{ edge_gateway_game_port_range }} accept
   }
@@ -22,18 +19,9 @@ table inet filter {
     type filter hook forward priority 0;
     policy drop;
     ct state {established, related} accept
-    iif "wg0" accept
-    oif "wg0" accept
-    {% if edge_gateway_mode == 'dnat' %}
-    iif "eth0" oif "wg0" tcp dport { {{ edge_gateway_ingress_ports | join(', ') }} } ip daddr {{ edge_gateway_traefik_vip }} accept
-    iif "wg0" oif "eth0" ct state {established, related} accept
-    {% else %}
-    iif "lo" oif "wg0" tcp dport { {{ edge_gateway_proxy_backend_http_port }}, {{ edge_gateway_proxy_backend_https_port }} } ip daddr {{ edge_gateway_traefik_vip }} accept
-    iif "wg0" oif "lo" ct state {established, related} accept
-    {% endif %}
-    # Game traffic: DNAT forward regardless of mode
-    iif "eth0" oif "wg0" udp dport {{ edge_gateway_game_port_range }} ip daddr {{ edge_gateway_traefik_vip }} accept
-    iif "eth0" oif "wg0" tcp dport {{ edge_gateway_game_port_range }} ip daddr {{ edge_gateway_traefik_vip }} accept
+    # Game traffic: DNAT to k3s node via Tailscale
+    iif "eth0" oif "{{ edge_gateway_tailscale_interface }}" udp dport {{ edge_gateway_game_port_range }} accept
+    iif "eth0" oif "{{ edge_gateway_tailscale_interface }}" tcp dport {{ edge_gateway_game_port_range }} accept
   }
   chain output {
     type filter hook output priority 0;
@@ -41,44 +29,16 @@ table inet filter {
   }
 }
 
-{% if edge_gateway_mode == 'dnat' %}
 table ip nat {
-  set rfc1918 {
-    type ipv4_addr
-    flags interval
-    elements = { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 }
-  }
   chain prerouting {
     type nat hook prerouting priority -100;
-    tcp dport 80  dnat to {{ edge_gateway_traefik_vip }}:80
-    tcp dport 443 dnat to {{ edge_gateway_traefik_vip }}:443
-    # Game ports DNAT
-    udp dport {{ edge_gateway_game_port_range }} dnat to {{ edge_gateway_traefik_vip }}
-    tcp dport {{ edge_gateway_game_port_range }} dnat to {{ edge_gateway_traefik_vip }}
+    # Game ports DNAT direct to k3s node
+    udp dport {{ edge_gateway_game_port_range }} dnat to {{ edge_gateway_backend_ip }}
+    tcp dport {{ edge_gateway_game_port_range }} dnat to {{ edge_gateway_backend_ip }}
   }
   chain postrouting {
     type nat hook postrouting priority 100;
-    # Game traffic needs MASQUERADE so return packets route back through VPS
-    oif "wg0" udp dport {{ edge_gateway_game_port_range }} masquerade
-    oif "wg0" tcp dport {{ edge_gateway_game_port_range }} masquerade
+    # MASQUERADE game traffic through Tailscale
+    oif "{{ edge_gateway_tailscale_interface }}" masquerade
   }
 }
-{% else %}
-table ip nat {
-  set rfc1918 {
-    type ipv4_addr
-    flags interval
-    elements = { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 }
-  }
-  chain prerouting {
-    type nat hook prerouting priority -100;
-    # Game ports DNAT (bypasses HAProxy, goes direct)
-    udp dport {{ edge_gateway_game_port_range }} dnat to {{ edge_gateway_traefik_vip }}
-    tcp dport {{ edge_gateway_game_port_range }} dnat to {{ edge_gateway_traefik_vip }}
-  }
-  chain postrouting {
-    type nat hook postrouting priority 100;
-    oif "wg0" masquerade
-  }
-}
-{% endif %}
