@@ -54,31 +54,31 @@ spec:
       - CNAME
       - TXT
       - MX
-    provider:
-      name: webhook
-      webhook:
-        image:
-          repository: ghcr.io/michelangelomo/external-dns-desec-provider
-          tag: latest
-        env:
-          - name: WEBHOOK_APITOKEN
-            valueFrom:
-              secretKeyRef:
-                name: desec-token
-                key: token
-          - name: WEBHOOK_DOMAINFILTERS
-            value: "kragh.dev"
-          - name: WEBHOOK_EXCLUDEDOMAINS
-            value: "kube.pirate-acrux.ts.net"
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http-webhook
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: http-webhook
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
+    # provider:
+    #   name: webhook
+    #   webhook:
+    #     image:
+    #       repository: ghcr.io/michelangelomo/external-dns-desec-provider
+    #       tag: latest
+    #     env:
+    #       - name: WEBHOOK_APITOKEN
+    #         valueFrom:
+    #           secretKeyRef:
+    #             name: desec-token
+    #             key: token
+    #       - name: WEBHOOK_DOMAINFILTERS
+    #         value: "kragh.dev"
+    #       - name: WEBHOOK_EXCLUDEDOMAINS
+    #         value: "kube.pirate-acrux.ts.net"
+    #     livenessProbe:
+    #       httpGet:
+    #         path: /healthz
+    #         port: http-webhook
+    #       initialDelaySeconds: 10
+    #       timeoutSeconds: 5
+    #     readinessProbe:
+    #       httpGet:
+    #         path: /readyz
+    #         port: http-webhook
+    #       initialDelaySeconds: 10
+    #       timeoutSeconds: 5
