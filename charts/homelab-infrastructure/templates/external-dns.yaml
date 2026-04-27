@@ -39,7 +39,6 @@ spec:
     - name: infrastructure-cluster-secret-store
       namespace: infrastructure
   values:
-    registry: noop
     sources:
       - crd
       - service
@@ -54,31 +53,16 @@ spec:
       - CNAME
       - TXT
       - MX
-    # provider:
-    #   name: webhook
-    #   webhook:
-    #     image:
-    #       repository: ghcr.io/michelangelomo/external-dns-desec-provider
-    #       tag: latest
-    #     env:
-    #       - name: WEBHOOK_APITOKEN
-    #         valueFrom:
-    #           secretKeyRef:
-    #             name: desec-token
-    #             key: token
-    #       - name: WEBHOOK_DOMAINFILTERS
-    #         value: "kragh.dev"
-    #       - name: WEBHOOK_EXCLUDEDOMAINS
-    #         value: "kube.pirate-acrux.ts.net"
-    #     livenessProbe:
-    #       httpGet:
-    #         path: /healthz
-    #         port: http-webhook
-    #       initialDelaySeconds: 10
-    #       timeoutSeconds: 5
-    #     readinessProbe:
-    #       httpGet:
-    #         path: /readyz
-    #         port: http-webhook
-    #       initialDelaySeconds: 10
-    #       timeoutSeconds: 5
+    policy: sync
+    provider:
+      name: webhook
+      webhook:
+        image:
+          repository: docker.io/hetzner/external-dns-hetzner-webhook
+          tag: v0.3.3 # x-releaser-pleaser-version
+        env:
+          - name: HETZNER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: hetzner_token
+                key: token
