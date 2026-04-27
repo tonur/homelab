@@ -64,5 +64,5 @@ spec:
           - name: HETZNER_TOKEN
             valueFrom:
               secretKeyRef:
-                name: hetzner_token
+                name: hetzner-token
                 key: token
