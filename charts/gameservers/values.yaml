@@ -1,12 +1,15 @@
 defaults:
+  platform: "linux"
   publicIP: 198.55.102.244
   image: thetestgame/steam:stable
-  tz: "Europe/Copenhagen"  # Set to Denmark/Copenhagen
+  tz: "Europe/Copenhagen"
   puid: "50520"
   pgid: "50520"
-  storageClass: "local-path" # Replace with your cluster's storage class
+  storageClass: "local-path"
   storageSize: "20Gi"
 
 servers:
   windrose:
     appId: "4129620"
+    platform: "windows"
+    startCommand: 'xvfb-run --auto-servernum wine64 /data/server/WindroseServer.exe'

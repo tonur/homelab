@@ -26,7 +26,7 @@ spec:
           if [ ! -f /data/custom_server ]; then
             cat > /data/custom_server << 'EOF'
           #!/bin/bash
-          su - steam -c "${SERVER_DIR}/srcds_run -console -game YOURGAME -port 27015"
+          su - steam -c "{{ $config.startCommand }}"
           EOF
             chmod 0700 /data/custom_server
             chown {{ $defaults.puid }}:{{ $defaults.pgid }} /data/custom_server
@@ -40,6 +40,8 @@ spec:
         env:
         - name: STEAM_APP_ID
           value: {{ $config.appId | quote }}
+        - name: PLATFORM
+          value: {{ $config.platform | default $defaults.platform | quote }}
         - name: PUID
           value: {{ $defaults.puid | quote }}
         - name: PGID
