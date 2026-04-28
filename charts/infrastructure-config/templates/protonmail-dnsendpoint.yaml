@@ -16,7 +16,6 @@ spec:
       recordType: TXT
       targets:
         # Use escaped double quotes for the content
-        - "\"google-site-verification=7KOsydnaXFkW0IAMtmd_Kw6dSj6el3D8asu71GWJp5A\""
         - "\"protonmail-verification=6aafd588ba3176a40fd0c2ff73163bd695112cd4\""
         - "\"v=spf1 include:_spf.protonmail.ch ~all\""
       ttl: 3600
@@ -30,15 +29,15 @@ spec:
     - dnsName: protonmail._domainkey.kragh.dev
       recordType: CNAME
       targets:
-        - "protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
+        - "protonmail.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
       ttl: 3600
     - dnsName: protonmail2._domainkey.kragh.dev
       recordType: CNAME
       targets:
-        - "protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
+        - "protonmail2.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
       ttl: 3600
     - dnsName: protonmail3._domainkey.kragh.dev
       recordType: CNAME
       targets:
-        - "protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch."
+        - "protonmail3.domainkey.drr7mijuybfzxjq43mzpoy3n54tcy6zw7vagwgdkhy4t7cavfscfa.domains.proton.ch"
       ttl: 3600
