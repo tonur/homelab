@@ -59,10 +59,14 @@ spec:
       webhook:
         image:
           repository: docker.io/hetzner/external-dns-hetzner-webhook
-          tag: v0.3.3 # x-releaser-pleaser-version
+          tag: v0.3.3
         env:
           - name: HETZNER_TOKEN
             valueFrom:
               secretKeyRef:
                 name: hetzner-token
                 key: token
+          - name: USE_CLOUD_API
+            value: "true"
+          - name: BULK_MODE
+            value: "true"

@@ -8,8 +8,8 @@ spec:
     - dnsName: kragh.dev
       recordType: MX
       targets:
-        - "10 mail.protonmail.ch."
-        - "20 mailsec.protonmail.ch."
+        - "10 mail.protonmail.ch"
+        - "20 mailsec.protonmail.ch"
       ttl: 3600
 
     - dnsName: kragh.dev
