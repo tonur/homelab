@@ -12,5 +12,10 @@ servers:
   windrose:
     platform: "windows"
     appId: "4129620"
-    port: 27015
-    startCommand: 'xvfb-run --auto-servernum wine /data/server/WindroseServer.exe'
+    ports:
+      - port: 27015
+        targetPort: 7777
+    startCommand: "xvfb-run --auto-servernum wine /data/server/WindroseServer.exe"
+    extraEnvs:
+      - name: USE_DIRECT_CONNECTION
+        value: "true"

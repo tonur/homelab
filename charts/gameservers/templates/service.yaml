@@ -9,14 +9,16 @@ spec:
   selector:
     app: {{ $name }}
   ports:
+  {{- range $config.ports }}
     - name: game-udp
       protocol: UDP
-      port: {{ $config.port }}
-      targetPort: 27015
-      nodePort: {{ $config.port }}
+      port: {{ .port }}
+      nodePort: {{ .port }}
+      targetPort: {{ .targetPort }}
     - name: game-tcp
       protocol: TCP
-      port: {{ $config.port }}
-      targetPort: 27015
-      nodePort: {{ $config.port }}
+      port: {{ .port }}
+      nodePort: {{ .port }}
+      targetPort: {{ .targetPort }}
+  {{- end }}
 {{- end }}

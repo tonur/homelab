@@ -48,6 +48,10 @@ spec:
           value: {{ $defaults.pgid | quote }}
         - name: TZ
           value: {{ $defaults.tz | quote }}
+        {{- range $config.extraEnvs }}
+        - name: {{ .name }}
+          value: {{ .value }}
+        {{- end }}
         volumeMounts:
         - name: game-storage
           mountPath: /data
