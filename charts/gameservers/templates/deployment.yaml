@@ -50,7 +50,7 @@ spec:
           value: {{ $defaults.tz | quote }}
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
-          value: {{ .value }}
+          value: {{ .value | quote }}
         {{- end }}
         volumeMounts:
         - name: game-storage
