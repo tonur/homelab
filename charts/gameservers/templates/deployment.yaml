@@ -23,17 +23,12 @@ spec:
         - -c
         - |
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
-          # Force remove if it's a directory to prevent cat failure
-          if [ -d /data/custom_server ]; then rm -rf /data/custom_server; fi
-          
           if [ ! -f /data/custom_server ]; then
             cat > /data/custom_server << 'EOF'
           #!/bin/bash
-          # Ensure we have the right permissions to run the binary
-          chmod +x /data/server/WindroseServer.exe 2>/dev/null
           su - steam -c "{{ $config.startCommand }}"
           EOF
-            chmod 0755 /data/custom_server
+            chmod 0700 /data/custom_server
             chown {{ $defaults.puid }}:{{ $defaults.pgid }} /data/custom_server
           fi
         volumeMounts:
