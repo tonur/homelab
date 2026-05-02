@@ -59,7 +59,7 @@ servers:
                 "MaxPlayerCount": 8,
                 "UserSelectedRegion": "",
                 "P2pProxyAddress": "0.0.0.0",
-                "UseDirectConnection": true,
+                "UseDirectConnection": false,
                 "DirectConnectionServerAddress": "198.55.102.244",
                 "DirectConnectionServerPort": 27099,
                 "DirectConnectionProxyAddress": "0.0.0.0"
