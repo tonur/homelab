@@ -15,6 +15,11 @@ spec:
       labels:
         app: {{ $name }}
     spec:
+      # This fixes the DNS subdomain resolution (the wget www.google.com failure)
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       securityContext:
         fsGroup: {{ $defaults.pgid }}
         runAsUser: {{ $defaults.puid | int }}
@@ -29,7 +34,7 @@ spec:
         - sh
         - -c
         - |
-          echo "Preparing persistent structure..."
+          echo "Setting up writable paths..."
           mkdir -p /data/server /data/steam_home
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
         volumeMounts:
@@ -44,23 +49,19 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # 1. Wait for the network to actually be 'up' and DNS to resolve
-            echo "Waiting for network and Steam DNS..."
-            until timeout 2 bash -c "cat < /dev/null > /dev/tcp/google.com/443" 2>/dev/null; do
-              echo "Network not ready, sleeping 2s..."
-              sleep 2
-            done
-            
-            echo "Network is up. Verifying Steam connectivity..."
-            # Try to resolve a Steam CM just to be sure
-            until getent hosts cm01-dk.steampowered.com; do
-              echo "Waiting for Steam DNS resolution..."
+            # 1. Simple network check using built-in bash features (no extra tools needed)
+            echo "Checking internet access..."
+            until timeout 1 bash -c "cat < /dev/null > /dev/tcp/8.8.8.8/53" 2>/dev/null; do
+              echo "Waiting for gateway..."
               sleep 2
             done
 
-            # 2. Run SteamCMD with explicit platform override and validation
-            # We use the full path to avoid any ambiguity
-            /usr/games/steamcmd \
+            # 2. Find the steamcmd binary dynamically
+            STEAMCMD_BIN=$(which steamcmd || echo "/usr/games/steamcmd")
+            echo "Using SteamCMD at: $STEAMCMD_BIN"
+
+            # 3. Run the update
+            $STEAMCMD_BIN \
               +@sSteamCmdForcePlatformType windows \
               +force_install_dir /data/server \
               +login anonymous \
@@ -86,7 +87,8 @@ spec:
         - bash
         - -c
         - |
-          echo "Starting {{ $name }} Dedicated Server..."
+          echo "Starting {{ $name }}..."
+          # Running the actual launch command
           exec xvfb-run --auto-servernum {{ $config.startCommand }}
         volumeMounts:
         - name: game-storage
