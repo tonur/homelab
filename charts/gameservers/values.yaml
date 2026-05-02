@@ -16,7 +16,7 @@ servers:
       - port: 27099
         targetPort: 27099
     binaryPath: "/data/server/R5/Binaries/Win64/WindroseServer-Win64-Shipping.exe"
-    binaryFlags: "-server -log -unattended -NoUI -port=27099"
+    binaryFlags: "-server -log -unattended -NoUI -port=27099 -PublicIP=198.55.102.244 -MultiHome -BLPort=27099"
     extraEnvs:
       - name: WINEDLLOVERRIDES
         value: "mscoree,mshtml="

@@ -14,5 +14,7 @@ spec:
     - dnsName: {{ printf "_game._udp.%s.%s" $name "kragh.dev" }}
       recordType: SRV
       targets:
-        - {{ printf "0 5 %d %s.%s" (int $config.port) $name "kragh.dev" | quote }}
+    {{- range $config.ports }}
+        - {{ printf "0 5 %d %s.%s" (int .port) $name "kragh.dev" | quote }}
+    {{- end }}
   {{- end }}
