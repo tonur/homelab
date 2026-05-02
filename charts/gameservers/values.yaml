@@ -24,3 +24,30 @@ servers:
         value: "v4"
     debugCommands: |
       tail -F /data/server/R5/Saved/Logs/*.log &
+    configInjections:
+      - secretName: "windrose-json-config"
+        files:
+          - source: "ServerDescription.json"
+            destination: "/data/server/R5/ServerDescription.json"
+        secretData:
+          # We template the entire JSON file here
+          ServerDescription.json: |
+            {
+              "Version": 1,
+              "DeploymentId": "0.10.0.4.268-9d2ca277",
+              "ServerDescription_Persistent": {
+                "PersistentServerId": "288F0FDE426E0671BDF607818598539F",
+                "InviteCode": "d952dcb5",
+                "IsPasswordProtected": {{ if .password }}true{{ else }}false{{ end }},
+                "Password": {{ .password | quote }},
+                "ServerName": "Tonur",
+                "WorldIslandId": "EFCDC157DF1B41DA57AC438F20ACF099",
+                "MaxPlayerCount": 8,
+                "UserSelectedRegion": "",
+                "P2pProxyAddress": "127.0.0.1",
+                "UseDirectConnection": true,
+                "DirectConnectionServerAddress": "198.55.102.244",
+                "DirectConnectionServerPort": 27015,
+                "DirectConnectionProxyAddress": "0.0.0.0"
+              }
+            }

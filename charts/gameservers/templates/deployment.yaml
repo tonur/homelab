@@ -35,16 +35,35 @@ spec:
         - |
           echo "Preparing paths and identity..."
           mkdir -p /data/server /data/steam_home /data/etc
-          
+
           # Create a custom passwd file so the user has a name
           echo "root:x:0:0:root:/root:/bin/sh" > /data/etc/passwd
           echo "steam:x:{{ $defaults.puid }}:{{ $defaults.pgid }}:steam:/data/steam_home:/bin/bash" >> /data/etc/passwd
-          
+
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
+
+          {{- if $config.configInjections }}
+          echo "Injecting templated configurations..."
+          {{- range $injection := $config.configInjections }}
+          {{- range $file := $injection.files }}
+          mkdir -p $(dirname {{ $file.destination }})
+          cp /config-injections/{{ $injection.secretName }}/{{ $file.source }} {{ $file.destination }}
+          chown {{ $defaults.puid }}:{{ $defaults.pgid }} {{ $file.destination }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+
           echo "Filesystem prepare done!"
         volumeMounts:
         - name: game-storage
           mountPath: /data
+        {{- if $config.configInjections }}
+        {{- range $injection := $config.configInjections }}
+        - name: injection-{{ $injection.secretName }}
+          mountPath: /config-injections/{{ $injection.secretName }}
+          readOnly: true
+        {{- end }}
+        {{- end }}
 
       - name: steam-updater
         image: {{ $defaults.image }}
@@ -111,4 +130,11 @@ spec:
       - name: game-storage
         persistentVolumeClaim:
           claimName: {{ $name }}-data-pvc
+      {{- if $config.configInjections }}
+      {{- range $injection := $config.configInjections }}
+      - name: injection-{{ $injection.secretName }}
+        secret:
+          secretName: {{ $injection.secretName }}
+      {{- end }}
+      {{- end }}
 {{- end }}
