@@ -15,28 +15,30 @@ spec:
       labels:
         app: {{ $name }}
     spec:
-      initContainers:
-      - name: init-permissions
-        image: busybox
-        command:
-        - sh
-        - -c
-        - |
-          chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
-          if [ ! -f /data/custom_server ]; then
-            cat > /data/custom_server << 'EOF'
-          #!/bin/bash
-          su - steam -c "{{ $config.startCommand }}"
-          EOF
-            chmod 0700 /data/custom_server
-            chown {{ $defaults.puid }}:{{ $defaults.pgid }} /data/custom_server
-          fi
-        volumeMounts:
-        - name: game-storage
-          mountPath: /data
+      securityContext:
+        fsGroup: {{ $defaults.pgid }}
+        runAsUser: {{ $defaults.puid }}
+        runAsGroup: {{ $defaults.pgid }}
       containers:
       - name: steam-server
         image: {{ $defaults.image }}
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            # 1. Update/Install
+            /entrypoint.sh & 
+            UPDATE_PID=$!
+            wait $UPDATE_PID
+
+            # 2. Safety Check
+            echo "Waiting for binary..."
+            until [ -f "/data/{{ $config.binaryPath }}" ]; do
+              sleep 5
+            done
+
+            # 3. Launch
+            echo "Starting server..."
+            {{ $config.startCommand }}
         env:
         - name: STEAM_APP_ID
           value: {{ $config.appId | quote }}
