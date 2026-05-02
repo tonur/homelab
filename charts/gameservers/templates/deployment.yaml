@@ -21,7 +21,7 @@ spec:
         runAsGroup: {{ $defaults.pgid | int }}
 
       initContainers:
-      # STAGE 1: Fix volume permissions (Runs as Root)
+      # STAGE 1: The "Janitor" - Prepares folders and fixes permissions
       - name: filesystem-prepare
         image: busybox
         securityContext:
@@ -30,16 +30,21 @@ spec:
         - sh
         - -c
         - |
-          echo "Preparing directory structure..."
-          mkdir -p /data/server
+          echo "Preparing persistent structure..."
+          mkdir -p /data/server /data/steam_home
+          # Ensure user 50520 owns the whole volume
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
         volumeMounts:
         - name: game-storage
           mountPath: /data
 
-      # STAGE 2: Download/Update Game Files (Runs as Steam User)
+      # STAGE 2: The "Provisioner" - Downloads/Updates the game
       - name: steam-updater
         image: {{ $defaults.image }}
+        env:
+        # Crucial: This tells SteamCMD to put its config files in the PVC
+        - name: HOME
+          value: "/data/steam_home"
         command: ["/usr/games/steamcmd"]
         args:
           - "+@sSteamCmdForcePlatformType"
@@ -56,24 +61,26 @@ spec:
         - name: game-storage
           mountPath: /data
 
-      # STAGE 3: Run the Game (Runs as Steam User)
+      # STAGE 3: The "Server" - Runs the actual game
       containers:
       - name: game-runtime
         image: {{ $defaults.image }}
-        command:
-        - bash
-        - -c
-        - |
-          echo "Starting {{ $name }} Dedicated Server..."
-          # 'exec' ensures the game process receives SIGTERM for graceful shutdowns
-          exec xvfb-run --auto-servernum {{ $config.startCommand }}
         env:
+        - name: HOME
+          value: "/data/steam_home"
         - name: TZ
           value: {{ $defaults.tz | quote }}
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
         {{- end }}
+        command:
+        - bash
+        - -c
+        - |
+          echo "Starting {{ $name }} Dedicated Server..."
+          # exec ensures the game process gets PID 1
+          exec xvfb-run --auto-servernum {{ $config.startCommand }}
         volumeMounts:
         - name: game-storage
           mountPath: /data
