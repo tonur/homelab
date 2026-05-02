@@ -15,7 +15,7 @@ servers:
     ports:
       - port: 27015
         targetPort: 7777
-    startCommand: "wine /data/server/WindroseServer.exe"
+    binary: "WindroseServer.exe"
     extraEnvs:
       - name: USE_DIRECT_CONNECTION
         value: "true"

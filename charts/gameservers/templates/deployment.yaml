@@ -15,7 +15,6 @@ spec:
       labels:
         app: {{ $name }}
     spec:
-      # This fixes the DNS subdomain resolution (the wget www.google.com failure)
       dnsConfig:
         options:
           - name: ndots
@@ -34,9 +33,19 @@ spec:
         - sh
         - -c
         - |
-          echo "Setting up writable paths..."
+          echo "Cleaning up and preparing writable paths..."
           mkdir -p /data/server /data/steam_home
+          
+          # Force a clean manifest state to fix the 0x6 error
+          # We remove the metadata but KEEP the actual game data if it exists
+          rm -rf /data/steam_home/*
+          rm -rf /data/server/steamapps/downloading/*
+          rm -rf /data/server/steamapps/temp/*
+          # Remove specifically the manifest for this app to force a re-check
+          rm -f /data/server/steamapps/appmanifest_{{ $config.appId }}.acf
+          
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
+          echo "Ready."
         volumeMounts:
         - name: game-storage
           mountPath: /data
@@ -49,19 +58,10 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            # 1. Simple network check using built-in bash features (no extra tools needed)
-            echo "Checking internet access..."
-            until timeout 1 bash -c "cat < /dev/null > /dev/tcp/8.8.8.8/53" 2>/dev/null; do
-              echo "Waiting for gateway..."
-              sleep 2
-            done
+            # Verify we can actually write to the target before starting
+            touch /data/server/write_test && rm /data/server/write_test || (echo "PERMISSIONS FAIL" && exit 1)
 
-            # 2. Find the steamcmd binary dynamically
-            STEAMCMD_BIN=$(which steamcmd || echo "/usr/games/steamcmd")
-            echo "Using SteamCMD at: $STEAMCMD_BIN"
-
-            # 3. Run the update
-            $STEAMCMD_BIN \
+            /usr/games/steamcmd \
               +@sSteamCmdForcePlatformType windows \
               +force_install_dir /data/server \
               +login anonymous \
@@ -87,9 +87,14 @@ spec:
         - bash
         - -c
         - |
+          # Wait until the binary actually exists
+          echo "Waiting for binary at /data/server/{{ $config.binary }}..."
+          until [ -f "/data/server/{{ $config.binary }}" ]; do
+            sleep 5
+          done
+
           echo "Starting {{ $name }}..."
-          # Running the actual launch command
-          exec xvfb-run --auto-servernum {{ $config.startCommand }}
+          exec xvfb-run --auto-servernum wine /data/server/{{ $config.binary }}"
         volumeMounts:
         - name: game-storage
           mountPath: /data
