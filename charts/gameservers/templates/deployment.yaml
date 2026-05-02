@@ -47,6 +47,7 @@ spec:
           {{- range $injection := $config.configInjections }}
           {{- range $file := $injection.files }}
           mkdir -p $(dirname {{ $file.destination }})
+          rm {{ $file.destination }}
           cp /config-injections/{{ $injection.secretName }}/{{ $file.source }} {{ $file.destination }}
           chown {{ $defaults.puid }}:{{ $defaults.pgid }} {{ $file.destination }}
           echo "{{ $file.destination }} content:"

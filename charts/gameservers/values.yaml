@@ -51,17 +51,13 @@ servers:
               "DeploymentId": "0.10.0.4.268-9d2ca277",
               "ServerDescription_Persistent": {
                 "PersistentServerId": "288F0FDE426E0671BDF607818598539F",
-                "InviteCode": "d952dcb5",
+                "InviteCode": "mnaXiwCij5xZ3ZgXGj1hUWHPbtqK4jih",
                 "IsPasswordProtected": {{ if .password }}true{{ else }}false{{ end }},
                 "Password": {{ .password | quote }},
                 "ServerName": "Tonur",
                 "WorldIslandId": "48F07DE8E24049BAE7A77B2EF4A61345",
                 "MaxPlayerCount": 8,
                 "UserSelectedRegion": "",
-                "P2pProxyAddress": "0.0.0.0",
-                "UseDirectConnection": false,
-                "DirectConnectionServerAddress": "198.55.102.244",
-                "DirectConnectionServerPort": 27099,
-                "DirectConnectionProxyAddress": "0.0.0.0"
+                "P2pProxyAddress": "0.0.0.0"
               }
             }
