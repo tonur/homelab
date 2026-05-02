@@ -74,8 +74,8 @@ spec:
           value: "/data/steam_home"
         - name: TZ
           value: {{ $defaults.tz | quote }}
-        - name: WINEDEBUG
-          value: "-all" # Set to "fixme-all,err-all" if you need to debug Wine itself
+        - name: WINEDLLOVERRIDES
+          value: "mscoree,mshtml="
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
@@ -84,35 +84,23 @@ spec:
         - bash
         - -c
         - |
-          # 1. Manual Xvfb Start
-          echo "Initializing Virtual Display..."
           Xvfb :99 -screen 0 1024x768x16 &
           export DISPLAY=:99
-          export WINEPREFIX=/data/steam_home/.wine
-          
-          # 2. Skip Wine's "Install Mono/Gecko" popups which can hang the boot
-          export WINEDLLOVERRIDES="mscoree,mshtml="
 
-          # 3. Wait for binary
           until [ -f "/data/server/{{ $config.binary }}" ]; do
             echo "Waiting for binary..."
             sleep 5
           done
 
-          echo "Starting {{ $name }} Dedicated Server..."
+          echo "Starting {{ $name }}..."
           cd /data/server
 
-          # 4. Log Redirection Trick
-          # Clear old logs, create a fresh one, and tail it to the container output
-          rm -f /data/server/unity_log.txt
-          touch /data/server/unity_log.txt
-          tail -f /data/server/unity_log.txt &
+          {{- if $config.debugCommands }}
+          {{- $config.debugCommands | nindent 10 }}
+          {{- end }}
           
-          # 5. Launch with a local log file path
-          exec wine "/data/server/{{ $config.binary }}" \
-            -batchmode \
-            -nographics \
-            -logFile "/data/server/unity_log.txt"
+          # Launch the game with Unreal-specific flags
+          exec wine "/data/server/{{ $config.binary }}" -server -log
         volumeMounts:
         - name: game-storage
           mountPath: /data

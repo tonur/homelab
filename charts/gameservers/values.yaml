@@ -19,3 +19,8 @@ servers:
     extraEnvs:
       - name: USE_DIRECT_CONNECTION
         value: "true"
+    debugCommands: |
+      # Unreal Engine Logging Setup
+      mkdir -p /data/server/R5/Saved/Logs
+      touch /data/server/R5/Saved/Logs/WindroseServer.log
+      tail -F /data/server/R5/Saved/Logs/*.log &
