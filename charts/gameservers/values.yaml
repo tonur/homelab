@@ -16,7 +16,7 @@ servers:
       - port: 27015
         targetPort: 7777
     binaryPath: "/data/server/R5/Binaries/Win64/WindroseServer-Win64-Shipping.exe"
-    binaryFlags: "-server -log -unattended -NoUI -port=7777 -QueryPort=27015 -DirectConnection"
+    binaryFlags: "-server -log -unattended -NoUI -port=7777"
     extraEnvs:
       - name: WINEDLLOVERRIDES
         value: "mscoree,mshtml="
@@ -47,7 +47,7 @@ servers:
                 "P2pProxyAddress": "127.0.0.1",
                 "UseDirectConnection": true,
                 "DirectConnectionServerAddress": "198.55.102.244",
-                "DirectConnectionServerPort": 27015,
+                "DirectConnectionServerPort": 7777,
                 "DirectConnectionProxyAddress": "0.0.0.0"
               }
             }
