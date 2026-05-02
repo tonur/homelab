@@ -1,5 +1,6 @@
 defaults:
   platform: "linux"
+  publicIP: 198.55.102.244
   image: thetestgame/steam:stable
   tz: "Europe/Copenhagen"
   puid: "50520"

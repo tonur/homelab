@@ -1,17 +1,6 @@
 {{- $defaults := .Values.defaults -}}
 {{- range $name, $config := .Values.servers }}
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $name }}-launch-script
-data:
-  custom_server: |
-    #!/bin/bash
-    echo "--- Starting Custom Launch Script ---"
-    
-    su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,6 +17,33 @@ spec:
     spec:
       securityContext:
         fsGroup: {{ $defaults.pgid }}
+      initContainers:
+      - name: create-launch-script
+        image: busybox
+        command:
+        - sh
+        - -c
+        - |
+          # 1. Create the custom_server file on the writable PVC
+          cat > /data/custom_server << 'EOF'
+          #!/bin/bash
+          echo "------------------------------------------"
+          echo "   Launching {{ $name }} via Custom Script"
+          echo "------------------------------------------"
+          
+          # Dropping privileges to 'steam' and using xvfb for the virtual display
+          # We use the startCommand defined in values.yaml
+          su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
+          EOF
+
+          # 2. Set the exact permissions the main container expects
+          chmod 755 /data/custom_server
+          chown {{ $defaults.puid }}:{{ $defaults.pgid }} /data/custom_server
+          
+          echo "Launch script created successfully at /data/custom_server"
+        volumeMounts:
+        - name: game-storage
+          mountPath: /data
       containers:
       - name: steam-server
         image: {{ $defaults.image }}
@@ -49,16 +65,8 @@ spec:
         volumeMounts:
         - name: game-storage
           mountPath: /data
-        - name: script-volume
-          # see https://github.com/GamePackets/docker-steam-server#custom-server
-          mountPath: /data/custom_server
-          subPath: custom_server
       volumes:
       - name: game-storage
         persistentVolumeClaim:
           claimName: {{ $name }}-data-pvc
-      - name: script-volume
-        configMap:
-          name: {{ $name }}-launch-script
-          defaultMode: 0755
 {{- end }}
