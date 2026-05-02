@@ -33,22 +33,15 @@ spec:
         - sh
         - -c
         - |
-          echo "Cleaning up and preparing writable paths..."
-          mkdir -p /data/server /data/steam_home
+          echo "Preparing paths and identity..."
+          mkdir -p /data/server /data/steam_home /data/etc
           
-          # Force a clean manifest state to fix the 0x6 error
-          # We remove the metadata but KEEP the actual game data if it exists
-          rm -rf /data/steam_home/*
-          rm -rf /data/server/steamapps/downloading/*
-          rm -rf /data/server/steamapps/temp/*
-          # Remove specifically the manifest for this app to force a re-check
-          rm -f /data/server/steamapps/appmanifest_{{ $config.appId }}.acf
+          # Create a custom passwd file so the user has a name
+          echo "root:x:0:0:root:/root:/bin/sh" > /data/etc/passwd
+          echo "steam:x:{{ $defaults.puid }}:{{ $defaults.pgid }}:steam:/data/steam_home:/bin/bash" >> /data/etc/passwd
           
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
-
-          # Create a fragment of a passwd file
-          echo "steam:x:{{ $defaults.puid }}:{{ $defaults.pgid }}:steam:/data/steam_home:/bin/bash" > /data/passwd_fragment
-          echo "Ready."
+          echo "Filesystem prepare done!"
         volumeMounts:
         - name: game-storage
           mountPath: /data
@@ -91,15 +84,14 @@ spec:
         - bash
         - -c
         - |
-          # 1. Identity Setup (Optional: helps some apps that check for a username)
-          export USER=steam
-          export LOGNAME=steam
-          
-          # 2. Manual Xvfb Start (More reliable than xvfb-run for logging)
+          # 1. Manual Xvfb Start
           echo "Initializing Virtual Display..."
           Xvfb :99 -screen 0 1024x768x16 &
           export DISPLAY=:99
-          sleep 2
+          export WINEPREFIX=/data/steam_home/.wine
+          
+          # 2. Skip Wine's "Install Mono/Gecko" popups which can hang the boot
+          export WINEDLLOVERRIDES="mscoree,mshtml="
 
           # 3. Wait for binary
           until [ -f "/data/server/{{ $config.binary }}" ]; do
@@ -109,14 +101,18 @@ spec:
 
           echo "Starting {{ $name }} Dedicated Server..."
           cd /data/server
+
+          # 4. Log Redirection Trick
+          # Clear old logs, create a fresh one, and tail it to the container output
+          rm -f /data/server/unity_log.txt
+          touch /data/server/unity_log.txt
+          tail -f /data/server/unity_log.txt &
           
-          # 4. The Launch with Console Logs
-          # -batchmode -nographics: Essential for headless Unity servers
-          # -logFile /dev/stdout: Force logs to show up in 'kubectl logs'
+          # 5. Launch with a local log file path
           exec wine "/data/server/{{ $config.binary }}" \
             -batchmode \
             -nographics \
-            -logFile /dev/stdout
+            -logFile "/data/server/unity_log.txt"
         volumeMounts:
         - name: game-storage
           mountPath: /data
@@ -124,4 +120,7 @@ spec:
       - name: game-storage
         persistentVolumeClaim:
           claimName: {{ $name }}-data-pvc
+      - name: game-storage
+        mountPath: /etc/passwd
+        subPath: etc/passwd
 {{- end }}
