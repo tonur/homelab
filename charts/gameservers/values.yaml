@@ -32,8 +32,10 @@ servers:
         value: "-all,warn+winsock"
       - name: WINEESYNC
         value: "1"
+      - name: WINEIPVERSION
+        value: "ipv4"
       - name: WINEDLLOVERRIDES
-        value: "mscoree,mshtml=,ws2_32=n" # Force native windows winsock
+        value: "mscoree,mshtml=,bcrypt=n,crypt32=n,ws2_32=n"
     debugCommands: |
       tail -F /data/server/R5/Saved/Logs/*.log &
     configInjections:
@@ -56,7 +58,7 @@ servers:
                 "WorldIslandId": "EFCDC157DF1B41DA57AC438F20ACF099",
                 "MaxPlayerCount": 8,
                 "UserSelectedRegion": "",
-                "P2pProxyAddress": "127.0.0.1",
+                "P2pProxyAddress": "0.0.0.0",
                 "UseDirectConnection": true,
                 "DirectConnectionServerAddress": "198.55.102.244",
                 "DirectConnectionServerPort": 27099,
