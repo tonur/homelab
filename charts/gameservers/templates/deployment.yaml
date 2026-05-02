@@ -17,52 +17,59 @@ spec:
     spec:
       securityContext:
         fsGroup: {{ $defaults.pgid }}
+        runAsUser: {{ $defaults.puid | int }}
+        runAsGroup: {{ $defaults.pgid | int }}
+
       initContainers:
-      - name: filesystem-reset
+      # STAGE 1: Fix volume permissions (Runs as Root)
+      - name: filesystem-prepare
         image: busybox
+        securityContext:
+          runAsUser: 0 
         command:
         - sh
         - -c
         - |
-          echo "Resetting Steam metadata to clear 0x6 error..."
-          # Force SteamCMD to re-calculate its download state
-          rm -rf /data/steamapps
-          rm -rf /data/temp
-          
-          echo "Re-writing launch script..."
-          cat > /data/custom_server << 'EOF'
-          #!/bin/bash
-          echo "--- Starting {{ $name }} ---"
-          # su - steam ensures the game runs as the correct user
-          # xvfb-run provides the virtual display for the Windows binary
-          su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
-          EOF
-
-          echo "Fixing permissions recursively for UID {{ $defaults.puid }}..."
-          chmod 755 /data/custom_server
-          # Ensure every file/folder is owned by the steam user (50520)
+          echo "Preparing directory structure..."
+          mkdir -p /data/server
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
-          
-          echo "Filesystem ready."
         volumeMounts:
         - name: game-storage
           mountPath: /data
-      containers:
-      - name: steam-server
+
+      # STAGE 2: Download/Update Game Files (Runs as Steam User)
+      - name: steam-updater
         image: {{ $defaults.image }}
+        command: ["/usr/games/steamcmd"]
+        args:
+          - "+@sSteamCmdForcePlatformType"
+          - "windows"
+          - "+force_install_dir"
+          - "/data/server"
+          - "+login"
+          - "anonymous"
+          - "+app_update"
+          - {{ $config.appId | quote }}
+          - "validate"
+          - "+quit"
+        volumeMounts:
+        - name: game-storage
+          mountPath: /data
+
+      # STAGE 3: Run the Game (Runs as Steam User)
+      containers:
+      - name: game-runtime
+        image: {{ $defaults.image }}
+        command:
+        - bash
+        - -c
+        - |
+          echo "Starting {{ $name }} Dedicated Server..."
+          # 'exec' ensures the game process receives SIGTERM for graceful shutdowns
+          exec xvfb-run --auto-servernum {{ $config.startCommand }}
         env:
-        - name: STEAM_APP_ID
-          value: {{ $config.appId | quote }}
-        - name: PLATFORM
-          value: {{ $config.platform | default $defaults.platform | quote }}
-        - name: PUID
-          value: {{ $defaults.puid | quote }}
-        - name: PGID
-          value: {{ $defaults.pgid | quote }}
         - name: TZ
           value: {{ $defaults.tz | quote }}
-        - name: STEAMAPPVALIDATE
-          value: "true"
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
