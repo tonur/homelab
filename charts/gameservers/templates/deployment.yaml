@@ -105,4 +105,8 @@ spec:
         volumeMounts:
         - name: game-storage
           mountPath: /data
+      volumes:
+      - name: game-storage
+        persistentVolumeClaim:
+          claimName: {{ $name }}-data-pvc
 {{- end }}
