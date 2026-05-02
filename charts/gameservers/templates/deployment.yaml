@@ -113,7 +113,7 @@ spec:
           # 4. The Launch with Console Logs
           # -batchmode -nographics: Essential for headless Unity servers
           # -logFile /dev/stdout: Force logs to show up in 'kubectl logs'
-          exec wine64 "/data/server/{{ $config.binary }}" \
+          exec wine "/data/server/{{ $config.binary }}" \
             -batchmode \
             -nographics \
             -logFile /dev/stdout
