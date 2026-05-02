@@ -120,7 +120,4 @@ spec:
       - name: game-storage
         persistentVolumeClaim:
           claimName: {{ $name }}-data-pvc
-      - name: game-storage
-        mountPath: /etc/passwd
-        subPath: etc/passwd
 {{- end }}
