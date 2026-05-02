@@ -1,6 +1,5 @@
 defaults:
   platform: "linux"
-  publicIP: 198.55.102.244
   image: thetestgame/steam:stable
   tz: "Europe/Copenhagen"
   puid: "50520"
@@ -12,12 +11,7 @@ servers:
   windrose:
     platform: "windows"
     appId: "4129620"
-    # The relative path to the exe from /data to verify installation
-    binaryPath: "server/WindroseServer.exe" 
-    ports:
-      - port: 27015
-        targetPort: 7777
-    startCommand: "xvfb-run --auto-servernum wine /data/server/WindroseServer.exe"
+    startCommand: "wine64 /data/server/WindroseServer.exe"
     extraEnvs:
       - name: USE_DIRECT_CONNECTION
         value: "true"

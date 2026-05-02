@@ -1,6 +1,17 @@
 {{- $defaults := .Values.defaults -}}
 {{- range $name, $config := .Values.servers }}
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}-launch-script
+data:
+  custom_server: |
+    #!/bin/bash
+    echo "--- Starting Custom Launch Script ---"
+    
+    su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,45 +28,9 @@ spec:
     spec:
       securityContext:
         fsGroup: {{ $defaults.pgid }}
-        runAsUser: {{ $defaults.puid }}
-        runAsGroup: {{ $defaults.pgid }}
       containers:
       - name: steam-server
         image: {{ $defaults.image }}
-        command: ["/bin/bash", "-c"]
-        args:
-          - |
-            # 1. Try to find and run the SteamCMD update script
-            # We check the most common locations automatically
-            ENTRYPOINT_PATH=""
-            for path in "/entrypoint.sh" "/usr/local/bin/entrypoint.sh" "/home/steam/entrypoint.sh"; do
-              if [ -f "$path" ]; then
-                ENTRYPOINT_PATH="$path"
-                break
-              fi
-            done
-
-            if [ -z "$ENTRYPOINT_PATH" ]; then
-              echo "ERROR: Entrypoint script not found. Update skipped."
-              # If we can't update, we check if the binary at least exists
-            else
-              echo "Found entrypoint at $ENTRYPOINT_PATH. Starting update..."
-              $ENTRYPOINT_PATH &
-              UPDATE_PID=$!
-              wait $UPDATE_PID
-            fi
-
-            # 2. Safety Check: Ensure the binary exists before moving to launch
-            echo "Checking for binary at /data/{{ $config.binaryPath }}..."
-            until [ -f "/data/{{ $config.binaryPath }}" ]; do
-              echo "Binary not found. If this is a first-time install, SteamCMD may still be running or failed."
-              sleep 10
-            done
-
-            # 3. Launch the game
-            echo "Starting server..."
-            # Using 'exec' here ensures the game process gets PID 1 and handles signals correctly
-            exec {{ $config.startCommand }}
         env:
         - name: STEAM_APP_ID
           value: {{ $config.appId | quote }}
@@ -74,8 +49,15 @@ spec:
         volumeMounts:
         - name: game-storage
           mountPath: /data
+        - name: script-volume
+          mountPath: /data/custom_server
+          subPath: custom_server
       volumes:
       - name: game-storage
         persistentVolumeClaim:
           claimName: {{ $name }}-data-pvc
+      - name: script-volume
+        configMap:
+          name: {{ $name }}-launch-script
+          defaultMode: 0755
 {{- end }}
