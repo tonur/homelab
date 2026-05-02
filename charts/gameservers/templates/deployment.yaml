@@ -45,6 +45,9 @@ spec:
           rm -f /data/server/steamapps/appmanifest_{{ $config.appId }}.acf
           
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
+
+          # Create a fragment of a passwd file
+          echo "steam:x:{{ $defaults.puid }}:{{ $defaults.pgid }}:steam:/data/steam_home:/bin/bash" > /data/passwd_fragment
           echo "Ready."
         volumeMounts:
         - name: game-storage
@@ -70,7 +73,6 @@ spec:
         volumeMounts:
         - name: game-storage
           mountPath: /data
-
       containers:
       - name: game-runtime
         image: {{ $defaults.image }}
@@ -79,9 +81,8 @@ spec:
           value: "/data/steam_home"
         - name: TZ
           value: {{ $defaults.tz | quote }}
-        # Wine often needs a "fake" X server for these Windows builds
-        - name: DISPLAY
-          value: ":99"
+        - name: WINEDEBUG
+          value: "-all" # Set to "fixme-all,err-all" if you need to debug Wine itself
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
@@ -90,23 +91,30 @@ spec:
         - bash
         - -c
         - |
-          # 1. Wait until the binary actually exists
-          echo "Waiting for binary at /data/server/{{ $config.binary }}..."
+          # 1. Identity Setup (Optional: helps some apps that check for a username)
+          export USER=steam
+          export LOGNAME=steam
+          
+          # 2. Manual Xvfb Start (More reliable than xvfb-run for logging)
+          echo "Initializing Virtual Display..."
+          Xvfb :99 -screen 0 1024x768x16 &
+          export DISPLAY=:99
+          sleep 2
+
+          # 3. Wait for binary
           until [ -f "/data/server/{{ $config.binary }}" ]; do
+            echo "Waiting for binary..."
             sleep 5
           done
 
-          echo "Starting {{ $name }}..."
-          # 2. Change directory to the server folder so Wine/Unity find relative assets
+          echo "Starting {{ $name }} Dedicated Server..."
           cd /data/server
           
-          # 3. Launch via xvfb. (Removed the trailing " that caused the crash)
-          exec xvfb-run --auto-servernum wine /data/server/{{ $config.binary }}
-        volumeMounts:
-        - name: game-storage
-          mountPath: /data
-      volumes:
-      - name: game-storage
-        persistentVolumeClaim:
-          claimName: {{ $name }}-data-pvc
+          # 4. The Launch with Console Logs
+          # -batchmode -nographics: Essential for headless Unity servers
+          # -logFile /dev/stdout: Force logs to show up in 'kubectl logs'
+          exec wine64 "/data/server/{{ $config.binary }}" \
+            -batchmode \
+            -nographics \
+            -logFile /dev/stdout
 {{- end }}
