@@ -17,9 +17,6 @@ spec:
     spec:
       securityContext:
         fsGroup: {{ $defaults.pgid }}
-        # Explicitly run the pod as the steam user to avoid permission flip-flops
-        runAsUser: {{ $defaults.puid | int }}
-        runAsGroup: {{ $defaults.pgid | int }}
       initContainers:
       - name: filesystem-reset
         image: busybox
@@ -27,22 +24,23 @@ spec:
         - sh
         - -c
         - |
-          echo "Nuclear reset of Steam metadata to fix 0x6..."
-          # Delete manifest folders that often cause the 0x6 lock
+          echo "Resetting Steam metadata to clear 0x6 error..."
+          # Force SteamCMD to re-calculate its download state
           rm -rf /data/steamapps
           rm -rf /data/temp
           
-          echo "Writing launch script..."
+          echo "Re-writing launch script..."
           cat > /data/custom_server << 'EOF'
           #!/bin/bash
-          # We use xvfb for Unity/Windows headless support
-          echo "Starting Windrose..."
-          xvfb-run --auto-servernum {{ $config.startCommand }}
+          echo "--- Starting {{ $name }} ---"
+          # su - steam ensures the game runs as the correct user
+          # xvfb-run provides the virtual display for the Windows binary
+          su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
           EOF
 
           echo "Fixing permissions recursively for UID {{ $defaults.puid }}..."
           chmod 755 /data/custom_server
-          # Ensure every file/folder (including hidden ones) is owned by our user
+          # Ensure every file/folder is owned by the steam user (50520)
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
           
           echo "Filesystem ready."
@@ -61,7 +59,8 @@ spec:
           value: {{ $defaults.puid | quote }}
         - name: PGID
           value: {{ $defaults.pgid | quote }}
-        # This tells the image to validate files, which helps clear 0x6
+        - name: TZ
+          value: {{ $defaults.tz | quote }}
         - name: STEAMAPPVALIDATE
           value: "true"
         {{- range $config.extraEnvs }}
