@@ -55,7 +55,7 @@ servers:
                 "IsPasswordProtected": {{ if .password }}true{{ else }}false{{ end }},
                 "Password": {{ .password | quote }},
                 "ServerName": "Tonur",
-                "WorldIslandId": "EFCDC157DF1B41DA57AC438F20ACF099",
+                "WorldIslandId": "48F07DE8E24049BAE7A77B2EF4A61345",
                 "MaxPlayerCount": 8,
                 "UserSelectedRegion": "",
                 "P2pProxyAddress": "0.0.0.0",
