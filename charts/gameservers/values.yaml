@@ -16,6 +16,7 @@ servers:
       - port: 27015
         targetPort: 7777
     binary: "WindroseServer.exe"
+    binaryFlags: "-server -stdout -noconsole -NoUI"
     extraEnvs:
       - name: USE_DIRECT_CONNECTION
         value: "true"

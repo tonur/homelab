@@ -96,11 +96,12 @@ spec:
           cd /data/server
 
           {{- if $config.debugCommands }}
+          echo "Adding debug commands..."
           {{- $config.debugCommands | nindent 10 }}
           {{- end }}
           
           # Launch the game with Unreal-specific flags
-          exec wine "/data/server/{{ $config.binary }}" -server -log
+          exec wine "/data/server/{{ $config.binary }}" {{ $config.binaryFlags }}
         volumeMounts:
         - name: game-storage
           mountPath: /data
