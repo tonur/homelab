@@ -13,10 +13,16 @@ servers:
     platform: "windows"
     appId: "4129620"
     ports:
-      - port: 27099
+      - name: game-udp
+        port: 27099
         targetPort: 27099
+        protocol: UDP
+      - name: game-tcp
+        port: 27099
+        targetPort: 27098
+        protocol: TCP
     binaryPath: "/data/server/R5/Binaries/Win64/WindroseServer-Win64-Shipping.exe"
-    binaryFlags: "-server -log -unattended -NoUI -port=27099 -PublicIP=198.55.102.244 -MultiHome -BLPort=27099"
+    binaryFlags: "-server -log -unattended -NoUI -port=27099 -PublicIP=198.55.102.244 -MultiHome -BLPort=27098"
     extraEnvs:
       - name: CURL_IPRESOLVE
         value: "v4"

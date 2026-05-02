@@ -12,7 +12,7 @@ spec:
   - from: []
     ports:
     {{- range $config.ports }}
-    - protocol: UDP
+    - protocol: {{ .protocol }}
       port: {{ .targetPort }}
     {{- end }}
 {{- end }}

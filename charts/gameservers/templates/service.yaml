@@ -10,13 +10,8 @@ spec:
     app: {{ $name }}
   ports:
   {{- range $config.ports }}
-    - name: game-udp
-      protocol: UDP
-      port: {{ .port }}
-      nodePort: {{ .port }}
-      targetPort: {{ .targetPort }}
-    - name: game-tcp
-      protocol: TCP
+    - name: {{ .name }}
+      protocol: {{ .protocol }}
       port: {{ .port }}
       nodePort: {{ .port }}
       targetPort: {{ .targetPort }}
