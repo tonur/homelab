@@ -87,7 +87,7 @@ spec:
           Xvfb :99 -screen 0 1024x768x16 &
           export DISPLAY=:99
 
-          until [ -f "/data/server/{{ $config.binary }}" ]; do
+          until [ -f "/data/server/{{ $config.binaryPath }}" ]; do
             echo "Waiting for binary..."
             sleep 5
           done
@@ -101,7 +101,7 @@ spec:
           {{- end }}
           
           # Launch the game with Unreal-specific flags
-          exec wine "/data/server/{{ $config.binary }}" {{ $config.binaryFlags }}
+          exec wine "{{ $config.binaryPath }}" {{ $config.binaryFlags }}
         volumeMounts:
         - name: game-storage
           mountPath: /data
