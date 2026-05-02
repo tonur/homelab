@@ -50,6 +50,7 @@ spec:
         - name: game-storage
           mountPath: /data
         - name: script-volume
+          # see https://github.com/GamePackets/docker-steam-server#custom-server
           mountPath: /data/custom_server
           subPath: custom_server
       volumes:

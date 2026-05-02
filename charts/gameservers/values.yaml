@@ -11,6 +11,9 @@ servers:
   windrose:
     platform: "windows"
     appId: "4129620"
+    ports:
+      - port: 27015
+        targetPort: 7777
     startCommand: "wine64 /data/server/WindroseServer.exe"
     extraEnvs:
       - name: USE_DIRECT_CONNECTION
