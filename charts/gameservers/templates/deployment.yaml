@@ -18,29 +18,33 @@ spec:
       securityContext:
         fsGroup: {{ $defaults.pgid }}
       initContainers:
-      - name: create-launch-script
+      - name: prepare-filesystem
         image: busybox
         command:
         - sh
         - -c
         - |
-          # 1. Create the custom_server file on the writable PVC
+          echo "Cleaning up potentially corrupt Steam metadata..."
+          # Fix for Error 0x6: Wipe the appmetadata/manifests if they exist
+          # This forces a clean re-validation of the files
+          rm -rf /data/steamapps
+          
+          echo "Writing launch script..."
           cat > /data/custom_server << 'EOF'
           #!/bin/bash
           echo "------------------------------------------"
           echo "   Launching {{ $name }} via Custom Script"
           echo "------------------------------------------"
-          
-          # Dropping privileges to 'steam' and using xvfb for the virtual display
-          # We use the startCommand defined in values.yaml
+          # Run the server with xvfb for virtual display support
           su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
           EOF
 
-          # 2. Set the exact permissions the main container expects
+          echo "Fixing permissions recursively..."
           chmod 755 /data/custom_server
-          chown {{ $defaults.puid }}:{{ $defaults.pgid }} /data/custom_server
+          # Ensure user 50520 owns the ENTIRE volume
+          chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
           
-          echo "Launch script created successfully at /data/custom_server"
+          echo "Filesystem ready."
         volumeMounts:
         - name: game-storage
           mountPath: /data
@@ -58,6 +62,8 @@ spec:
           value: {{ $defaults.pgid | quote }}
         - name: TZ
           value: {{ $defaults.tz | quote }}
+        - name: UPDATE_SERVER
+          value: "1"
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
