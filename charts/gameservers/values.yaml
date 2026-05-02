@@ -18,10 +18,16 @@ servers:
     binaryPath: "/data/server/R5/Binaries/Win64/WindroseServer-Win64-Shipping.exe"
     binaryFlags: "-server -log -unattended -NoUI -port=27099 -PublicIP=198.55.102.244 -MultiHome -BLPort=27099"
     extraEnvs:
-      - name: WINEDLLOVERRIDES
-        value: "mscoree,mshtml="
       - name: CURL_IPRESOLVE
         value: "v4"
+      - name: UE_FORCE_IPV4
+        value: "1"
+      - name: WINEDEBUG
+        value: "-all,warn+winsock"
+      - name: WINEESYNC
+        value: "1"
+      - name: WINEDLLOVERRIDES
+        value: "mscoree,mshtml=,ws2_32=n" # Force native windows winsock
     debugCommands: |
       tail -F /data/server/R5/Saved/Logs/*.log &
     configInjections:
