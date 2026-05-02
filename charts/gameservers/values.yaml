@@ -25,7 +25,7 @@ servers:
     debugCommands: |
       tail -F /data/server/R5/Saved/Logs/*.log &
     configInjections:
-      - secretName: "json-config"
+      - secretName: "windrose-json-config"
         files:
           - source: "ServerDescription.json"
             destination: "/data/server/R5/ServerDescription.json"
