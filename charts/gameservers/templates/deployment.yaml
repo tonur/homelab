@@ -49,6 +49,8 @@ spec:
           mkdir -p $(dirname {{ $file.destination }})
           cp /config-injections/{{ $injection.secretName }}/{{ $file.source }} {{ $file.destination }}
           chown {{ $defaults.puid }}:{{ $defaults.pgid }} {{ $file.destination }}
+          echo "{{ $file.destination }} content:"
+          cat {{ $file.destination  }}
           {{- end }}
           {{- end }}
           {{- end }}
@@ -126,10 +128,6 @@ spec:
         volumeMounts:
         - name: game-storage
           mountPath: /data
-        - name: injection-windrose-json-config
-          mountPath: /data/server/R5/ServerDescription.json
-          subPath: ServerDescription.json # Mounts the specific key as a file
-          readOnly: true
       volumes:
       - name: game-storage
         persistentVolumeClaim:
