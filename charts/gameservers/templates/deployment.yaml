@@ -70,6 +70,8 @@ spec:
       - name: game-runtime
         image: {{ $defaults.image }}
         env:
+        - name: USER
+          value: "steam"
         - name: HOME
           value: "/data/steam_home"
         - name: TZ

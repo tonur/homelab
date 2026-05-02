@@ -16,12 +16,13 @@ servers:
       - port: 27015
         targetPort: 7777
     binaryPath: "/data/server/R5/Binaries/Win64/WindroseServer-Win64-Shipping.exe"
-    binaryFlags: "-server -log -unattended -NoUI"
+    binaryFlags: "-server -log -unattended -NoUI -port=7777 -QueryPort=27015"
     extraEnvs:
+      - name: WINEDLLOVERRIDES
+        value: "mscoree,mshtml="
+      - name: CURL_IPRESOLVE
+        value: "v4"
       - name: USE_DIRECT_CONNECTION
         value: "true"
     debugCommands: |
-      # Unreal Engine Logging Setup
-      mkdir -p /data/server/R5/Saved/Logs
-      touch /data/server/R5/Saved/Logs/WindroseServer.log
       tail -F /data/server/R5/Saved/Logs/*.log &
