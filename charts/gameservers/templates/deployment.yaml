@@ -79,6 +79,9 @@ spec:
           value: "/data/steam_home"
         - name: TZ
           value: {{ $defaults.tz | quote }}
+        # Wine often needs a "fake" X server for these Windows builds
+        - name: DISPLAY
+          value: ":99"
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
@@ -87,19 +90,19 @@ spec:
         - bash
         - -c
         - |
-          # Wait until the binary actually exists
+          # 1. Wait until the binary actually exists
           echo "Waiting for binary at /data/server/{{ $config.binary }}..."
           until [ -f "/data/server/{{ $config.binary }}" ]; do
             sleep 5
           done
 
           echo "Starting {{ $name }}..."
-          exec xvfb-run --auto-servernum wine /data/server/{{ $config.binary }}"
+          # 2. Change directory to the server folder so Wine/Unity find relative assets
+          cd /data/server
+          
+          # 3. Launch via xvfb. (Removed the trailing " that caused the crash)
+          exec xvfb-run --auto-servernum wine /data/server/{{ $config.binary }}
         volumeMounts:
         - name: game-storage
           mountPath: /data
-      volumes:
-      - name: game-storage
-        persistentVolumeClaim:
-          claimName: {{ $name }}-data-pvc
 {{- end }}
