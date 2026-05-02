@@ -17,31 +17,32 @@ spec:
     spec:
       securityContext:
         fsGroup: {{ $defaults.pgid }}
+        # Explicitly run the pod as the steam user to avoid permission flip-flops
+        runAsUser: {{ $defaults.puid | int }}
+        runAsGroup: {{ $defaults.pgid | int }}
       initContainers:
-      - name: prepare-filesystem
+      - name: filesystem-reset
         image: busybox
         command:
         - sh
         - -c
         - |
-          echo "Cleaning up potentially corrupt Steam metadata..."
-          # Fix for Error 0x6: Wipe the appmetadata/manifests if they exist
-          # This forces a clean re-validation of the files
+          echo "Nuclear reset of Steam metadata to fix 0x6..."
+          # Delete manifest folders that often cause the 0x6 lock
           rm -rf /data/steamapps
+          rm -rf /data/temp
           
           echo "Writing launch script..."
           cat > /data/custom_server << 'EOF'
           #!/bin/bash
-          echo "------------------------------------------"
-          echo "   Launching {{ $name }} via Custom Script"
-          echo "------------------------------------------"
-          # Run the server with xvfb for virtual display support
-          su - steam -c "xvfb-run --auto-servernum {{ $config.startCommand }}"
+          # We use xvfb for Unity/Windows headless support
+          echo "Starting Windrose..."
+          xvfb-run --auto-servernum {{ $config.startCommand }}
           EOF
 
-          echo "Fixing permissions recursively..."
+          echo "Fixing permissions recursively for UID {{ $defaults.puid }}..."
           chmod 755 /data/custom_server
-          # Ensure user 50520 owns the ENTIRE volume
+          # Ensure every file/folder (including hidden ones) is owned by our user
           chown -R {{ $defaults.puid }}:{{ $defaults.pgid }} /data
           
           echo "Filesystem ready."
@@ -60,10 +61,9 @@ spec:
           value: {{ $defaults.puid | quote }}
         - name: PGID
           value: {{ $defaults.pgid | quote }}
-        - name: TZ
-          value: {{ $defaults.tz | quote }}
-        - name: UPDATE_SERVER
-          value: "1"
+        # This tells the image to validate files, which helps clear 0x6
+        - name: STEAMAPPVALIDATE
+          value: "true"
         {{- range $config.extraEnvs }}
         - name: {{ .name }}
           value: {{ .value | quote }}
