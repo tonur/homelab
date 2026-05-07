@@ -101,17 +101,16 @@ spec:
             - home.kragh.dev
           secretName: home-assistant-tls
 
-    # Additional volumes for USB device access
     additionalVolumes:
       - hostPath:
           path: /dev/serial/by-id/usb-Nabu_Casa_ZBT-2_DCB4D90E5AE0-if00
           type: CharDevice
         name: zbt-2
 
-    # Additional volume mounts for USB device access
     additionalMounts:
-      - mountPath: /dev/ttyUSB0
+      - mountPath: /dev/serial/by-id/usb-Nabu_Casa_ZBT-2_DCB4D90E5AE0-if00
         name: zbt-2
+        readOnly: false
 
     # Node selector to ensure deployment on node with USB device
     nodeSelector:
