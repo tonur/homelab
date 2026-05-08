@@ -15,8 +15,5 @@ spec:
           port: 80
           namespace: infrastructure
           nativeLB: true
-      middlewares:
-        - name: oauth2-proxy-auth
-          namespace: infrastructure
   tls:
     secretName: open-webui-tls
