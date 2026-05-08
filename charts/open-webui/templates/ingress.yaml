@@ -15,7 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: json-resume
+                name: open-webui 
                 port:
                   number: 80
   tls:
