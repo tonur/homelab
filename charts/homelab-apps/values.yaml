@@ -11,3 +11,12 @@ jsonResume:
 
 gameservers:
   enabled: true
+
+litellm:
+  enabled: true
+
+ollama:
+  enabled: true
+
+openWebUI:
+  enabled: true
