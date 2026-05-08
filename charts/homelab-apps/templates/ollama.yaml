@@ -1,0 +1,61 @@
+{{- if .Values.litellm.enabled }}
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: ollama-helm
+  namespace: apps
+spec:
+  interval: 24h
+  url: https://otwld.github.io/ollama-helm/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: ollama
+      version: "0.54.0" # Use the latest version from ArtifactHub
+      sourceRef:
+        kind: HelmRepository
+        name: ollama-helm
+        namespace: apps
+  install:
+    createNamespace: true
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: -1
+  values:
+    ollama:
+      gpu:
+        enabled: false # Keep disabled for Ryzen 4300U to avoid ROCm complexity
+      
+      # Pre-pull a model so it's ready for OpenWebUI immediately
+      models:
+        - llama3.2:3b
+
+    persistentVolume:
+      enabled: true
+      size: 30Gi
+      storageClass: "local-path"
+
+    # Set resource limits so Ollama doesn't starve your other pods
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+      limits:
+        cpu: "4"
+        memory: "8Gi"
+
+    service:
+      type: ClusterIP
+      port: 11434
+{{- end }}
