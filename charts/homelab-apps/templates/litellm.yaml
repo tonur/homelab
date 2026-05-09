@@ -6,6 +6,7 @@ metadata:
   name: litellm
   namespace: apps
 spec:
+  type: "oci"
   interval: 24h
   url: oci://ghcr.io/berriai
 ---
