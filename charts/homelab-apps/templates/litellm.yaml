@@ -88,8 +88,8 @@ spec:
   data:
     - secretKey: OPENROUTER_API_KEY
       remoteRef:
-        key: OPENROUTER-API-KEY
+        key: OPENROUTER_API_KEY
     - secretKey: LITELLM_MASTER_KEY
       remoteRef:
-        key: LITELLM-MASTER-KEY
+        key: LITELLM_MASTER_KEY
 {{- end }}
