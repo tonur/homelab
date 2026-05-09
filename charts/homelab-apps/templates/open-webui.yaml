@@ -33,6 +33,8 @@ spec:
     remediation:
       retries: -1
   values:
+    ollama:
+      enabled: false
     ingress:
       enabled: true
       class: "traefik"
