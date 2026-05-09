@@ -8,7 +8,7 @@ metadata:
 spec:
   type: "oci"
   interval: 24h
-  url: oci://ghcr.io/berriai/litellm-helm
+  url: oci://ghcr.io/berriai
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -19,8 +19,8 @@ spec:
   interval: 15m
   chart:
     spec:
-      chart: litellm 
-      version: "0.1.2"
+      chart: litellm-helm
+      version: "1.82.3"
       sourceRef:
         kind: HelmRepository
         name: litellm
