@@ -20,7 +20,7 @@ spec:
   chart:
     spec:
       chart: litellm-helm
-      version: "1.82.14"
+      version: "1.82.3"
       sourceRef:
         kind: HelmRepository
         name: litellm
