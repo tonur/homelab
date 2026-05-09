@@ -16,8 +16,6 @@ metadata:
   namespace: apps
 spec:
   interval: 15m
-  targetNamespace: litellm 
-  releaseName: litellm
   chart:
     spec:
       chart: litellm 
@@ -27,7 +25,6 @@ spec:
         name: litellm
         namespace: apps
   install:
-    createNamespace: true
     remediation:
       retries: -1
   upgrade:
@@ -78,7 +75,7 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: litellm-secrets
-  namespace: litellm
+  namespace: apps
 spec:
   refreshInterval: "1h"
   secretStoreRef:

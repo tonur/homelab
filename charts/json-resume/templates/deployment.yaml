@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: json-resume
-  namespace: json-resume
   labels:
     app.kubernetes.io/name: json-resume
     app.kubernetes.io/component: frontend

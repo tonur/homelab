@@ -17,8 +17,6 @@ metadata:
   namespace: apps
 spec:
   interval: 15m
-  targetNamespace: home-assistant
-  releaseName: home-assistant
   chart:
     spec:
       chart: home-assistant
@@ -26,9 +24,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: pajikos
-        namespace: apps
   install:
-    createNamespace: true
     remediation:
       retries: -1
   upgrade:

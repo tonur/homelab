@@ -13,7 +13,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: ollama
-  namespace: ollama
+  namespace: apps
 spec:
   interval: 15m
   chart:
@@ -25,7 +25,6 @@ spec:
         name: ollama-helm
         namespace: apps
   install:
-    createNamespace: true
     remediation:
       retries: -1
   upgrade:
