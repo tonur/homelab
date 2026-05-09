@@ -1,5 +1,14 @@
 {{- if .Values.openWebUI.enabled }}
 ---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: open-webui
+  namespace: apps
+spec:
+  interval: 24h
+  url: https://open-webui.github.io/helm-charts
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -9,12 +18,12 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: ./charts/open-webui
-      version: "*"
+      chart: open-webui
+      version: "14.4.0"
       sourceRef:
-        kind: GitRepository
-        name: homelab
-        namespace: default
+        kind: HelmRepository
+        name: open-webui
+        namespace: apps
       interval: 1m
       reconcileStrategy: Revision
   install:
@@ -23,4 +32,11 @@ spec:
   upgrade:
     remediation:
       retries: -1
+  values:
+    ingress:
+      enabled: true
+      class: "traefik"
+      host: "open-webui.kragh.dev"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
 {{- end }}
