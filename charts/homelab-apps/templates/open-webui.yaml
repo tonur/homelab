@@ -36,6 +36,8 @@ spec:
     openaiApiKeyExistingSecret: litellm-secrets 
     openaiApiKeyExistingSecretKey: LITELLM_MASTER_KEY
     openaiBaseApiUrl: http://litellm.apps.svc.cluster.local:4000/v1
+    ollamaUrls:
+      - "http://ollama.apps.svc.cluster.local:11434"
     ollama:
       enabled: false
     pipelines:
