@@ -39,6 +39,7 @@ spec:
       enabled: true
       class: "traefik"
       host: "open-webui.kragh.dev"
+      tls: true
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
 {{- end }}
