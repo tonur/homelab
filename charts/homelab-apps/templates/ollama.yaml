@@ -19,7 +19,7 @@ spec:
   chart:
     spec:
       chart: ollama
-      version: "0.56.0" # Use the latest version from ArtifactHub
+      version: "1.56.0" # Use the latest version from ArtifactHub
       sourceRef:
         kind: HelmRepository
         name: ollama-helm
