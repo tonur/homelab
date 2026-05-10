@@ -33,15 +33,12 @@ spec:
     remediation:
       retries: -1
   values:
-    extraEnvVars:
-      - name: OPENAI_API_BASE_URL
-        value: "http://litellm.apps.svc.cluster.local:4000/v1" 
-      - name: OPENAI_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: litellm-secrets 
-            key: LITELLM_MASTER_KEY
+    openaiApiKeyExistingSecret: litellm-secrets 
+    openaiApiKeyExistingSecretKey: LITELLM_MASTER_KEY
+    openaiBaseApiUrl: http://litellm.apps.svc.cluster.local:4000/v1
     ollama:
+      enabled: false
+    pipelines:
       enabled: false
     ingress:
       enabled: true
