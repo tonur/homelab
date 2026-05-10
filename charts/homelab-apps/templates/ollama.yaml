@@ -36,10 +36,6 @@ spec:
       gpu:
         enabled: false # Keep disabled for Ryzen 4300U to avoid ROCm complexity
       
-      # Pre-pull a model so it's ready for OpenWebUI immediately
-      models:
-        - llama3.2:3b
-
     persistentVolume:
       enabled: true
       size: 30Gi
