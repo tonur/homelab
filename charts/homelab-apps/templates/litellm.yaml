@@ -36,6 +36,11 @@ spec:
     environmentSecrets:
       - litellm-secrets
     proxy_config:
+      model_list:
+        - model_name: gemma4:31b-cloud
+          litellm_params:
+            model: gemma4
+            api_key: os.environ/OLLAMA_API_KEY
       general_settings:
         allow_unknown_models: true
         master_key: os.environ/LITELLM_MASTER_KEY # Your admin key
