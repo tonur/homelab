@@ -20,3 +20,6 @@ ollama:
 
 openWebUI:
   enabled: true
+
+suwayomi:
+  enabled: true
