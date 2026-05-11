@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ $config | toJson | sha256sum }}
+        checksum/{{ $name }}: {{ $config | toJson | sha256sum }}
       labels:
         app: {{ $name }}
     spec:
