@@ -22,7 +22,7 @@ spec:
         - name: TZ
           value: "Europe/Copenhagen"
         - name: AUTH_MODE
-          value: "ui_login"
+          value: "basic_auth"
         - name: AUTH_USERNAME
           value: "admin"
         - name: AUTH_PASSWORD
