@@ -21,12 +21,6 @@ spec:
         env:
         - name: TZ
           value: "Europe/Copenhagen"
-        - name: OPDS_SHOW_ONLY_DOWNLOADED_CHAPTERS
-          value: "true"
-        - name: SERVER_DOWNLOAD_AS_CBZ
-          value: "true"
-        - name: OPDS_USE_BINARY_FILE_SIZES
-          value: "true"
         - name: AUTH_MODE
           value: "ui_login"
         - name: AUTH_USERNAME
