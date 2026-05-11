@@ -21,8 +21,10 @@ spec:
         env:
         - name: TZ
           value: "Europe/Copenhagen"
-        - name: SERVER_OPDS_CBZ_MIMETYPE
-          value: "application/x-cbz"
+        - name: SERVER_OPDS_CBZMIMETYPE
+          value: "LEGACY"
+        - name: SERVER_OPDS_CBRMIMETYPE
+          value: "LEGACY"
         - name: AUTH_MODE
           value: "basic_auth"
         - name: AUTH_USERNAME
