@@ -21,7 +21,8 @@ spec:
         env:
         - name: TZ
           value: "Europe/Copenhagen"
-        # Optional: Security (Recommended for public domain)
+        - name: AUTH_MODE
+          value: "ui_login"
         - name: AUTH_USERNAME
           value: "admin"
         - name: AUTH_PASSWORD
