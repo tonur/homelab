@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: suwayomi
+        app.kubernetes.io/name: suwayomi
     spec:
       containers:
       - name: suwayomi
