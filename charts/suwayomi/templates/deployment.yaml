@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: suwayomi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suwayomi
+  template:
+    metadata:
+      labels:
+        app: suwayomi
+    spec:
+      containers:
+      - name: suwayomi
+        image: ghcr.io/suwayomi/suwayomi-server:stable
+        ports:
+        - containerPort: 4567
+        env:
+        - name: TZ
+          value: "Europe/Copenhagen"
+        # Optional: Security (Recommended for public domain)
+        - name: AUTH_USERNAME
+          value: "admin"
+        - name: AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: suwayomi-secrets
+              key: ADMIN_PASSWORD
+        volumeMounts:
+        - name: data
+          mountPath: /home/suwayomi/.local/share/Tachidesk
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: suwayomi-data
