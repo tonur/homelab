@@ -36,27 +36,20 @@ spec:
     environmentSecrets:
       - litellm-secrets
     proxy_config:
-      model_list:
-        # dummy model to start proxy
-        - model_name: "llama-default"
-          litellm_params:
-            model: ollama/llama3.2
-            api_base: os.environ/OLLAMA_API_BASE
       general_settings:
         allow_unknown_models: true
         master_key: os.environ/LITELLM_MASTER_KEY # Your admin key
         max_budget: 20.0 # Safety cap: LiteLLM will stop cloud requests at $20/mo
         budget_duration: 30d
-        # Allows usage of the UI at https://litellm.kragh.dev/ui
         ui_access_mode: "admin"
     extraEnv:
-      - name: OPENROUTER_API_KEY
+      - name: OLLAMA_API_KEY
         valueFrom:
           secretKeyRef:
             name: litellm-secrets
-            key: OPENROUTER_API_KEY
+            key: OLLAMA_API_KEY
       - name: OLLAMA_API_BASE
-        value: "http://ollama-service.ollama-namespace.svc.cluster.local:11434"
+        value: "https://ollama.com"
     ingress:
       enabled: true
       className: "traefik"
@@ -86,9 +79,9 @@ spec:
     name: litellm-secrets
     creationPolicy: Owner
   data:
-    - secretKey: OPENROUTER_API_KEY
+    - secretKey: OLLAMA_API_KEY
       remoteRef:
-        key: OPENROUTER_API_KEY
+        key: OLLAMA_API_KEY
     - secretKey: LITELLM_MASTER_KEY
       remoteRef:
         key: LITELLM_MASTER_KEY

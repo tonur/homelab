@@ -34,7 +34,7 @@ spec:
   values:
     ollama:
       gpu:
-        enabled: false # Keep disabled for Ryzen 4300U to avoid ROCm complexity
+        enabled: true
       
     persistentVolume:
       enabled: true
@@ -48,7 +48,7 @@ spec:
         memory: "4Gi"
       limits:
         cpu: "4"
-        memory: "10Gi"
+        memory: "8Gi"
 
     service:
       type: ClusterIP
