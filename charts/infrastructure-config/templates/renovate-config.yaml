@@ -1,4 +1,22 @@
 ---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: renovate-secrets
+  namespace: infrastructure
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: infisical
+    kind: ClusterSecretStore
+  target:
+    name: renovate-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: RENOVATE_TOKEN
+      remoteRef:
+        key: RENOVATE_TOKEN
+---
 apiVersion: renovate-operator.mogenius.com/v1alpha1
 kind: RenovateJob
 metadata:
@@ -9,7 +27,7 @@ spec:
   schedule: "47 21 * * *"
   parallelism: 1 
   provider:
-    name: "forgejo" 
+    name: "gitea" 
     endpoint: "https://codeberg.org/api/v1"
 
   extraEnv:

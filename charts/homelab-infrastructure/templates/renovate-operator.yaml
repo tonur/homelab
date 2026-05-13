@@ -31,32 +31,3 @@ spec:
   upgrade:
     remediation:
       retries: -1
-  values:
-    extraEnv:
-      - name: RENOVATE_PLATFORM
-        value: "forgejo"
-      - name: RENOVATE_ENDPOINT
-        value: "https://codeberg.org/api/v1"
-      - name: RENOVATE_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: renovate-secrets
-            key: RENOVATE_TOKEN
----
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-  name: renovate-secrets
-  namespace: infrastructure
-spec:
-  refreshInterval: "1h"
-  secretStoreRef:
-    name: infisical
-    kind: ClusterSecretStore
-  target:
-    name: renovate-secrets
-    creationPolicy: Owner
-  data:
-    - secretKey: RENOVATE_TOKEN
-      remoteRef:
-        key: RENOVATE_TOKEN
