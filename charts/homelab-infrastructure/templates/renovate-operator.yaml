@@ -22,7 +22,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: mogenius
-        namespace: apps
+        namespace: infrastructure
       interval: 1m
       reconcileStrategy: Revision
   install:
