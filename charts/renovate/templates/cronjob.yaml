@@ -16,10 +16,6 @@ spec:
               env:
                 - name: RENOVATE_GIT_AUTHOR
                   value: "Renovate Bot <bot@renovateapp.com>"
-                - name: RENOVATE_PLATFORM
-                  value: "gitea"
-                - name: RENOVATE_ENDPOINT
-                  value: "https://codeberg.org/api/v1"
                 - name: RENOVATE_AUTODISCOVER
                   value: "true"
                 - name: RENOVATE_AUTODISCOVER_FILTER

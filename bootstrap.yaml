@@ -6,7 +6,7 @@ metadata:
   namespace: default
 spec:
   interval: 1m
-  url: https://codeberg.org/tonur/homelab.git
+  url: https://github.com/tonur/homelab
   ref:
     branch: main
 ---
