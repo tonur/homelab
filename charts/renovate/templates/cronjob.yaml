@@ -14,6 +14,11 @@ spec:
             - name: renovate
               image: renovate/renovate:37.340
               env:
+                - name: RENOVATE_HOST_RULES
+                  valueFrom:
+                    secretKeyRef:
+                      name: renovate-secrets
+                      key: RENOVATE_HOST_RULES
                 - name: RENOVATE_GIT_AUTHOR
                   value: "Renovate Bot <bot@renovateapp.com>"
                 - name: RENOVATE_REPOSITORIES
