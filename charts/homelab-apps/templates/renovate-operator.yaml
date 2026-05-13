@@ -1,0 +1,93 @@
+{{- if .Values.renovate.enabled }}
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: mogenius
+  namespace: apps
+spec:
+  interval: 24h
+  url: https://mogenius.github.io/helm-charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+  namespace: apps
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: renovate-operator
+      version: "1.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: mogenius
+        namespace: apps
+      interval: 1m
+      reconcileStrategy: Revision
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+  values:
+    extraEnv:
+      - name: RENOVATE_PLATFORM
+        value: "forgejo"
+      - name: RENOVATE_ENDPOINT
+        value: "https://codeberg.org/api/v1"
+      - name: RENOVATE_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: renovate-secrets
+            key: token
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: renovate-secrets
+  namespace: apps
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: infisical 
+    kind: ClusterSecretStore
+  target:
+    name: renovate-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: RENOVATE_TOKEN
+      remoteRef:
+        key: RENOVATE_TOKEN
+---
+apiVersion: renovate-operator.mogenius.com/v1alpha1
+kind: RenovateJob
+metadata:
+  name: production-updates
+  namespace: apps
+spec:
+  image: renovate/renovate:37.340
+  schedule: "0 2 * * *" 
+  parallelism: 1 
+  provider:
+    name: "forgejo" 
+    endpoint: "https://codeberg.org/api/v1"
+
+  extraEnv:
+    - name: RENOVATE_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: renovate-secrets
+          key: token
+    - name: RENOVATE_AUTODISCOVER
+      value: "true"
+    - name: RENOVATE_AUTODISCOVER_FILTER
+      value: "tonur/*"
+
+  # This uses the default /tmp mount as defined in your CRD's default properties
+  scratchVolume:
+    enabled: true
+    path: "/tmp"
+{{- end }}
