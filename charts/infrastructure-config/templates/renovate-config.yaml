@@ -24,7 +24,7 @@ metadata:
   namespace: infrastructure
 spec:
   image: renovate/renovate:37.340
-  schedule: "47 21 * * *"
+  schedule: "52 21 * * *"
   parallelism: 1 
   provider:
     name: "gitea" 
