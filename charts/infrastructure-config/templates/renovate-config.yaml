@@ -3,10 +3,10 @@ apiVersion: renovate-operator.mogenius.com/v1alpha1
 kind: RenovateJob
 metadata:
   name: homelab-updates
-  namespace: apps
+  namespace: infrastructure
 spec:
   image: renovate/renovate:37.340
-  schedule: "0 2 * * *" 
+  schedule: "45 21 * * *" 
   parallelism: 1 
   provider:
     name: "forgejo" 
