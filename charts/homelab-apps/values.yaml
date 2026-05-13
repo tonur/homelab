@@ -23,6 +23,3 @@ openWebUI:
 
 suwayomi:
   enabled: true
-
-renovate:
-  enabled: true
