@@ -28,4 +28,3 @@ spec:
     - name: external-dns
     - name: external-secrets
     - name: tailscale-operator
-    - name: renovate-operator
