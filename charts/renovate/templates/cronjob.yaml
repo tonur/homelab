@@ -17,7 +17,7 @@ spec:
               - 8.8.8.8
           containers:
             - name: renovate
-              image: renovate/renovate:37.340
+              image: renovate/renovate:37.440
               env:
                 - name: RENOVATE_HOST_RULES
                   valueFrom:
