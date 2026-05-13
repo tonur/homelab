@@ -6,7 +6,7 @@ metadata:
   namespace: infrastructure
 spec:
   interval: 24h
-  url: https://mogenius.github.io/helm-charts/
+  url: https://helm.mogenius.com/public
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
