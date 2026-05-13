@@ -16,10 +16,8 @@ spec:
               env:
                 - name: RENOVATE_GIT_AUTHOR
                   value: "Renovate Bot <bot@renovateapp.com>"
-                - name: RENOVATE_AUTODISCOVER
-                  value: "true"
-                - name: RENOVATE_AUTODISCOVER_FILTER
-                  value: "tonur/*"
+                - name: RENOVATE_REPOSITORIES
+                  value: "tonur/homelab"
                 - name: RENOVATE_TOKEN
                   valueFrom:
                     secretKeyRef:
